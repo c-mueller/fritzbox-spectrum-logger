@@ -39,7 +39,6 @@ var blue = color.RGBA{R: 0, G: 0, B: 255,}
 
 func (s *Spectrum) Render() ([]byte, error) {
     w, h := s.computeSize()
-    fmt.Println(w, h)
     img := gg.NewContext(w, h)
     img.SetFillRuleEvenOdd()
     img.SetLineWidth(2)
@@ -54,12 +53,15 @@ func (s *Spectrum) Render() ([]byte, error) {
         img.SetColor(color.Black)
         img.DrawString(fmt.Sprintf("Port #%d - %s", index, port.SpectrumInfo.ConnectionMode), 10, float64(10+index*560))
 
+        //Render SNR Spectrum
         port.renderSpectrum(index, img, port.SpectrumInfo.CurrentSNRValues,
             30, 20, renderConfig{
                 PrimaryColor:   purple,
                 SecondaryColor: purple,
                 SecondaryAreas: make([]UpstreamRange, 0),
             })
+
+        //Render Bit Spectrum
         port.renderSpectrum(index, img, port.SpectrumInfo.CurrentBitValues,
             30, 300, renderConfig{
                 PrimaryColor:   blue,
@@ -105,11 +107,17 @@ func (port *SpectrumPort) renderSpectrum(index int, img *gg.Context, data ValueL
 func renderGrid(img *gg.Context, startX, startY, length float64) {
     for i := 1; i <= (gridCount - 1); i++ {
         setColor(img, darkGray)
-        horizontalX, horizontalY := startX+float64(i)*(length/gridCount)*barWidth, startY
-        img.DrawLine(horizontalX, horizontalY, horizontalX, horizontalY+260)
+        //Draw Vertical lines of the grid
+        vX, vY := startX+float64(i)*(length/gridCount)*barWidth, startY
+        img.DrawLine(vX, vY, vX, vY+260)
         img.Stroke()
-        verticalX, verticalY := startX-10, startY+((float64(i)/gridCount)*250)
-        img.DrawLine(verticalX, verticalY, verticalX+length*barWidth+10, verticalY)
+        //Draw Line Description
+        vLineValue := int64(length * (float64(i) / gridCount))
+        img.DrawString(fmt.Sprintf("%d", vLineValue), vX+5, vY+260+5)
+
+        //Draw Horizontal Lines of the grid
+        hX, hY := startX-10, startY+((float64(i)/gridCount)*250)
+        img.DrawLine(hX, hY, hX+length*barWidth+10, hY)
         img.Stroke()
     }
 }

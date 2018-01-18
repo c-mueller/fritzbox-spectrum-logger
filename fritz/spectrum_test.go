@@ -45,6 +45,16 @@ func TestDrawSpectrum(t *testing.T) {
     file.Close()
 }
 
+func BenchmarkRenderSpeed(b *testing.B) {
+    b.Log("Loading test Data")
+    data := loadTestData(nil)
+    b.ResetTimer()
+    for i := 0; i < b.N; i++ {
+        b.Log("Iteration", i)
+        data.Render()
+    }
+}
+
 func loadTestData(t *testing.T) *Spectrum {
     file, err := os.Open("testdata/example_spectrum.json")
     if err != nil {

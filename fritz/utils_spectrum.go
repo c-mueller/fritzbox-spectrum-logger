@@ -1,15 +1,15 @@
 // Copyright (c) 2018 Christian Müller <cmueller.dev@gmail.com>
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), to deal in
 // the Software without restriction, including without limitation the rights to
 // use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
 // the Software, and to permit persons to whom the Software is furnished to do so,
 // subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 // FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
@@ -19,46 +19,33 @@
 
 package fritz
 
-import (
-    "net/url"
-    "io/ioutil"
-    "fmt"
-    "encoding/json"
-    "errors"
-    "time"
-)
-
-func (c *Session) GetSpectrum() (*Spectrum, error) {
-    spcUrl, err := c.getSpectrumUrl()
-    if err != nil {
-        return nil, err
+func (c ValueList) getMax() float64 {
+    max := 0
+    for _, v := range c {
+        if v > max {
+            max = v
+        }
     }
 
-    res, err := c.client.Get(spcUrl.String())
-    if err != nil {
-        return nil, err
-    }
-
-    data, err := ioutil.ReadAll(res.Body)
-
-    var spectrum *Spectrum
-
-    err = json.Unmarshal(data, &spectrum)
-    if err != nil {
-        return nil, errors.New("spectrum_dl: Downloading spectrum failed, maybe the session timed out")
-    } else if spectrum.PortCount < 1 {
-        return nil, errors.New("spectrum_dl: Downloading spectrum failed, maybe the session timed out")
-    }
-
-    spectrum.Timestamp = time.Now().Unix()
-
-    return spectrum, nil
+    return float64(max)
 }
 
-func (c *Session) getSpectrumUrl() (*url.URL, error) {
-    return c.getUrl(fmt.Sprintf("/internet/dsl_spectrum.lua?sid=%s&useajax=1", c.sessionInfo.SID))
+func (s SpectrumPorts) getMaxCount() int {
+    maxLen := 0
+    for _, v := range s {
+        if len(v.SpectrumInfo.CurrentBitValues) > maxLen {
+            maxLen = len(v.SpectrumInfo.CurrentBitValues)
+        }
+    }
+
+    return maxLen
 }
 
-func (s *Spectrum) JSON() ([]byte, error) {
-    return json.Marshal(s)
+func (r *renderConfig) useSecondary(idx int) bool {
+    for _, v := range r.SecondaryAreas{
+        if idx >= v.FirstIndex && idx <= v.LastIndex {
+            return true
+        }
+    }
+    return false
 }

@@ -1,15 +1,15 @@
 // Copyright (c) 2018 Christian Müller <cmueller.dev@gmail.com>
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), to deal in
 // the Software without restriction, including without limitation the rights to
 // use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
 // the Software, and to permit persons to whom the Software is furnished to do so,
 // subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 // FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
@@ -20,45 +20,40 @@
 package fritz
 
 import (
-    "net/url"
-    "io/ioutil"
-    "fmt"
+    "testing"
+    "os"
     "encoding/json"
-    "errors"
-    "time"
+    "io/ioutil"
+    "github.com/Flaque/filet"
+    "fmt"
+    "path/filepath"
 )
 
-func (c *Session) GetSpectrum() (*Spectrum, error) {
-    spcUrl, err := c.getSpectrumUrl()
-    if err != nil {
-        return nil, err
-    }
+func TestDrawSpectrum(t *testing.T) {
+    tmpDir := filet.TmpDir(t, "")
+    t.Log("Using tmpdir", tmpDir)
+    //defer filet.CleanUp(t)
 
-    res, err := c.client.Get(spcUrl.String())
-    if err != nil {
-        return nil, err
-    }
+    t.Log("Loading test Data")
+    data := loadTestData(t)
+    imgdata, _ := data.Render()
+    fmt.Println(len(imgdata))
 
-    data, err := ioutil.ReadAll(res.Body)
-
-    var spectrum *Spectrum
-
-    err = json.Unmarshal(data, &spectrum)
-    if err != nil {
-        return nil, errors.New("spectrum_dl: Downloading spectrum failed, maybe the session timed out")
-    } else if spectrum.PortCount < 1 {
-        return nil, errors.New("spectrum_dl: Downloading spectrum failed, maybe the session timed out")
-    }
-
-    spectrum.Timestamp = time.Now().Unix()
-
-    return spectrum, nil
+    path := filepath.Join(tmpDir, "test.png")
+    file, _ := os.Create(path)
+    file.Write(imgdata)
+    file.Close()
 }
 
-func (c *Session) getSpectrumUrl() (*url.URL, error) {
-    return c.getUrl(fmt.Sprintf("/internet/dsl_spectrum.lua?sid=%s&useajax=1", c.sessionInfo.SID))
-}
-
-func (s *Spectrum) JSON() ([]byte, error) {
-    return json.Marshal(s)
+func loadTestData(t *testing.T) *Spectrum {
+    file, err := os.Open("testdata/example_spectrum.json")
+    if err != nil {
+        t.Log(err)
+        t.FailNow()
+    }
+    var result *Spectrum
+    data, err := ioutil.ReadAll(file)
+    file.Close()
+    err = json.Unmarshal(data, &result)
+    return result
 }

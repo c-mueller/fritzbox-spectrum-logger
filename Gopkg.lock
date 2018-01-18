@@ -2,10 +2,37 @@
 
 
 [[projects]]
+  branch = "master"
+  name = "github.com/Flaque/filet"
+  packages = ["."]
+  revision = "70fb4a62b734b80db316664a8d0932432bebaa41"
+
+[[projects]]
+  name = "github.com/boltdb/bolt"
+  packages = ["."]
+  revision = "2f1ce7a837dcb8da3ec595b1dac9d0632f0f99e8"
+  version = "v1.3.1"
+
+[[projects]]
+  name = "github.com/fogleman/gg"
+  packages = ["."]
+  revision = "6166aa3c1afaee416f384645a81636267aee6d25"
+  version = "v1.0.0"
+
+[[projects]]
   name = "github.com/fsnotify/fsnotify"
   packages = ["."]
   revision = "c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9"
   version = "v1.4.7"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/golang/freetype"
+  packages = [
+    "raster",
+    "truetype"
+  ]
+  revision = "e2365dfdc4a05e4b8299a783240d4a7d5a65d4e4"
 
 [[projects]]
   branch = "master"
@@ -94,6 +121,17 @@
 
 [[projects]]
   branch = "master"
+  name = "golang.org/x/image"
+  packages = [
+    "font",
+    "font/basicfont",
+    "font/plan9font",
+    "math/fixed"
+  ]
+  revision = "12117c17ca67ffa1ce22e9409f3b0b0a93ac08c7"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
   revision = "fff93fa7cd278d84afc205751523809c464168ab"
@@ -120,6 +158,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "bf5b06e0cfa4be2b8501a8001bcf7ab4168ae5dcac4cf9bd58037a8fc37530b7"
+  inputs-digest = "bd50965bd184716ab51e4eeba1beab1b4e769802eca3b32e7d4d89eda4de7b5b"
   solver-name = "gps-cdcl"
   solver-version = 1

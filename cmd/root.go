@@ -48,7 +48,8 @@ var RootCmd = &cobra.Command{
             panic(err)
         }
         spectrum, err := client.GetSpectrum()
-        fmt.Printf("%+v\n", spectrum)
+        msg, _ := spectrum.JSON()
+        fmt.Printf("%s\n", string( msg))
     },
 }
 

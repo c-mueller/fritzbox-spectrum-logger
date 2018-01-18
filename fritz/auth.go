@@ -31,6 +31,10 @@ import (
     "errors"
 )
 
+// Creates a new Client instance.
+// The Endpoint has to be the hostname or ip address of the Fritz!Box, HTTPS is currently not supported
+// Password and Username have to be empty if there is no authentication
+// Username has to be empty if a password is used for authentication
 func NewClient(endpoint, username, password string) *Session {
     return &Session{
         Endpoint: endpoint,
@@ -40,6 +44,9 @@ func NewClient(endpoint, username, password string) *Session {
     }
 }
 
+// Attempts a Login with the Credentials set in the session.
+// To Perform other operations, like downloading a spectrum, you have to call this operation
+// A error is returned if the credentials are wrong or the Login could not get performed.
 func (c *Session) Login() error {
     initialSession, err := c.getInitialSessionInfo()
     if err != nil {

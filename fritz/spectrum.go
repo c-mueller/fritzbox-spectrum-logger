@@ -28,6 +28,10 @@ import (
     "time"
 )
 
+var errSessionTimedOut = errors.New("spectrum_dl: Downloading spectrum failed, maybe the session timed out")
+
+// This operation downloads the Spectrum from the Fritz!Box
+// A error gets returned if the download fails.
 func (c *Session) GetSpectrum() (*Spectrum, error) {
     spcUrl, err := c.getSpectrumUrl()
     if err != nil {
@@ -45,9 +49,9 @@ func (c *Session) GetSpectrum() (*Spectrum, error) {
 
     err = json.Unmarshal(data, &spectrum)
     if err != nil {
-        return nil, errors.New("spectrum_dl: Downloading spectrum failed, maybe the session timed out")
+        return nil, errSessionTimedOut
     } else if spectrum.PortCount < 1 {
-        return nil, errors.New("spectrum_dl: Downloading spectrum failed, maybe the session timed out")
+        return nil, errSessionTimedOut
     }
 
     spectrum.Timestamp = time.Now().Unix()
@@ -59,6 +63,8 @@ func (c *Session) getSpectrumUrl() (*url.URL, error) {
     return c.getUrl(fmt.Sprintf("/internet/dsl_spectrum.lua?sid=%s&useajax=1", c.sessionInfo.SID))
 }
 
+// Converts the given spectrum to a ByteArray
+// Returns a error if the Marshalling fails
 func (s *Spectrum) JSON() ([]byte, error) {
     return json.Marshal(s)
 }

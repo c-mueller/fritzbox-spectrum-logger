@@ -37,6 +37,7 @@ var purple = color.RGBA{R: 255, G: 0, B: 255, A: 0,}
 var green = color.RGBA{R: 0, G: 255, B: 0, A: 0,}
 var blue = color.RGBA{R: 0, G: 0, B: 255,}
 
+// Renders the spectrum to a PNG byte array
 func (s *Spectrum) Render() ([]byte, error) {
     w, h := s.computeSize()
     img := gg.NewContext(w, h)

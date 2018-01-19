@@ -30,54 +30,66 @@ import (
     "github.com/c-mueller/fritzbox-spectrum-logger/fritz"
     "time"
     "github.com/c-mueller/fritzbox-spectrum-logger/repository"
+    "github.com/op/go-logging"
+    "github.com/c-mueller/fritzbox-spectrum-logger/application"
 )
 
+var log = logging.MustGetLogger("cli")
+
 var cfgFile string
+
+var appCfgFlag string
 
 var usernameFlag string
 var passwordFlag string
 var endpointFlag string
 var dbPathFlag string
 
-// RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
     Use:   "fritzbox-spectrum-logger",
     Short: "This application requests the DSL Spectrum of a Fritz!Box in a given interval and Stores it for later review.",
-    Run:   mainCommand,
+    Run:   launchServer,
+}
+
+func launchServer(cmd *cobra.Command, args []string) {
+    app := application.LaunchApplication(appCfgFlag)
+    if app != nil {
+        app.Listen()
+    }
 }
 
 func mainCommand(cmd *cobra.Command, args []string) {
-    fmt.Print("Logging in...")
+    log.Info("Logging in...")
     client := fritz.NewClient(endpointFlag, usernameFlag, passwordFlag)
     err := client.Login()
     failOnError(err)
-    fmt.Println("Done!")
+    log.Info("Login Done!")
 
-    fmt.Print("Opening DB...")
+    log.Info("Opening DB...")
     repo, err := repository.NewRepository(dbPathFlag)
     failOnError(err)
     defer repo.Close()
-    fmt.Println("Done!")
+    log.Info("Done!")
 
     ticker := time.NewTicker(time.Second * 5)
     for range ticker.C {
         go func() {
             currentTime := time.Now()
-            fmt.Printf("[%d:%d:%d]: Downloading Spectrum...",
+            log.Infof("[%d:%d:%d]: Downloading Spectrum...",
                 currentTime.Hour(), currentTime.Minute(), currentTime.Second())
             spectrum, err := client.GetSpectrum()
             if err != nil {
-                fmt.Println("Fail!")
-                fmt.Println(err)
+                log.Error("Fail!")
+                log.Error(err.Error())
                 return
             }
             err = repo.Insert(spectrum)
             if err != nil {
-                fmt.Println("Fail!")
-                fmt.Println(err)
+                log.Error("Fail!")
+                log.Error(err.Error())
                 return
             }
-            fmt.Println("Done!")
+            log.Info("Download Done!")
         }()
     }
 }
@@ -90,8 +102,6 @@ func failOnError(err error) {
     }
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
     if err := RootCmd.Execute(); err != nil {
         fmt.Println(err)
@@ -112,27 +122,26 @@ func init() {
         "", "The password used to login, empty if none")
     RootCmd.Flags().StringVarP(&dbPathFlag, "db-path", "d",
         "spectra.db", "The path to store the spectrums at")
+
+    RootCmd.Flags().StringVarP(&appCfgFlag, "app-config","c","config.yml", "The path to the config file")
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
     if cfgFile != "" {
-        // Use config file from the flag.
         viper.SetConfigFile(cfgFile)
     } else {
-        // Find home directory.
         home, err := homedir.Dir()
         if err != nil {
             fmt.Println(err)
             os.Exit(1)
         }
 
-        // Search config in home directory with name ".fritzbox-spectrum-logger" (without extension).
         viper.AddConfigPath(home)
         viper.SetConfigName(".fritzbox-spectrum-logger")
     }
 
-    viper.AutomaticEnv() // read in environment variables that match
+    viper.AutomaticEnv()
 
     viper.SetDefault("endpoint", "fritz.box")
     viper.SetDefault("use-tls", "false")
@@ -140,7 +149,6 @@ func initConfig() {
     viper.SetDefault("password", "password")
     viper.SetDefault("application-endpoint", ":8080")
 
-    // If a config file is found, read it in.
     if err := viper.ReadInConfig(); err == nil {
         fmt.Println("Using config file:", viper.ConfigFileUsed())
     }

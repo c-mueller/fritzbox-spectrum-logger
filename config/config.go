@@ -4,19 +4,33 @@ import (
     "os"
     "io/ioutil"
     "gopkg.in/yaml.v2"
+    "github.com/op/go-logging"
 )
+
+var log = logging.MustGetLogger("config")
 
 func ReadOrCreate(path string) (*Configuration, error) {
     if _, err := os.Stat(path); os.IsNotExist(err) {
+        log.Debug("Creating new Configuration")
         cfg := Configuration{
-            cfgPath: path,
+            cfgPath:        path,
+            BindAddress:    defaultBindAddress,
+            DatabasePath:   defaultDbPath,
+            AskForPassword: defaultAskForPassword,
+            Autolaunch:     defaultAutoLaunch,
+            UpdateInterval: defaultInterval,
+            Credentials: RouterCredentials{
+                Endpoint: defaultEndpoint,
+            },
         }
+        log.Debug("Writing new Configuration")
         err = cfg.Write()
         if err != nil {
             return nil, err
         }
         return &cfg, nil
     }
+    log.Debug("Loading Configuration")
     cfgFile, err := os.Open(path)
     defer cfgFile.Close()
     if err != nil {

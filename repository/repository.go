@@ -5,9 +5,13 @@ import (
     "github.com/c-mueller/fritzbox-spectrum-logger/fritz"
     "time"
     "fmt"
+    "github.com/op/go-logging"
 )
 
+var log = logging.MustGetLogger("repository")
+
 func NewRepository(path string) (*Repository, error) {
+    log.Debugf("Opening database '%s'", path)
     db, err := bolt.Open(path, 0777, &bolt.Options{})
 
     if err != nil {
@@ -52,6 +56,7 @@ func (r *Repository) Insert(spectrum *fritz.Spectrum) error {
 }
 
 func (r *Repository) Close() error {
+    log.Debug("Closing Database")
     return r.db.Close()
 }
 
@@ -62,6 +67,7 @@ func initDb(db *bolt.DB) error {
     if err != nil {
         return err
     }
+
     _, err = tx.CreateBucketIfNotExists([]byte(SpectrumListBucketName))
     if err != nil {
         return err

@@ -55,3 +55,6 @@ local.properties
 .scala_dependencies
 .worksheet
 vendor/
+config.yml
+fritzbox-spectrum-logger
+spectra.db

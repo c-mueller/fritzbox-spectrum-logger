@@ -20,8 +20,30 @@
 
 package main
 
-import "github.com/c-mueller/fritzbox-spectrum-logger/cmd"
+import (
+	"github.com/c-mueller/fritzbox-spectrum-logger/cmd"
+	"github.com/op/go-logging"
+	"os"
+)
+
+var format = logging.MustStringFormatter(
+	`%{color}[%{time:15:04:05} - %{level}] - %{module}:%{color:reset} %{message}`,
+)
+
+var log = logging.MustGetLogger("main")
 
 func main() {
+	stderrBackend := logging.NewLogBackend(os.Stderr, "", 0)
+	stdoutBackend := logging.NewLogBackend(os.Stdout, "", 0)
+
+	stdoutBackendFormatter := logging.NewBackendFormatter(stdoutBackend, format)
+	stderrLeveled := logging.AddModuleLevel(stderrBackend)
+	stderrLeveled.SetLevel(logging.ERROR, "")
+
+	// Set the backends to be used.
+	logging.SetBackend(stderrLeveled, stdoutBackendFormatter)
+
+	log.Debug("Initialized Logger")
+
 	cmd.Execute()
 }

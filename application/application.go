@@ -5,6 +5,7 @@ import (
     "github.com/c-mueller/fritzbox-spectrum-logger/config"
     "github.com/gin-gonic/gin"
     "github.com/c-mueller/fritzbox-spectrum-logger/repository"
+    "time"
 )
 
 var log = logging.MustGetLogger("server")
@@ -18,15 +19,18 @@ func LaunchApplication(configPath string) *Application {
         return nil
     }
     return &Application{
-        config:  *cfg,
-        bindAdr: cfg.BindAddress,
+        config:            *cfg,
+        bindAdr:           cfg.BindAddress,
+        state:             IDLE,
+        startTime:         time.Now(),
+        sessionLogCounter: 0,
     }
 }
 
 func (a *Application) Listen() error {
     log.Debug("Launching server...")
     log.Debug("Initilializing repository (datastore)")
-    repo, err  := repository.NewRepository(a.config.DatabasePath)
+    repo, err := repository.NewRepository(a.config.DatabasePath)
 
     if err != nil {
         return err
@@ -37,7 +41,17 @@ func (a *Application) Listen() error {
     log.Debug("Registering HTTP mappings")
     gin.SetMode(gin.ReleaseMode)
     engine := gin.Default()
+    a.registerHTTPMappings(engine)
 
     log.Debug("Launching HTTP Server")
     return engine.Run(a.bindAdr)
+}
+
+func (a *Application) registerHTTPMappings(engine *gin.Engine) {
+    engine.GET("/api/status", a.getStatus)
+    engine.GET("/api/config", a.getConfiguration)
+
+    engine.POST("/api/config", a.updateConfig)
+    engine.POST("/api/control/start", a.startCollecting)
+    engine.POST("/api/control/stop", a.stopCollecting)
 }

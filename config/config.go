@@ -52,6 +52,13 @@ func ReadOrCreate(path string) (*Configuration, error) {
     return &conf, nil
 }
 
+func (c *Configuration) Update(cfg *Configuration) {
+    //Only allow the updating of the Credentials, Intervall and autolaunch property using the webinterface
+    c.Credentials = cfg.Credentials
+    c.Autolaunch = cfg.Autolaunch
+    c.UpdateInterval = cfg.UpdateInterval
+}
+
 func (c *Configuration) Write() error {
     var data []byte
     var err error

@@ -1,0 +1,20 @@
+workspace:
+  base: /go
+  path: src/github.com/c-mueller/fritzbox-spectrum-logger
+
+pipeline:
+  build:
+    image: golang:${GO_VERSION}
+    commands:
+      # Install Godep
+      - go get -u github.com/golang/dep/cmd/dep
+      # Install Dependencies
+      - dep ensure
+      - go build
+      - go test -v ./...
+
+matrix:
+  GO_VERSION:
+    - latest
+    - "1.9"
+    - "1.8"

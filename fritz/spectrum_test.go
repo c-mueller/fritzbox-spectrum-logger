@@ -20,50 +20,49 @@
 package fritz
 
 import (
-    "testing"
-    "os"
-    "encoding/json"
-    "io/ioutil"
-    "github.com/Flaque/filet"
-    "fmt"
-    "path/filepath"
+	"encoding/json"
+	"fmt"
+	"github.com/Flaque/filet"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"testing"
 )
 
 func TestDrawSpectrum(t *testing.T) {
-    tmpDir := filet.TmpDir(t, "")
-    t.Log("Using tmpdir", tmpDir)
-    //defer filet.CleanUp(t)
+	tmpDir := filet.TmpDir(t, "")
+	t.Log("Using tmpdir", tmpDir)
+	//defer filet.CleanUp(t)
 
-    t.Log("Loading test Data")
-    data := loadTestData(t)
-    imgdata, _ := data.Render()
-    fmt.Println(len(imgdata))
+	t.Log("Loading test Data")
+	data := loadTestData(t)
+	imgdata, _ := data.Render()
+	fmt.Println(len(imgdata))
 
-    path := filepath.Join(tmpDir, "test.png")
-    file, _ := os.Create(path)
-    file.Write(imgdata)
-    file.Close()
+	path := filepath.Join(tmpDir, "test.png")
+	file, _ := os.Create(path)
+	file.Write(imgdata)
+	file.Close()
 }
 
 func BenchmarkRenderSpeed(b *testing.B) {
-    b.Log("Loading test Data")
-    data := loadTestData(nil)
-    b.ResetTimer()
-    for i := 0; i < b.N; i++ {
-        b.Log("Iteration", i)
-        data.Render()
-    }
+	b.Log("Loading test Data")
+	data := loadTestData(nil)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		data.Render()
+	}
 }
 
 func loadTestData(t *testing.T) *Spectrum {
-    file, err := os.Open("testdata/example_spectrum.json")
-    if err != nil {
-        t.Log(err)
-        t.FailNow()
-    }
-    var result *Spectrum
-    data, err := ioutil.ReadAll(file)
-    file.Close()
-    err = json.Unmarshal(data, &result)
-    return result
+	file, err := os.Open("testdata/example_spectrum.json")
+	if err != nil {
+		t.Log(err)
+		t.FailNow()
+	}
+	var result *Spectrum
+	data, err := ioutil.ReadAll(file)
+	file.Close()
+	err = json.Unmarshal(data, &result)
+	return result
 }

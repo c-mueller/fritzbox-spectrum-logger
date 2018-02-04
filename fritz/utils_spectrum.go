@@ -20,32 +20,32 @@
 package fritz
 
 func (c ValueList) getMax() float64 {
-    max := 0
-    for _, v := range c {
-        if v > max {
-            max = v
-        }
-    }
+	max := 0
+	for _, v := range c {
+		if v > max {
+			max = v
+		}
+	}
 
-    return float64(max)
+	return float64(max)
 }
 
 func (s SpectrumPorts) getMaxCount() int {
-    maxLen := 0
-    for _, v := range s {
-        if len(v.SpectrumInfo.CurrentBitValues) > maxLen {
-            maxLen = len(v.SpectrumInfo.CurrentBitValues)
-        }
-    }
+	maxLen := 0
+	for _, v := range s {
+		if len(v.SpectrumInfo.CurrentBitValues) > maxLen {
+			maxLen = len(v.SpectrumInfo.CurrentBitValues)
+		}
+	}
 
-    return maxLen
+	return maxLen
 }
 
 func (r *renderConfig) useSecondary(idx int) bool {
-    for _, v := range r.SecondaryAreas{
-        if idx >= v.FirstIndex && idx <= v.LastIndex {
-            return true
-        }
-    }
-    return false
+	for _, v := range r.SecondaryAreas {
+		if idx >= v.FirstIndex && idx <= v.LastIndex {
+			return true
+		}
+	}
+	return false
 }

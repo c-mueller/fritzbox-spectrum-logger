@@ -14,10 +14,10 @@ pipeline:
     image: golang:${GO_VERSION}
     commands:
       - go build
-  test:
+  test_and_benchmark:
     image: golang:${GO_VERSION}
     commands:
-      - go test -v ./...
+      - go test -v -cover -bench=. -benchtime=10s ./...
 
 matrix:
   GO_VERSION:

@@ -50,7 +50,6 @@ func BenchmarkRenderSpeed(b *testing.B) {
 	data := loadTestData(nil)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		b.Log("Iteration", i)
 		data.Render()
 	}
 }

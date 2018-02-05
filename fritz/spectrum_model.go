@@ -1,5 +1,5 @@
 // Copyright (c) 2018 Christian Müller <cmueller.dev@gmail.com>
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), to deal in
 // the Software without restriction, including without limitation the rights to
@@ -25,39 +25,39 @@ type SpectrumPorts []SpectrumPort
 type ValueList []int
 
 type Spectrum struct {
-    PortCount int           `json:"ports"`
-    Ports     SpectrumPorts `json:"port"`
-    Timestamp int64         `json:"timestamp"`
+	PortCount int           `json:"ports"`
+	Ports     SpectrumPorts `json:"port"`
+	Timestamp int64         `json:"timestamp"`
 }
 
 type SpectrumPort struct {
-    SpectrumInfo SpectrumInfo `json:"us"`
+	SpectrumInfo SpectrumInfo `json:"us"`
 }
 
 type SpectrumInfo struct {
-    TonesPerBATValue    int             `json:"TONES_PER_BAT_VALUE"`
-    MaximumSNRFrequency int             `json:"MAX_SNR_FREQ"`
-    PilotToneIndex      int             `json:"PILOT"`
-    UpstreamRanges      []UpstreamRange `json:"BIT_BANDCONFIG"`
-    DetectedNoiseValues ValueList       `json:"DETECTED_RFI_VALUES"`
-    ConnectionMode      string          `json:"MODE"`
-    MaximumBATFrequency int             `json:"MAX_BAT_FREQ"`
-    TonesPerSNRValue    int             `json:"TONES_PER_SNR_VALUE"`
-    CurrentBitValues    ValueList       `json:"ACT_BIT_VALUES"`
-    MaximumBitValues    ValueList       `json:"MAX_BIT_VALUES"`
-    MinimumBitValues    ValueList       `json:"MIN_BIT_VALUES"`
-    CurrentSNRValues    ValueList       `json:"ACT_SNR_VALUES"`
-    MaximumSNRValues    ValueList       `json:"MAX_SNR_VALUES"`
-    MinimumSNRValues    ValueList       `json:"MIN_SNR_VALUES"`
+	TonesPerBATValue    int             `json:"TONES_PER_BAT_VALUE"`
+	MaximumSNRFrequency int             `json:"MAX_SNR_FREQ"`
+	PilotToneIndex      int             `json:"PILOT"`
+	UpstreamRanges      []UpstreamRange `json:"BIT_BANDCONFIG"`
+	DetectedNoiseValues ValueList       `json:"DETECTED_RFI_VALUES"`
+	ConnectionMode      string          `json:"MODE"`
+	MaximumBATFrequency int             `json:"MAX_BAT_FREQ"`
+	TonesPerSNRValue    int             `json:"TONES_PER_SNR_VALUE"`
+	CurrentBitValues    ValueList       `json:"ACT_BIT_VALUES"`
+	MaximumBitValues    ValueList       `json:"MAX_BIT_VALUES"`
+	MinimumBitValues    ValueList       `json:"MIN_BIT_VALUES"`
+	CurrentSNRValues    ValueList       `json:"ACT_SNR_VALUES"`
+	MaximumSNRValues    ValueList       `json:"MAX_SNR_VALUES"`
+	MinimumSNRValues    ValueList       `json:"MIN_SNR_VALUES"`
 }
 
 type UpstreamRange struct {
-    FirstIndex int `json:"FIRST"`
-    LastIndex  int `json:"LAST"`
+	FirstIndex int `json:"FIRST"`
+	LastIndex  int `json:"LAST"`
 }
 
 type renderConfig struct {
-    PrimaryColor   color.RGBA
-    SecondaryColor color.RGBA
-    SecondaryAreas []UpstreamRange
+	PrimaryColor   color.RGBA
+	SecondaryColor color.RGBA
+	SecondaryAreas []UpstreamRange
 }

@@ -1,5 +1,5 @@
 package repository
 
 const (
-    SpectrumListBucketName = "Spectra"
+	SpectrumListBucketName = "Spectra"
 )

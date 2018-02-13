@@ -1,0 +1,13 @@
+<SessionInfo>
+    <SID>ff88e4d39354992f</SID>
+    <Challenge>ab7190d6</Challenge>
+    <BlockTime>128</BlockTime>
+    <Rights>
+        <Name>BoxAdmin</Name>
+        <Access>2</Access>
+        <Name>Phone</Name>
+        <Access>2</Access>
+        <Name>NAS></Name>
+        <Access>2</Access>
+    </Rights>
+</SessionInfo>

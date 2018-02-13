@@ -6,6 +6,7 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/c-mueller/fritzbox-spectrum-logger/fritz"
 	"github.com/op/go-logging"
+	"sort"
 	"time"
 )
 
@@ -26,8 +27,55 @@ func NewRepository(path string) (*Repository, error) {
 	}, nil
 }
 
-func (r *Repository) GetSpectraForRepositoryKey(k RepositoryKey) ([]*fritz.Spectrum, error) {
-	return r.GetSpectraForDay(k.GetIntegerValues())
+func (r *Repository) GetAllSpectrumKeys() (SpectraKeys, error) {
+	tx, err := r.db.Begin(false)
+	if err != nil {
+		return nil, err
+	}
+
+	spectraBucket := tx.Bucket([]byte(SpectrumListBucketName))
+
+	keys := make(SpectraKeys, 0)
+
+	spectraBucket.ForEach(func(yearKey, v []byte) error {
+		yearBucket := spectraBucket.Bucket(yearKey)
+		if yearBucket == nil {
+			//Ignore element if it is not a bucket
+			return nil
+		}
+		yearBucket.ForEach(func(monthKey, v []byte) error {
+			monthBucket := yearBucket.Bucket(monthKey)
+			if monthBucket == nil {
+				//Ignore element if it is not a bucket
+				return nil
+			}
+			monthBucket.ForEach(func(dayKey, v []byte) error {
+				dayBucket := monthBucket.Bucket(dayKey)
+				if dayBucket == nil {
+					//Ignore element if it is not a bucket
+					return nil
+				}
+				key := SpectrumKey{
+					Year:  string(yearKey),
+					Month: string(monthKey),
+					Day:   string(dayKey),
+				}
+				keys = append(keys, key)
+				return nil
+			})
+			return nil
+		})
+		return nil
+	})
+
+	sort.Sort(keys)
+
+	return keys, nil
+}
+
+func (r *Repository) GetSpectraForSpectrumKey(k SpectrumKey) ([]*fritz.Spectrum, error) {
+	y, m, d := k.GetIntegerValues()
+	return r.GetSpectraForDay(d, m, y)
 }
 
 func (r *Repository) GetSpectraForDay(day, month, year int) ([]*fritz.Spectrum, error) {
@@ -90,7 +138,7 @@ func (r *Repository) Insert(spectrum *fritz.Spectrum) error {
 
 	timestamp := time.Unix(spectrum.Timestamp, 0)
 	year := fmt.Sprintf("%d", timestamp.Year())
-	month := timestamp.Month().String()
+	month := fmt.Sprintf("%d", int(timestamp.Month()))
 	day := fmt.Sprintf("%d", timestamp.Day())
 
 	spectraBucket, _ := tx.CreateBucketIfNotExists([]byte(SpectrumListBucketName))

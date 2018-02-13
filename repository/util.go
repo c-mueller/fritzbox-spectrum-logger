@@ -17,14 +17,33 @@ package repository
 
 import (
 	"strconv"
+	"fmt"
 )
 
 func (sk *SpectrumKey) GetIntegerValues() (y, m, d int) {
-	year, _ := strconv.ParseInt(sk.Year, 10, 32)
-	month, _ := strconv.ParseInt(sk.Month, 10, 32)
-	day, _ := strconv.ParseInt(sk.Day, 10, 32)
+	year, err := strconv.ParseInt(sk.Year, 10, 32)
+	if err != nil {
+		return -1, -1, -1
+	}
+	month, err := strconv.ParseInt(sk.Month, 10, 32)
+	if err != nil {
+		return -1, -1, -1
+	}
+	day, err := strconv.ParseInt(sk.Day, 10, 32)
+	if err != nil {
+		return -1, -1, -1
+	}
 	y, m, d = int(year), int(month), int(day)
 	return
+}
+
+func (sk *SpectrumKey) IsValid() bool {
+	y, _, _ := sk.GetIntegerValues()
+	return y != -1
+}
+
+func (sk *SpectrumKey) String() string {
+	return fmt.Sprintf("Year: %s Month: %s Day: %s", sk.Year, sk.Month, sk.Day)
 }
 
 func (k SpectraKeys) Len() int {

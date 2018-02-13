@@ -44,6 +44,7 @@ func NewRepository(path string) (*Repository, error) {
 
 func (r *Repository) GetAllSpectrumKeys() (SpectraKeys, error) {
 	tx, err := r.db.Begin(false)
+	defer tx.Commit()
 	if err != nil {
 		return nil, err
 	}
@@ -52,19 +53,19 @@ func (r *Repository) GetAllSpectrumKeys() (SpectraKeys, error) {
 
 	keys := make(SpectraKeys, 0)
 
-	spectraBucket.ForEach(func(yearKey, v []byte) error {
+	err = spectraBucket.ForEach(func(yearKey, v []byte) error {
 		yearBucket := spectraBucket.Bucket(yearKey)
 		if yearBucket == nil {
 			//Ignore element if it is not a bucket
 			return nil
 		}
-		yearBucket.ForEach(func(monthKey, v []byte) error {
+		err := yearBucket.ForEach(func(monthKey, v []byte) error {
 			monthBucket := yearBucket.Bucket(monthKey)
 			if monthBucket == nil {
 				//Ignore element if it is not a bucket
 				return nil
 			}
-			monthBucket.ForEach(func(dayKey, v []byte) error {
+			err := monthBucket.ForEach(func(dayKey, v []byte) error {
 				dayBucket := monthBucket.Bucket(dayKey)
 				if dayBucket == nil {
 					//Ignore element if it is not a bucket
@@ -78,10 +79,13 @@ func (r *Repository) GetAllSpectrumKeys() (SpectraKeys, error) {
 				keys = append(keys, key)
 				return nil
 			})
-			return nil
+			return err
 		})
-		return nil
+		return err
 	})
+	if err != nil {
+		return nil, err
+	}
 
 	sort.Sort(keys)
 
@@ -89,6 +93,9 @@ func (r *Repository) GetAllSpectrumKeys() (SpectraKeys, error) {
 }
 
 func (r *Repository) GetSpectraForSpectrumKey(k SpectrumKey) ([]*fritz.Spectrum, error) {
+	if !k.IsValid() {
+		return nil, InvalidDateKey
+	}
 	y, m, d := k.GetIntegerValues()
 	return r.GetSpectraForDay(d, m, y)
 }
@@ -99,6 +106,7 @@ func (r *Repository) GetSpectraForDay(day, month, year int) ([]*fritz.Spectrum, 
 	dayByte := []byte(fmt.Sprintf("%d", day))
 
 	tx, err := r.db.Begin(false)
+	defer tx.Commit()
 	if err != nil {
 		return nil, err
 	}

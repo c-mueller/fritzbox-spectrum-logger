@@ -58,14 +58,22 @@ func (a *Application) Listen() error {
 	engine := gin.Default()
 	a.registerHTTPMappings(engine)
 
-	log.Debug("Launching HTTP Server")
+	log.Debug("Launched HTTP Server")
 	return engine.Run(a.bindAdr)
 }
 
 func (a *Application) registerHTTPMappings(engine *gin.Engine) {
+	//Status Informations
 	engine.GET("/api/status", a.getStatus)
 	engine.GET("/api/config", a.getConfiguration)
 
+	//Spectra Retrieval
+	engine.GET("/api/spectra", a.getValidDates)
+	engine.GET("/api/spectra/:year/:month/:day", a.listSpectraForDay)
+	engine.GET("/api/spectra/:year/:month/:day/:timestamp", a.getRawSpectrum)
+	engine.GET("/api/spectra/:year/:month/:day/:timestamp/img", a.getRenderedSpectrum)
+
+	//Configuration Operations
 	engine.POST("/api/config", a.updateConfig)
 	engine.POST("/api/control/start", a.startCollecting)
 	engine.POST("/api/control/stop", a.stopCollecting)

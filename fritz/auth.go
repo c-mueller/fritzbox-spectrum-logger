@@ -32,6 +32,7 @@ import (
 // Password and Username have to be empty if there is no authentication
 // Username has to be empty if a password is used for authentication
 func NewClient(endpoint, username, password string) *Session {
+	endpoint = strings.Replace(endpoint, "http://", "", -1)
 	return &Session{
 		Endpoint: endpoint,
 		Username: username,

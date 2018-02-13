@@ -12,7 +12,7 @@ type Application struct {
 	bindAdr           string
 	repo              *repository.Repository
 	session           *fritz.Session
-	state             ApplicationState
+	state             APIState
 	startTime         time.Time
 	updateTicker      *time.Ticker
 	sessionLogCounter int64

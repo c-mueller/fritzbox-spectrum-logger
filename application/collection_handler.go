@@ -74,6 +74,7 @@ func (a *Application) collectionHandler() {
 	log.Info("Logged In!")
 
 	for range a.updateTicker.C {
+		log.Info("Collecting...")
 		err := a.collect()
 		if err != nil {
 			log.Errorf("Could not download Spectrum. Aborting. Error: %v", err)

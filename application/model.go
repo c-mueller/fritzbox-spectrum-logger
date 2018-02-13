@@ -28,3 +28,14 @@ type InfoResponse struct {
 	State   string `json:"state"`
 	Message string `json:"message"`
 }
+
+type KeysResponse struct {
+	Keys             repository.SpectraKeys `json:"keys"`
+	RequestTimestamp int64                  `json:"timestamp"`
+}
+
+type TimestampResponse struct {
+	Timestamps       []int64                `json:"timestamps"`
+	Key              repository.SpectrumKey `json:"requested_day"`
+	RequestTimestamp int64                  `json:"timestamp"`
+}

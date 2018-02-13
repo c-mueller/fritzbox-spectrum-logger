@@ -2,5 +2,5 @@
 
 ## License
 
-FSL is licensed under the MIT License.
+FSL is licensed under the GPL v3.0 License.
 

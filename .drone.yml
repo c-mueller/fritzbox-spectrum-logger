@@ -13,7 +13,7 @@ pipeline:
   build:
     image: golang:${GO_VERSION}
     commands:
-      - go build
+      - go build -v
   test_and_benchmark:
     image: golang:${GO_VERSION}
     commands:
@@ -27,4 +27,3 @@ matrix:
   GO_VERSION:
     - latest
     - "1.9"
-    - "rc"

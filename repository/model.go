@@ -7,8 +7,10 @@ type Repository struct {
 	db           *bolt.DB
 }
 
-type RepositoryKey struct {
+type SpectrumKey struct {
 	Year  string `json:"year"`
 	Month string `json:"month"`
 	Day   string `json:"day"`
 }
+
+type SpectraKeys []SpectrumKey

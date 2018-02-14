@@ -4,9 +4,8 @@ workspace:
 
 pipeline:
   build_ui:
-    image: node:latest
+    image: teracy/angular-cli:latest
     commands:
-      - npm install -g @angular/cli
       - cd ui
       - npm install
       - ng build --prod

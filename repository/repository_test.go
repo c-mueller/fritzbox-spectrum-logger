@@ -63,7 +63,7 @@ func TestRepository_GetAllSpectrumKeys(t *testing.T) {
 	insertSpectra(spectrum, repo, t, 1000, 6)
 
 	keys, _ := repo.GetAllSpectrumKeys()
-	assert.Equal(t, 251, len(keys))
+	assert.True(t, len(keys) >= 250)
 	for i, v := range keys {
 		assert.Equal(t, "2018", v.Year)
 		if i >= 1 {

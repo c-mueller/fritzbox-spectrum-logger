@@ -18,7 +18,17 @@ package repository
 import (
 	"fmt"
 	"strconv"
+	"time"
 )
+
+func GetFromTimestamp(timestamp int64) SpectrumKey {
+	t := time.Unix(timestamp, 0)
+	return SpectrumKey{
+		Day:   string(t.Day()),
+		Month: string(int(t.Month())),
+		Year:  string(t.Year()),
+	}
+}
 
 func (sk *SpectrumKey) GetIntegerValues() (y, m, d int) {
 	year, err := strconv.ParseInt(sk.Year, 10, 32)

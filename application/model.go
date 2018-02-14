@@ -16,12 +16,14 @@ type Application struct {
 	startTime         time.Time
 	updateTicker      *time.Ticker
 	sessionLogCounter int64
+	latest            *LatestSpectrumResponse
 }
 
 type StatusResponse struct {
-	State         string `json:"state"`
-	Uptime        int64  `json:"uptime"`
-	SpectrumCount int64  `json:"spectrum_count"`
+	State         string                 `json:"state"`
+	Uptime        int64                  `json:"uptime"`
+	SpectrumCount int64                  `json:"spectrum_count"`
+	Latest        *LatestSpectrumResponse `json:"latest"`
 }
 
 type InfoResponse struct {
@@ -38,4 +40,9 @@ type TimestampResponse struct {
 	Timestamps       []int64                `json:"timestamps"`
 	Key              repository.SpectrumKey `json:"requested_day"`
 	RequestTimestamp int64                  `json:"timestamp"`
+}
+
+type LatestSpectrumResponse struct {
+	Key       repository.SpectrumKey `json:"date"`
+	Timestamp int64                  `json:"timestamp"`
 }

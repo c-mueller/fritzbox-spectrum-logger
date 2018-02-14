@@ -18,6 +18,7 @@ package application
 import (
 	"github.com/c-mueller/fritzbox-spectrum-logger/repository"
 	"github.com/gin-gonic/gin"
+	"strconv"
 	"time"
 )
 
@@ -35,14 +36,7 @@ func (a *Application) getValidDates(ctx *gin.Context) {
 }
 
 func (a *Application) listSpectraForDay(ctx *gin.Context) {
-	year := ctx.Param("year")
-	month := ctx.Param("month")
-	day := ctx.Param("day")
-	key := repository.SpectrumKey{
-		Year:  year,
-		Month: month,
-		Day:   day,
-	}
+	key := getSpectrumKeyFormContext(ctx)
 	if !key.IsValid() {
 		log.Errorf("A Invalid Key was requested: %s", key.String())
 		ctx.String(404, "")
@@ -51,7 +45,7 @@ func (a *Application) listSpectraForDay(ctx *gin.Context) {
 	spectra, err := a.repo.GetSpectraForSpectrumKey(key)
 	if err != nil {
 		log.Errorf("Spectra Retrieval failed: %s", err)
-		ctx.String(500, "")
+		ctx.String(404, "")
 		return
 	}
 	timestamps := make([]int64, 0)
@@ -66,9 +60,55 @@ func (a *Application) listSpectraForDay(ctx *gin.Context) {
 }
 
 func (a *Application) getRawSpectrum(ctx *gin.Context) {
-
+	key := getSpectrumKeyFormContext(ctx)
+	timestampString := ctx.Param("timestamp")
+	timestamp, err := strconv.ParseInt(timestampString, 10, 64)
+	if !key.IsValid() || err != nil {
+		log.Errorf("A Invalid Key was requested: %s - Timestamp: %s", key.String(), timestampString)
+		ctx.String(404, "")
+		return
+	}
+	spectrum, err := a.repo.GetSpectrumBySpectrumKey(&key, timestamp)
+	if err != nil {
+		log.Errorf("Spectra Retrieval failed: %s", err)
+		ctx.String(404, "")
+		return
+	}
+	ctx.JSON(200, spectrum)
 }
 
 func (a *Application) getRenderedSpectrum(ctx *gin.Context) {
+	key := getSpectrumKeyFormContext(ctx)
+	timestampString := ctx.Param("timestamp")
+	timestamp, err := strconv.ParseInt(timestampString, 10, 64)
+	if !key.IsValid() || err != nil {
+		log.Errorf("A Invalid Key was requested: %s - Timestamp: %s", key.String(), timestampString)
+		ctx.String(404, "")
+		return
+	}
+	spectrum, err := a.repo.GetSpectrumBySpectrumKey(&key, timestamp)
+	if err != nil {
+		log.Errorf("Spectra Retrieval failed: %s", err)
+		ctx.String(404, "")
+		return
+	}
+	image, err := spectrum.Render()
+	if err != nil {
+		log.Errorf("Rendering The spectrum failed", err)
+		ctx.String(500, "")
+		return
+	}
+	ctx.Data(200, "image/png", image)
+}
 
+func getSpectrumKeyFormContext(ctx *gin.Context) repository.SpectrumKey {
+	year := ctx.Param("year")
+	month := ctx.Param("month")
+	day := ctx.Param("day")
+	key := repository.SpectrumKey{
+		Year:  year,
+		Month: month,
+		Day:   day,
+	}
+	return key
 }

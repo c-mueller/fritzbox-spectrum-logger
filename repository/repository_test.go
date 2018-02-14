@@ -41,6 +41,7 @@ func TestTest_Parallel_Usage(t *testing.T) {
 	waitGroup.Add(2)
 
 	go handleInsertions(t, repo, &waitGroup)
+	time.Sleep(100 * time.Millisecond)
 	go handleRetrievals(t, repo, &waitGroup)
 
 	waiter := make(chan struct{})
@@ -64,14 +65,23 @@ func handleInsertions(t *testing.T, repo *Repository, wg *sync.WaitGroup) {
 	defer wg.Done()
 	cnt := 0
 	for i := 0; i < 50; i++ {
-		fmt.Println("Inserting Round:", i)
-		for j := 0; j < 100; j++ {
+		executions := int64(0)
+		timeSum := int64(0)
+		for j := 0; j < 250; j++ {
 			spectrum.Timestamp = spectrum.Timestamp + int64(j+i*1000)
+
+			ts := time.Now()
 			err := repo.Insert(spectrum)
+			timeSum += time.Since(ts).Nanoseconds()
+			executions++
+
 			assert.NoError(t, err)
 			time.Sleep(10 * time.Microsecond)
 			cnt++
 		}
+
+		fmt.Printf("Insertion Round %d Done. Average Operation Time %s\n", i, time.Duration(timeSum/executions)*time.Nanosecond)
+
 		time.Sleep(100 * time.Microsecond)
 	}
 	t.Log("Inserted", cnt, "Elements")
@@ -79,16 +89,17 @@ func handleInsertions(t *testing.T, repo *Repository, wg *sync.WaitGroup) {
 
 func handleRetrievals(t *testing.T, repo *Repository, wg *sync.WaitGroup) {
 	defer wg.Done()
-	for i := 0; i < 50; i++ {
-		fmt.Println("Reading Round:", i)
-		for j := 0; j < 100; j++ {
-			keys, err := repo.GetAllSpectrumKeys()
+	for i := 0; i < 80; i++ {
+		executions := int64(0)
+		timeSum := int64(0)
+		for j := 0; j < 500; j++ {
+			ts := time.Now()
+			_, err := repo.GetAllSpectrumKeys()
+			timeSum += time.Since(ts).Nanoseconds()
+			executions++
 			assert.NoError(t, err)
-			for _, v := range keys {
-				_, err := repo.GetSpectraForSpectrumKey(v)
-				assert.NoError(t, err)
-			}
 		}
+		fmt.Printf("Retrieval Round %d Done. Average Operation Time %s\n", i, time.Duration(timeSum/executions)*time.Nanosecond)
 		time.Sleep(100 * time.Microsecond)
 	}
 }

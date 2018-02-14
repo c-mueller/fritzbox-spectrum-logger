@@ -43,46 +43,44 @@ func NewRepository(path string) (*Repository, error) {
 }
 
 func (r *Repository) GetAllSpectrumKeys() (SpectraKeys, error) {
-	tx, err := r.db.Begin(false)
-	defer tx.Commit()
-	if err != nil {
-		return nil, err
-	}
-
-	spectraBucket := tx.Bucket([]byte(SpectrumListBucketName))
-
 	keys := make(SpectraKeys, 0)
 
-	err = spectraBucket.ForEach(func(yearKey, v []byte) error {
-		yearBucket := spectraBucket.Bucket(yearKey)
-		if yearBucket == nil {
-			//Ignore element if it is not a bucket
-			return nil
-		}
-		err := yearBucket.ForEach(func(monthKey, v []byte) error {
-			monthBucket := yearBucket.Bucket(monthKey)
-			if monthBucket == nil {
+	err := r.db.View(func(tx *bolt.Tx) error {
+		spectraBucket := tx.Bucket([]byte(SpectrumListBucketName))
+
+		err := spectraBucket.ForEach(func(yearKey, v []byte) error {
+			yearBucket := spectraBucket.Bucket(yearKey)
+			if yearBucket == nil {
 				//Ignore element if it is not a bucket
 				return nil
 			}
-			err := monthBucket.ForEach(func(dayKey, v []byte) error {
-				dayBucket := monthBucket.Bucket(dayKey)
-				if dayBucket == nil {
+			err := yearBucket.ForEach(func(monthKey, v []byte) error {
+				monthBucket := yearBucket.Bucket(monthKey)
+				if monthBucket == nil {
 					//Ignore element if it is not a bucket
 					return nil
 				}
-				key := SpectrumKey{
-					Year:  string(yearKey),
-					Month: string(monthKey),
-					Day:   string(dayKey),
-				}
-				keys = append(keys, key)
-				return nil
+				err := monthBucket.ForEach(func(dayKey, v []byte) error {
+					dayBucket := monthBucket.Bucket(dayKey)
+					if dayBucket == nil {
+						//Ignore element if it is not a bucket
+						return nil
+					}
+					key := SpectrumKey{
+						Year:  string(yearKey),
+						Month: string(monthKey),
+						Day:   string(dayKey),
+					}
+					keys = append(keys, key)
+					return nil
+				})
+				return err
 			})
 			return err
 		})
 		return err
 	})
+
 	if err != nil {
 		return nil, err
 	}
@@ -104,82 +102,75 @@ func (r *Repository) GetSpectraForDay(day, month, year int) ([]*fritz.Spectrum, 
 	yearByte := []byte(fmt.Sprintf("%d", year))
 	monthByte := []byte(fmt.Sprintf("%d", month))
 	dayByte := []byte(fmt.Sprintf("%d", day))
+	data := make([]*fritz.Spectrum, 0)
 
-	tx, err := r.db.Begin(false)
-	defer tx.Commit()
+	err := r.db.View(func(tx *bolt.Tx) error {
+		spectraBucket := tx.Bucket([]byte(SpectrumListBucketName))
+		if spectraBucket == nil {
+			log.Error("Spectra Bucket not found!")
+			return BucketNotFoundError
+		}
+		yearBucket := spectraBucket.Bucket(yearByte)
+		if yearBucket == nil {
+			log.Errorf("Year Bucket (Year: '%s') not found!",
+				string(yearByte))
+			return BucketNotFoundError
+		}
+		monthBucket := yearBucket.Bucket(monthByte)
+		if monthBucket == nil {
+			log.Errorf("Month Bucket (Year: '%s' Month: '%s') not found!",
+				string(yearByte), string(monthByte))
+			return BucketNotFoundError
+		}
+		dayBucket := monthBucket.Bucket(dayByte)
+		if dayBucket == nil {
+			log.Errorf("Month Bucket (Year: '%s' Month: '%s' Day: '%s') not found!",
+				string(yearByte), string(monthByte), string(dayByte))
+			return BucketNotFoundError
+		}
+
+		err := dayBucket.ForEach(func(k, v []byte) error {
+			var spectrum *fritz.Spectrum
+			err := json.Unmarshal(v, &spectrum)
+			if err != nil {
+				return err
+			}
+			data = append(data, spectrum)
+			return nil
+		})
+		return err
+	})
+
 	if err != nil {
 		return nil, err
-	}
-
-	spectraBucket := tx.Bucket([]byte(SpectrumListBucketName))
-	if spectraBucket == nil {
-		log.Error("Spectra Bucket not found!")
-		return nil, BucketNotFoundError
-	}
-	yearBucket := spectraBucket.Bucket(yearByte)
-	if yearBucket == nil {
-		log.Errorf("Year Bucket (Year: '%s') not found!",
-			string(yearByte))
-		return nil, BucketNotFoundError
-	}
-	monthBucket := yearBucket.Bucket(monthByte)
-	if monthBucket == nil {
-		log.Errorf("Month Bucket (Year: '%s' Month: '%s') not found!",
-			string(yearByte), string(monthByte))
-		return nil, BucketNotFoundError
-	}
-	dayBucket := monthBucket.Bucket(dayByte)
-	if dayBucket == nil {
-		log.Errorf("Month Bucket (Year: '%s' Month: '%s' Day: '%s') not found!",
-			string(yearByte), string(monthByte), string(dayByte))
-		return nil, BucketNotFoundError
-	}
-
-	data := make([]*fritz.Spectrum, 0)
-	err = dayBucket.ForEach(func(k, v []byte) error {
-		var spectrum *fritz.Spectrum
-		err := json.Unmarshal(v, &spectrum)
-		if err != nil {
-			return err
-		}
-		data = append(data, spectrum)
-		return nil
-	})
-	if err != nil {
-		return data, err
 	}
 
 	return data, nil
 }
 
 func (r *Repository) Insert(spectrum *fritz.Spectrum) error {
-	tx, err := r.db.Begin(true)
-	defer tx.Commit()
-	if err != nil {
+	err := r.db.Update(func(tx *bolt.Tx) error {
+		timestamp := time.Unix(spectrum.Timestamp, 0)
+		year := fmt.Sprintf("%d", timestamp.Year())
+		month := fmt.Sprintf("%d", int(timestamp.Month()))
+		day := fmt.Sprintf("%d", timestamp.Day())
+
+		spectraBucket, _ := tx.CreateBucketIfNotExists([]byte(SpectrumListBucketName))
+
+		yearBucket, _ := spectraBucket.CreateBucketIfNotExists([]byte(year))
+		monthBucket, _ := yearBucket.CreateBucketIfNotExists([]byte(month))
+		dayBucket, _ := monthBucket.CreateBucketIfNotExists([]byte(day))
+
+		jsonData, err := spectrum.JSON()
+		if err != nil {
+			return err
+		}
+		err = dayBucket.Put([]byte(string(fmt.Sprintf("%d", timestamp.Unix()))), jsonData)
 		return err
-	}
+	})
+	r.db.Sync()
 
-	timestamp := time.Unix(spectrum.Timestamp, 0)
-	year := fmt.Sprintf("%d", timestamp.Year())
-	month := fmt.Sprintf("%d", int(timestamp.Month()))
-	day := fmt.Sprintf("%d", timestamp.Day())
-
-	spectraBucket, _ := tx.CreateBucketIfNotExists([]byte(SpectrumListBucketName))
-
-	yearBucket, _ := spectraBucket.CreateBucketIfNotExists([]byte(year))
-	monthBucket, _ := yearBucket.CreateBucketIfNotExists([]byte(month))
-	dayBucket, _ := monthBucket.CreateBucketIfNotExists([]byte(day))
-
-	jsonData, err := spectrum.JSON()
-	if err != nil {
-		return err
-	}
-	err = dayBucket.Put([]byte(string(fmt.Sprintf("%d", timestamp.Unix()))), jsonData)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 func (r *Repository) Close() error {

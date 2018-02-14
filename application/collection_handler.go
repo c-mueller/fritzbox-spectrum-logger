@@ -87,12 +87,13 @@ func (a *Application) collectionHandler() {
 
 func (a *Application) collect() error {
 	spec, err := a.session.GetSpectrum()
+	log.Info("Downloaded Spectrum with ", spec.PortCount, "Ports")
 	if err != nil {
 		return err
 	}
 
 	err = a.repo.Insert(spec)
-
+	log.Info("Inserted Element")
 	if err != nil {
 		return err
 	}

@@ -17,6 +17,7 @@ package repository
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/Flaque/filet"
 	"github.com/c-mueller/fritzbox-spectrum-logger/fritz"
 	"github.com/c-mueller/fritzbox-spectrum-logger/util"
@@ -24,9 +25,73 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sync"
 	"testing"
 	"time"
 )
+
+func TestTest_Parallel_Usage(t *testing.T) {
+	tmpdir := filet.TmpDir(t, "")
+	defer filet.CleanUp(t)
+
+	repo, err := NewRepository(filepath.Join(tmpdir, "test_db.db"))
+	assert.NoErrorf(t, err, "Initialization Failed")
+
+	var waitGroup sync.WaitGroup
+	waitGroup.Add(2)
+
+	go handleInsertions(t, repo, &waitGroup)
+	go handleRetrievals(t, repo, &waitGroup)
+
+	waiter := make(chan struct{})
+
+	go func() {
+		defer close(waiter)
+		waitGroup.Wait()
+	}()
+	select {
+	case <-waiter:
+		return
+	case <-time.After(2 * time.Minute):
+		t.Error("Test Timed out after 2 Minutes")
+		t.FailNow()
+	}
+
+}
+
+func handleInsertions(t *testing.T, repo *Repository, wg *sync.WaitGroup) {
+	spectrum := loadTestSpectrum(t)
+	defer wg.Done()
+	cnt := 0
+	for i := 0; i < 50; i++ {
+		fmt.Println("Inserting Round:", i)
+		for j := 0; j < 100; j++ {
+			spectrum.Timestamp = spectrum.Timestamp + int64(j+i*1000)
+			err := repo.Insert(spectrum)
+			assert.NoError(t, err)
+			time.Sleep(10 * time.Microsecond)
+			cnt++
+		}
+		time.Sleep(100 * time.Microsecond)
+	}
+	t.Log("Inserted", cnt, "Elements")
+}
+
+func handleRetrievals(t *testing.T, repo *Repository, wg *sync.WaitGroup) {
+	defer wg.Done()
+	for i := 0; i < 50; i++ {
+		fmt.Println("Reading Round:", i)
+		for j := 0; j < 100; j++ {
+			keys, err := repo.GetAllSpectrumKeys()
+			assert.NoError(t, err)
+			for _, v := range keys {
+				_, err := repo.GetSpectraForSpectrumKey(v)
+				assert.NoError(t, err)
+			}
+		}
+		time.Sleep(100 * time.Microsecond)
+	}
+}
 
 func TestInitRepo(t *testing.T) {
 	tmpdir := filet.TmpDir(t, "")

@@ -19,6 +19,7 @@ import (
 	"github.com/c-mueller/fritzbox-spectrum-logger/fritz"
 	"github.com/gin-gonic/gin"
 	"time"
+	"github.com/c-mueller/fritzbox-spectrum-logger/repository"
 )
 
 func (a *Application) startCollecting(ctx *gin.Context) {
@@ -74,7 +75,7 @@ func (a *Application) collectionHandler() {
 	log.Info("Logged In!")
 
 	for range a.updateTicker.C {
-		log.Info("Collecting...")
+		log.Debug("Downloading Spectrum...")
 		err := a.collect()
 		if err != nil {
 			log.Errorf("Could not download Spectrum. Aborting. Error: %v", err)
@@ -87,13 +88,17 @@ func (a *Application) collectionHandler() {
 
 func (a *Application) collect() error {
 	spec, err := a.session.GetSpectrum()
-	log.Info("Downloaded Spectrum with ", spec.PortCount, "Ports")
 	if err != nil {
 		return err
 	}
 
+	sk := repository.GetFromTimestamp(spec.Timestamp)
+	a.latest = &LatestSpectrumResponse{
+		Key:       sk,
+		Timestamp: spec.Timestamp,
+	}
+
 	err = a.repo.Insert(spec)
-	log.Info("Inserted Element")
 	if err != nil {
 		return err
 	}

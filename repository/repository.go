@@ -29,7 +29,7 @@ var log = logging.MustGetLogger("repository")
 
 func NewRepository(path string) (*Repository, error) {
 	log.Debugf("Opening database '%s'", path)
-	db, err := bolt.Open(path, 0777, &bolt.Options{})
+	db, err := bolt.Open(path, 0777, bolt.DefaultOptions)
 
 	if err != nil {
 		return nil, err
@@ -98,38 +98,50 @@ func (r *Repository) GetSpectraForSpectrumKey(k SpectrumKey) ([]*fritz.Spectrum,
 	return r.GetSpectraForDay(d, m, y)
 }
 
+func (r *Repository) GetSpectrumBySpectrumKey(k *SpectrumKey, timestamp int64) (*fritz.Spectrum, error) {
+	if !k.IsValid() {
+		return nil, InvalidDateKey
+	}
+	y, m, d := k.GetIntegerValues()
+	return r.GetSpectrum(d, m, y, timestamp)
+}
+
+func (r *Repository) GetSpectrum(day, month, year int, timestamp int64) (*fritz.Spectrum, error) {
+	yearByte, monthByte, dayByte := convertToByte(year, month, day)
+	timestampByte := []byte(fmt.Sprintf("%d", timestamp))
+	var spectrum *fritz.Spectrum
+
+	err := r.db.View(func(tx *bolt.Tx) error {
+		dayBucket, err := r.getDayBucket(dayByte, monthByte, yearByte, tx)
+		if err != nil {
+			return err
+		}
+		byteData := dayBucket.Get(timestampByte)
+		if byteData == nil {
+			return InvalidTimestampKey
+		}
+		err = json.Unmarshal(byteData, &spectrum)
+		return err
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return spectrum, nil
+}
+
 func (r *Repository) GetSpectraForDay(day, month, year int) ([]*fritz.Spectrum, error) {
-	yearByte := []byte(fmt.Sprintf("%d", year))
-	monthByte := []byte(fmt.Sprintf("%d", month))
-	dayByte := []byte(fmt.Sprintf("%d", day))
+	yearByte, monthByte, dayByte := convertToByte(year, month, day)
 	data := make([]*fritz.Spectrum, 0)
 
 	err := r.db.View(func(tx *bolt.Tx) error {
-		spectraBucket := tx.Bucket([]byte(SpectrumListBucketName))
-		if spectraBucket == nil {
-			log.Error("Spectra Bucket not found!")
-			return BucketNotFoundError
-		}
-		yearBucket := spectraBucket.Bucket(yearByte)
-		if yearBucket == nil {
-			log.Errorf("Year Bucket (Year: '%s') not found!",
-				string(yearByte))
-			return BucketNotFoundError
-		}
-		monthBucket := yearBucket.Bucket(monthByte)
-		if monthBucket == nil {
-			log.Errorf("Month Bucket (Year: '%s' Month: '%s') not found!",
-				string(yearByte), string(monthByte))
-			return BucketNotFoundError
-		}
-		dayBucket := monthBucket.Bucket(dayByte)
-		if dayBucket == nil {
-			log.Errorf("Month Bucket (Year: '%s' Month: '%s' Day: '%s') not found!",
-				string(yearByte), string(monthByte), string(dayByte))
-			return BucketNotFoundError
+
+		dayBucket, err := r.getDayBucket(dayByte, monthByte, yearByte, tx)
+		if err != nil {
+			return err
 		}
 
-		err := dayBucket.ForEach(func(k, v []byte) error {
+		err = dayBucket.ForEach(func(k, v []byte) error {
 			var spectrum *fritz.Spectrum
 			err := json.Unmarshal(v, &spectrum)
 			if err != nil {
@@ -140,7 +152,6 @@ func (r *Repository) GetSpectraForDay(day, month, year int) ([]*fritz.Spectrum, 
 		})
 		return err
 	})
-
 	if err != nil {
 		return nil, err
 	}
@@ -176,6 +187,40 @@ func (r *Repository) Insert(spectrum *fritz.Spectrum) error {
 func (r *Repository) Close() error {
 	log.Debug("Closing Database")
 	return r.db.Close()
+}
+
+func (r *Repository) getDayBucket(dayByte, monthByte, yearByte []byte, tx *bolt.Tx) (*bolt.Bucket, error) {
+	spectraBucket := tx.Bucket([]byte(SpectrumListBucketName))
+	if spectraBucket == nil {
+		log.Error("Spectra Bucket not found!")
+		return nil, BucketNotFoundError
+	}
+	yearBucket := spectraBucket.Bucket(yearByte)
+	if yearBucket == nil {
+		log.Errorf("Year Bucket (Year: '%s') not found!",
+			string(yearByte))
+		return nil, BucketNotFoundError
+	}
+	monthBucket := yearBucket.Bucket(monthByte)
+	if monthBucket == nil {
+		log.Errorf("Month Bucket (Year: '%s' Month: '%s') not found!",
+			string(yearByte), string(monthByte))
+		return nil, BucketNotFoundError
+	}
+	dayBucket := monthBucket.Bucket(dayByte)
+	if dayBucket == nil {
+		log.Errorf("Month Bucket (Year: '%s' Month: '%s' Day: '%s') not found!",
+			string(yearByte), string(monthByte), string(dayByte))
+		return nil, BucketNotFoundError
+	}
+	return dayBucket, nil
+}
+
+func convertToByte(year, month, day int) ([]byte, []byte, []byte) {
+	yearByte := []byte(fmt.Sprintf("%d", year))
+	monthByte := []byte(fmt.Sprintf("%d", month))
+	dayByte := []byte(fmt.Sprintf("%d", day))
+	return yearByte, monthByte, dayByte
 }
 
 func initDb(db *bolt.DB) error {

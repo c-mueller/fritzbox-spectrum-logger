@@ -23,3 +23,4 @@ const (
 
 var BucketNotFoundError = errors.New("repository: Bucket not Found")
 var InvalidDateKey = errors.New("repository: Invalid Date Key")
+var InvalidTimestampKey = errors.New("repository: Timestamp Not Found")

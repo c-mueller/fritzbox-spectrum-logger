@@ -16,12 +16,12 @@
 package fritz
 
 import (
-	"testing"
-	"io/ioutil"
-	"os"
 	"github.com/stretchr/testify/assert"
-	"net/http/httptest"
+	"io/ioutil"
 	"net/http"
+	"net/http/httptest"
+	"os"
+	"testing"
 )
 
 func TestFritzAuthNoPasswd(t *testing.T) {

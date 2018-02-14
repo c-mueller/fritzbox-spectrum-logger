@@ -42,7 +42,7 @@ func (s *SessionInfo) Valid() bool {
 	if s == nil {
 		return false
 	}
-	return  s.SID != "0000000000000000"
+	return s.SID != "0000000000000000"
 }
 
 func (s *Session) Valid() bool {

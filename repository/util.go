@@ -16,8 +16,8 @@
 package repository
 
 import (
-	"strconv"
 	"fmt"
+	"strconv"
 )
 
 func (sk *SpectrumKey) GetIntegerValues() (y, m, d int) {

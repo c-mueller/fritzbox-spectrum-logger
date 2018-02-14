@@ -3,6 +3,13 @@ workspace:
   path: src/github.com/c-mueller/fritzbox-spectrum-logger
 
 pipeline:
+  build_ui:
+    image: node:latest
+    commands:
+      - npm install -g @angular/cli
+      - cd ui
+      - npm install
+      - ng build --prod
   load_deps:
     image: golang:${GO_VERSION}
     commands:

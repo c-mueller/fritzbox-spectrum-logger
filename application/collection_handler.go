@@ -17,9 +17,9 @@ package application
 
 import (
 	"github.com/c-mueller/fritzbox-spectrum-logger/fritz"
+	"github.com/c-mueller/fritzbox-spectrum-logger/repository"
 	"github.com/gin-gonic/gin"
 	"time"
-	"github.com/c-mueller/fritzbox-spectrum-logger/repository"
 )
 
 func (a *Application) startCollecting(ctx *gin.Context) {

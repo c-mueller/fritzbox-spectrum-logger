@@ -6,16 +6,26 @@ pipeline:
   build_ui:
     image: teracy/angular-cli:latest
     commands:
+      # Build the UI
       - cd ui
       - npm install
       - ng build --prod
+      # Copy built artifact for static linking
+      - cd dist
+      - cp -r * ../../application/ui-dist
   load_deps:
     image: golang:${GO_VERSION}
     commands:
+      # Install Rice
+      - go get github.com/GeertJohan/go.rice
+      - go get github.com/GeertJohan/go.rice/rice
       # Install Godep
       - go get -u github.com/golang/dep/cmd/dep
       # Install Dependencies
       - dep ensure -v
+      # Compile static dependency file
+      - cd application
+      - rice embed-go
   build:
     image: golang:${GO_VERSION}
     commands:

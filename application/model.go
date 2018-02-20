@@ -23,7 +23,7 @@ type StatusResponse struct {
 	State         string                   `json:"state"`
 	Uptime        int64                    `json:"uptime"`
 	SpectrumCount int64                    `json:"spectrum_count"`
-	Latest        *gLatestSpectrumResponse `json:"latest"`
+	Latest        *LatestSpectrumResponse `json:"latest"`
 }
 
 type InfoResponse struct {

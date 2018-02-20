@@ -1,0 +1,1 @@
+This folder is used to store the built copy of the UI

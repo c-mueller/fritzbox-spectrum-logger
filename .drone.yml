@@ -41,5 +41,5 @@ pipeline:
 
 matrix:
   GO_VERSION:
-    - latest
+    - "1.10"
     - "1.9"

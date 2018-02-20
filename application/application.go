@@ -21,6 +21,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/op/go-logging"
 	"time"
+	"github.com/GeertJohan/go.rice"
 )
 
 var log = logging.MustGetLogger("server")
@@ -63,6 +64,11 @@ func (a *Application) Listen() error {
 }
 
 func (a *Application) registerHTTPMappings(engine *gin.Engine) {
+	ui := rice.MustFindBox("ui-dist")
+	engine.StaticFS("/ui", ui.HTTPBox())
+
+	engine.GET("/", a.redirectToUi)
+
 	//Status Informations
 	engine.GET("/api/status", a.getStatus)
 	engine.GET("/api/config", a.getConfiguration)
@@ -77,4 +83,8 @@ func (a *Application) registerHTTPMappings(engine *gin.Engine) {
 	engine.POST("/api/config", a.updateConfig)
 	engine.POST("/api/control/start", a.startCollecting)
 	engine.POST("/api/control/stop", a.stopCollecting)
+}
+
+func (a *Application) redirectToUi(ctx *gin.Context) {
+	ctx.Redirect(301, "/ui")
 }

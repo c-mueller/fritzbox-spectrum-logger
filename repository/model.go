@@ -29,3 +29,9 @@ type SpectrumKey struct {
 }
 
 type SpectraKeys []SpectrumKey
+
+type SpectraStats struct {
+	TotalCount     int64 `json:"total_count"`
+	LatestSpectrum int64 `json:"latest_spectrum"`
+	FirstSpectrum  int64 `json:"first_spectrum"`
+}

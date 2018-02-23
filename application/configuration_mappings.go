@@ -24,11 +24,17 @@ import (
 )
 
 func (a *Application) getStatus(ctx *gin.Context) {
+	stats, err := a.repo.GetStatistics()
+	if err != nil {
+		ctx.String(500, "")
+		return
+	}
 	if a.latest == nil {
 		ctx.JSON(200, StatusResponse{
 			State:         a.state.String(),
 			Uptime:        int64(time.Since(a.startTime).Seconds()),
 			SpectrumCount: a.sessionLogCounter,
+			Stats:         stats,
 		})
 	} else {
 		ctx.JSON(200, StatusResponse{
@@ -36,9 +42,9 @@ func (a *Application) getStatus(ctx *gin.Context) {
 			Uptime:        int64(time.Since(a.startTime).Seconds()),
 			SpectrumCount: a.sessionLogCounter,
 			Latest:        a.latest,
+			Stats:         stats,
 		})
 	}
-
 }
 
 func (a *Application) getConfiguration(ctx *gin.Context) {

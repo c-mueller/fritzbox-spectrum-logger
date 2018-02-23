@@ -24,9 +24,9 @@ import (
 func GetFromTimestamp(timestamp int64) SpectrumKey {
 	t := time.Unix(timestamp, 0)
 	return SpectrumKey{
-		Day:   string(t.Day()),
-		Month: string(int(t.Month())),
-		Year:  string(t.Year()),
+		Day:   fmt.Sprintf("%d", t.Day()),
+		Month: fmt.Sprintf("%d", int(t.Month())),
+		Year:  fmt.Sprintf("%d", t.Year()),
 	}
 }
 
@@ -80,4 +80,11 @@ func (k SpectraKeys) Less(i, j int) bool {
 	} else {
 		return aY < bY
 	}
+}
+
+func convertToByte(year, month, day int) ([]byte, []byte, []byte) {
+	yearByte := []byte(fmt.Sprintf("%d", year))
+	monthByte := []byte(fmt.Sprintf("%d", month))
+	dayByte := []byte(fmt.Sprintf("%d", day))
+	return yearByte, monthByte, dayByte
 }

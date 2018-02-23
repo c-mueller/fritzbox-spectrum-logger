@@ -1,3 +1,7 @@
 .center {
   margin: auto;
 }
+
+.table-row {
+  width: 50%;
+}

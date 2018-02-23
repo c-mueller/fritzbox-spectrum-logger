@@ -30,7 +30,26 @@ import (
 	"time"
 )
 
-func TestTest_Parallel_Usage(t *testing.T) {
+func TestCollect_Stats(t *testing.T) {
+	tmpdir := filet.TmpDir(t, "")
+	defer filet.CleanUp(t)
+
+	repo, err := NewRepository(filepath.Join(tmpdir, "test_db.db"))
+	assert.NoErrorf(t, err, "Initialization Failed")
+
+	spectrum := loadTestSpectrum(t)
+
+	insertSpectra(spectrum, repo, t, 10000, 6)
+
+	stats, err := repo.GetStatistics()
+	assert.NoError(t, err)
+
+	assert.Equal(t, int64(10000), stats.TotalCount)
+
+	repo.Close()
+}
+
+func Test_Parallel_Usage(t *testing.T) {
 	tmpdir := filet.TmpDir(t, "")
 	defer filet.CleanUp(t)
 
@@ -58,50 +77,6 @@ func TestTest_Parallel_Usage(t *testing.T) {
 		t.FailNow()
 	}
 
-}
-
-func handleInsertions(t *testing.T, repo *Repository, wg *sync.WaitGroup) {
-	spectrum := loadTestSpectrum(t)
-	defer wg.Done()
-	cnt := 0
-	for i := 0; i < 50; i++ {
-		executions := int64(0)
-		timeSum := int64(0)
-		for j := 0; j < 250; j++ {
-			spectrum.Timestamp = spectrum.Timestamp + int64(j+i*1000)
-
-			ts := time.Now()
-			err := repo.Insert(spectrum)
-			timeSum += time.Since(ts).Nanoseconds()
-			executions++
-
-			assert.NoError(t, err)
-			time.Sleep(10 * time.Microsecond)
-			cnt++
-		}
-
-		fmt.Printf("Insertion Round %d Done. Average Operation Time %s\n", i, time.Duration(timeSum/executions)*time.Nanosecond)
-
-		time.Sleep(100 * time.Microsecond)
-	}
-	t.Log("Inserted", cnt, "Elements")
-}
-
-func handleRetrievals(t *testing.T, repo *Repository, wg *sync.WaitGroup) {
-	defer wg.Done()
-	for i := 0; i < 80; i++ {
-		executions := int64(0)
-		timeSum := int64(0)
-		for j := 0; j < 500; j++ {
-			ts := time.Now()
-			_, err := repo.GetAllSpectrumKeys()
-			timeSum += time.Since(ts).Nanoseconds()
-			executions++
-			assert.NoError(t, err)
-		}
-		fmt.Printf("Retrieval Round %d Done. Average Operation Time %s\n", i, time.Duration(timeSum/executions)*time.Nanosecond)
-		time.Sleep(100 * time.Microsecond)
-	}
 }
 
 func TestInitRepo(t *testing.T) {
@@ -290,4 +265,48 @@ func loadTestSpectrum(t testing.TB) *fritz.Spectrum {
 	file.Close()
 	err = json.Unmarshal(data, &result)
 	return result
+}
+
+func handleInsertions(t *testing.T, repo *Repository, wg *sync.WaitGroup) {
+	spectrum := loadTestSpectrum(t)
+	defer wg.Done()
+	cnt := 0
+	for i := 0; i < 50; i++ {
+		executions := int64(0)
+		timeSum := int64(0)
+		for j := 0; j < 250; j++ {
+			spectrum.Timestamp = spectrum.Timestamp + int64(j+i*1000)
+
+			ts := time.Now()
+			err := repo.Insert(spectrum)
+			timeSum += time.Since(ts).Nanoseconds()
+			executions++
+
+			assert.NoError(t, err)
+			time.Sleep(10 * time.Microsecond)
+			cnt++
+		}
+
+		fmt.Printf("Insertion Round %d Done. Average Operation Time %s\n", i, time.Duration(timeSum/executions)*time.Nanosecond)
+
+		time.Sleep(100 * time.Microsecond)
+	}
+	t.Log("Inserted", cnt, "Elements")
+}
+
+func handleRetrievals(t *testing.T, repo *Repository, wg *sync.WaitGroup) {
+	defer wg.Done()
+	for i := 0; i < 80; i++ {
+		executions := int64(0)
+		timeSum := int64(0)
+		for j := 0; j < 500; j++ {
+			ts := time.Now()
+			_, err := repo.GetAllSpectrumKeys()
+			timeSum += time.Since(ts).Nanoseconds()
+			executions++
+			assert.NoError(t, err)
+		}
+		fmt.Printf("Retrieval Round %d Done. Average Operation Time %s\n", i, time.Duration(timeSum/executions)*time.Nanosecond)
+		time.Sleep(100 * time.Microsecond)
+	}
 }

@@ -22,6 +22,7 @@ import (
 	"github.com/c-mueller/fritzbox-spectrum-logger/fritz"
 	"github.com/op/go-logging"
 	"sort"
+	"strconv"
 	"time"
 )
 
@@ -45,40 +46,9 @@ func NewRepository(path string) (*Repository, error) {
 func (r *Repository) GetAllSpectrumKeys() (SpectraKeys, error) {
 	keys := make(SpectraKeys, 0)
 
-	err := r.db.View(func(tx *bolt.Tx) error {
-		spectraBucket := tx.Bucket([]byte(SpectrumListBucketName))
-
-		err := spectraBucket.ForEach(func(yearKey, v []byte) error {
-			yearBucket := spectraBucket.Bucket(yearKey)
-			if yearBucket == nil {
-				//Ignore element if it is not a bucket
-				return nil
-			}
-			err := yearBucket.ForEach(func(monthKey, v []byte) error {
-				monthBucket := yearBucket.Bucket(monthKey)
-				if monthBucket == nil {
-					//Ignore element if it is not a bucket
-					return nil
-				}
-				err := monthBucket.ForEach(func(dayKey, v []byte) error {
-					dayBucket := monthBucket.Bucket(dayKey)
-					if dayBucket == nil {
-						//Ignore element if it is not a bucket
-						return nil
-					}
-					key := SpectrumKey{
-						Year:  string(yearKey),
-						Month: string(monthKey),
-						Day:   string(dayKey),
-					}
-					keys = append(keys, key)
-					return nil
-				})
-				return err
-			})
-			return err
-		})
-		return err
+	err := r.forEachSpectrumKey(func(dayBucket *bolt.Bucket, key SpectrumKey) error {
+		keys = append(keys, key)
+		return nil
 	})
 
 	if err != nil {
@@ -88,22 +58,6 @@ func (r *Repository) GetAllSpectrumKeys() (SpectraKeys, error) {
 	sort.Sort(keys)
 
 	return keys, nil
-}
-
-func (r *Repository) GetSpectraForSpectrumKey(k SpectrumKey) ([]*fritz.Spectrum, error) {
-	if !k.IsValid() {
-		return nil, InvalidDateKey
-	}
-	y, m, d := k.GetIntegerValues()
-	return r.GetSpectraForDay(d, m, y)
-}
-
-func (r *Repository) GetSpectrumBySpectrumKey(k *SpectrumKey, timestamp int64) (*fritz.Spectrum, error) {
-	if !k.IsValid() {
-		return nil, InvalidDateKey
-	}
-	y, m, d := k.GetIntegerValues()
-	return r.GetSpectrum(d, m, y, timestamp)
 }
 
 func (r *Repository) GetSpectrum(day, month, year int, timestamp int64) (*fritz.Spectrum, error) {
@@ -131,26 +85,16 @@ func (r *Repository) GetSpectrum(day, month, year int, timestamp int64) (*fritz.
 }
 
 func (r *Repository) GetSpectraForDay(day, month, year int) ([]*fritz.Spectrum, error) {
-	yearByte, monthByte, dayByte := convertToByte(year, month, day)
 	data := make([]*fritz.Spectrum, 0)
 
-	err := r.db.View(func(tx *bolt.Tx) error {
-
-		dayBucket, err := r.getDayBucket(dayByte, monthByte, yearByte, tx)
+	err := r.forEachSpectrumInDay(year, month, day, func(dayBucket *bolt.Bucket, k, v []byte) error {
+		var spectrum *fritz.Spectrum
+		err := json.Unmarshal(v, &spectrum)
 		if err != nil {
 			return err
 		}
-
-		err = dayBucket.ForEach(func(k, v []byte) error {
-			var spectrum *fritz.Spectrum
-			err := json.Unmarshal(v, &spectrum)
-			if err != nil {
-				return err
-			}
-			data = append(data, spectrum)
-			return nil
-		})
-		return err
+		data = append(data, spectrum)
+		return nil
 	})
 	if err != nil {
 		return nil, err
@@ -162,9 +106,7 @@ func (r *Repository) GetSpectraForDay(day, month, year int) ([]*fritz.Spectrum, 
 func (r *Repository) Insert(spectrum *fritz.Spectrum) error {
 	err := r.db.Update(func(tx *bolt.Tx) error {
 		timestamp := time.Unix(spectrum.Timestamp, 0)
-		year := fmt.Sprintf("%d", timestamp.Year())
-		month := fmt.Sprintf("%d", int(timestamp.Month()))
-		day := fmt.Sprintf("%d", timestamp.Day())
+		year, month, day := convertToByte(timestamp.Year(), int(timestamp.Month()), timestamp.Day())
 
 		spectraBucket, _ := tx.CreateBucketIfNotExists([]byte(SpectrumListBucketName))
 
@@ -184,43 +126,42 @@ func (r *Repository) Insert(spectrum *fritz.Spectrum) error {
 	return err
 }
 
+func (r *Repository) GetStatistics() (*SpectraStats, error) {
+	min := time.Now().Unix() * 2
+	max := int64(0)
+	count := int64(0)
+
+	err := r.forEachSpectrumKey(func(dayBucket *bolt.Bucket, key SpectrumKey) error {
+		err := dayBucket.ForEach(func(k, v []byte) error {
+			count++
+			parsedTimestamp, err := strconv.ParseInt(string(k), 10, 64)
+			if err != nil {
+				return err
+			}
+			if parsedTimestamp < min {
+				min = parsedTimestamp
+			}
+			if parsedTimestamp > max {
+				max = parsedTimestamp
+			}
+			return nil
+		})
+		return err
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &SpectraStats{
+		FirstSpectrum:  min,
+		LatestSpectrum: max,
+		TotalCount:     count,
+	}, nil
+}
+
 func (r *Repository) Close() error {
 	log.Debug("Closing Database")
 	return r.db.Close()
-}
-
-func (r *Repository) getDayBucket(dayByte, monthByte, yearByte []byte, tx *bolt.Tx) (*bolt.Bucket, error) {
-	spectraBucket := tx.Bucket([]byte(SpectrumListBucketName))
-	if spectraBucket == nil {
-		log.Error("Spectra Bucket not found!")
-		return nil, BucketNotFoundError
-	}
-	yearBucket := spectraBucket.Bucket(yearByte)
-	if yearBucket == nil {
-		log.Errorf("Year Bucket (Year: '%s') not found!",
-			string(yearByte))
-		return nil, BucketNotFoundError
-	}
-	monthBucket := yearBucket.Bucket(monthByte)
-	if monthBucket == nil {
-		log.Errorf("Month Bucket (Year: '%s' Month: '%s') not found!",
-			string(yearByte), string(monthByte))
-		return nil, BucketNotFoundError
-	}
-	dayBucket := monthBucket.Bucket(dayByte)
-	if dayBucket == nil {
-		log.Errorf("Month Bucket (Year: '%s' Month: '%s' Day: '%s') not found!",
-			string(yearByte), string(monthByte), string(dayByte))
-		return nil, BucketNotFoundError
-	}
-	return dayBucket, nil
-}
-
-func convertToByte(year, month, day int) ([]byte, []byte, []byte) {
-	yearByte := []byte(fmt.Sprintf("%d", year))
-	monthByte := []byte(fmt.Sprintf("%d", month))
-	dayByte := []byte(fmt.Sprintf("%d", day))
-	return yearByte, monthByte, dayByte
 }
 
 func initDb(db *bolt.DB) error {

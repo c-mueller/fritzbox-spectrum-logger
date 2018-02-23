@@ -16,12 +16,13 @@
 package application
 
 import (
+	"time"
+
+	"github.com/GeertJohan/go.rice"
 	"github.com/c-mueller/fritzbox-spectrum-logger/config"
 	"github.com/c-mueller/fritzbox-spectrum-logger/repository"
 	"github.com/gin-gonic/gin"
 	"github.com/op/go-logging"
-	"time"
-	"github.com/GeertJohan/go.rice"
 )
 
 var log = logging.MustGetLogger("server")
@@ -64,11 +65,12 @@ func (a *Application) Listen() error {
 }
 
 func (a *Application) registerHTTPMappings(engine *gin.Engine) {
-	ui := rice.MustFindBox("ui-dist")
-	engine.StaticFS("/ui", ui.HTTPBox())
+	ui, err := rice.FindBox("ui-dist")
+	if err == nil {
+		engine.StaticFS("/ui", ui.HTTPBox())
 
-	engine.GET("/", a.redirectToUi)
-
+		engine.GET("/", a.redirectToUi)
+	}
 	//Status Informations
 	engine.GET("/api/status", a.getStatus)
 	engine.GET("/api/config", a.getConfiguration)

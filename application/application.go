@@ -46,7 +46,7 @@ func LaunchApplication(configPath string) *Application {
 
 func (a *Application) Listen() error {
 	log.Debug("Launching server...")
-	log.Debug("Initilializing repository (datastore)")
+	log.Debug("Initializing repository (Datastore)")
 	repo, err := repository.NewRepository(a.config.DatabasePath)
 
 	if err != nil {
@@ -70,6 +70,8 @@ func (a *Application) registerHTTPMappings(engine *gin.Engine) {
 		engine.StaticFS("/ui", ui.HTTPBox())
 
 		engine.GET("/", a.redirectToUi)
+	} else {
+		log.Warning("This is a Development Binary. This Means the WebApplication is not available on <URL>/ui")
 	}
 	//Status Informations
 	engine.GET("/api/status", a.getStatus)

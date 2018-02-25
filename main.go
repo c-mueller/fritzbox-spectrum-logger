@@ -28,15 +28,12 @@ var format = logging.MustStringFormatter(
 var log = logging.MustGetLogger("main")
 
 func main() {
-	stderrBackend := logging.NewLogBackend(os.Stderr, "", 0)
 	stdoutBackend := logging.NewLogBackend(os.Stdout, "", 0)
 
 	stdoutBackendFormatter := logging.NewBackendFormatter(stdoutBackend, format)
-	stderrLeveled := logging.AddModuleLevel(stderrBackend)
-	stderrLeveled.SetLevel(logging.ERROR, "")
 
 	// Set the backends to be used.
-	logging.SetBackend(stderrLeveled, stdoutBackendFormatter)
+	logging.SetBackend(stdoutBackendFormatter)
 
 	log.Debug("Initialized Logger")
 

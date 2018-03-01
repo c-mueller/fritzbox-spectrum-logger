@@ -9,15 +9,11 @@
           <tbody>
           <tr>
             <td scope="col" class="table-row">Status</td>
-            <td scope="col" class="table-row">Logging</td>
+            <td scope="col" class="table-row">{{ status.state }}</td>
           </tr>
           <tr>
             <td scope="col" class="table-row">Uptime</td>
-            <td scope="col" class="table-row">10h 10m</td>
-          </tr>
-          <tr>
-            <td scope="col" class="table-row">Spectras Downloaded</td>
-            <td scope="col" class="table-row">1.337</td>
+            <td scope="col" class="table-row">{{ status.uptime }}</td>
           </tr>
           </tbody>
         </table>
@@ -25,16 +21,20 @@
         <table class="table table-hover">
           <tbody>
           <tr>
+            <td scope="col" class="table-row">Spectras Downloaded (Current Session)</td>
+            <td scope="col" class="table-row">{{ stats.spectrum_count }}</td>
+          </tr>
+          <tr>
             <td scope="col" class="table-row">Total Spectras</td>
-            <td scope="col" class="table-row">13.337</td>
+            <td scope="col" class="table-row"> {{ stats.stats.total_count }}</td>
           </tr>
           <tr>
             <td scope="col" class="table-row">First Entry</td>
-            <td scope="col" class="table-row">20.02.2018 - 15:35:10</td>
+            <td scope="col" class="table-row">{{ toTime(stats.stats.first_spectrum) }}</td>
           </tr>
           <tr>
             <td scope="col" class="table-row">Latest Entry</td>
-            <td scope="col" class="table-row">20.02.2018 - 15:35:10</td>
+            <td scope="col" class="table-row">{{ toTime(stats.stats.latest_spectrum) }}</td>
           </tr>
           </tbody>
         </table>

@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {ApiService} from '../../services/api/api.service';
+import {StatResponse, StatusResponse} from '../../services/api/model';
 
 @Component({
   selector: 'app-status',
@@ -7,9 +9,23 @@ import { Component, OnInit } from '@angular/core';
 })
 export class StatusComponent implements OnInit {
 
-  constructor() { }
+  status: StatusResponse = {state: '', uptime: -1};
+  stats: StatResponse = {latest: null, spectrum_count: -1, stats: null};
+
+  constructor(private api: ApiService) {
+  }
 
   ngOnInit() {
+    this.api.getStatus().subscribe(e => {
+      this.status = e;
+    });
+    this.api.getStats().subscribe(e => {
+      this.stats = e;
+    });
+  }
+
+  toTime(val: number): string {
+    return new Date(val * 1000).toLocaleString();
   }
 
 }

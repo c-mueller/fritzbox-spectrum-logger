@@ -23,6 +23,7 @@ import (
 	"github.com/c-mueller/fritzbox-spectrum-logger/repository"
 	"github.com/gin-gonic/gin"
 	"github.com/op/go-logging"
+	"github.com/gin-contrib/cors"
 )
 
 var log = logging.MustGetLogger("server")
@@ -58,6 +59,9 @@ func (a *Application) Listen() error {
 	log.Debug("Registering HTTP mappings")
 	gin.SetMode(gin.ReleaseMode)
 	engine := gin.Default()
+
+	engine.Use(cors.Default())
+
 	a.registerHTTPMappings(engine)
 
 	log.Debug("Launched HTTP Server")
@@ -75,6 +79,7 @@ func (a *Application) registerHTTPMappings(engine *gin.Engine) {
 	}
 	//Status Informations
 	engine.GET("/api/status", a.getStatus)
+	engine.GET("/api/stats", a.getStats)
 	engine.GET("/api/config", a.getConfiguration)
 
 	//Spectra Retrieval

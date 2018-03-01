@@ -24,22 +24,25 @@ import (
 )
 
 func (a *Application) getStatus(ctx *gin.Context) {
+	ctx.JSON(200, StatusResponse{
+		State:  a.state.String(),
+		Uptime: int64(time.Since(a.startTime).Seconds()),
+	})
+}
+
+func (a *Application) getStats(ctx *gin.Context) {
 	stats, err := a.repo.GetStatistics()
 	if err != nil {
 		ctx.String(500, "")
 		return
 	}
 	if a.latest == nil {
-		ctx.JSON(200, StatusResponse{
-			State:         a.state.String(),
-			Uptime:        int64(time.Since(a.startTime).Seconds()),
+		ctx.JSON(200, StatResponse{
 			SpectrumCount: a.sessionLogCounter,
 			Stats:         stats,
 		})
 	} else {
-		ctx.JSON(200, StatusResponse{
-			State:         a.state.String(),
-			Uptime:        int64(time.Since(a.startTime).Seconds()),
+		ctx.JSON(200, StatResponse{
 			SpectrumCount: a.sessionLogCounter,
 			Latest:        a.latest,
 			Stats:         stats,

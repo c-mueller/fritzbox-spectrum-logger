@@ -20,8 +20,11 @@ type Application struct {
 }
 
 type StatusResponse struct {
-	State         string                   `json:"state"`
-	Uptime        int64                    `json:"uptime"`
+	State  string `json:"state"`
+	Uptime int64  `json:"uptime"`
+}
+
+type StatResponse struct {
 	SpectrumCount int64                    `json:"spectrum_count"`
 	Latest        *LatestSpectrumResponse  `json:"latest"`
 	Stats         *repository.SpectraStats `json:"stats"`

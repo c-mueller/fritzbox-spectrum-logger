@@ -10,6 +10,8 @@ import {HashLocationStrategy, LocationStrategy} from '@angular/common';
 import {AboutComponent} from './pages/about/about.component';
 import {ConfigComponent} from './pages/config/config.component';
 import {SpectraComponent} from './pages/spectra/spectra.component';
+import {HttpClientModule} from '@angular/common/http';
+import {ApiService} from './services/api/api.service';
 
 const appRoutes: Routes = [
   {
@@ -50,6 +52,8 @@ const appRoutes: Routes = [
   ],
   imports: [
     BrowserModule,
+    HttpClientModule,
+    BrowserModule,
     RouterModule.forRoot(appRoutes),
     NgbModule.forRoot(),
     NgbAlertModule.forRoot()
@@ -58,7 +62,8 @@ const appRoutes: Routes = [
     {
       provide: LocationStrategy,
       useClass: HashLocationStrategy
-    }
+    },
+    ApiService,
   ],
   bootstrap: [AppComponent]
 })

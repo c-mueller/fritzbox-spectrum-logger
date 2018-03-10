@@ -28,13 +28,15 @@ func ReadOrCreate(path string) (*Configuration, error) {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		log.Debug("Creating new Configuration")
 		cfg := Configuration{
-			cfgPath:                path,
-			BindAddress:            defaultBindAddress,
-			DatabasePath:           defaultDbPath,
-			AskForPassword:         defaultAskForPassword,
-			Autolaunch:             defaultAutoLaunch,
-			UpdateInterval:         defaultInterval,
-			SessionRefreshInterval: defaultSessionRefreshInterval,
+			cfgPath:                    path,
+			BindAddress:                defaultBindAddress,
+			DatabasePath:               defaultDbPath,
+			AskForPassword:             defaultAskForPassword,
+			Autolaunch:                 defaultAutoLaunch,
+			SessionRenewalAttemptCount: defaultSessionRefreshAttempts,
+			MaxDownloadFails:           defaultMaxDownloadFails,
+			UpdateInterval:             defaultInterval,
+			SessionRefreshInterval:     defaultSessionRefreshInterval,
 			Credentials: RouterCredentials{
 				Endpoint: defaultEndpoint,
 			},

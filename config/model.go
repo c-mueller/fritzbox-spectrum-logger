@@ -18,20 +18,24 @@ package config
 const defaultBindAddress = ":8080"
 const defaultInterval = 60
 const defaultSessionRefreshInterval = 3600
+const defaultSessionRefreshAttempts = 5
+const defaultMaxDownloadFails = 5
 const defaultAskForPassword = false
 const defaultAutoLaunch = false
 const defaultDbPath = "spectra.db"
 const defaultEndpoint = "192.168.178.1"
 
 type Configuration struct {
-	Credentials            RouterCredentials `yaml:"credentials" json:"credentials"`
-	DatabasePath           string            `yaml:"database_path" json:"database_path"`
-	UpdateInterval         int               `yaml:"update_interval" json:"update_interval"`
-	AskForPassword         bool              `yaml:"ask_for_password" json:"ask_for_password"`
-	Autolaunch             bool              `yaml:"autolaunch" json:"autolaunch"`
-	BindAddress            string            `yaml:"bind_address" json:"bind_address"`
-	SessionRefreshInterval int               `yaml:"session_refresh_interval" json:"session_refresh_interval" `
-	cfgPath                string
+	Credentials                RouterCredentials `yaml:"credentials" json:"credentials"`
+	DatabasePath               string            `yaml:"database_path" json:"database_path"`
+	UpdateInterval             int               `yaml:"update_interval" json:"update_interval"`
+	AskForPassword             bool              `yaml:"ask_for_password" json:"ask_for_password"`
+	Autolaunch                 bool              `yaml:"autolaunch" json:"autolaunch"`
+	BindAddress                string            `yaml:"bind_address" json:"bind_address"`
+	SessionRefreshInterval     int               `yaml:"session_refresh_interval" json:"session_refresh_interval"`
+	SessionRenewalAttemptCount int               `yaml:"session_refresh_attempts" json:"session_refresh_attempts" `
+	MaxDownloadFails           int               `yaml:"max_download_fails" json:"max_download_fails"`
+	cfgPath                    string
 }
 
 type RouterCredentials struct {

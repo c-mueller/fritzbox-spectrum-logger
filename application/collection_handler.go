@@ -63,9 +63,7 @@ func (a *Application) collectionHandler() {
 	a.state = LOGGING
 
 	log.Info("Logging into Fritz!Box")
-	cred := a.config.Credentials
-	a.session = fritz.NewClient(cred.Endpoint, cred.Username, cred.Password)
-	err := a.session.Login()
+	err := a.createSession()
 	if err != nil {
 		log.Error("Login failed: ", err)
 		a.updateTicker.Stop()
@@ -75,6 +73,20 @@ func (a *Application) collectionHandler() {
 	log.Info("Logged In!")
 
 	for range a.updateTicker.C {
+
+		if a.session.TokenTimedOut(int64(a.config.SessionRefreshInterval)) {
+			log.Info("Renewing Session...")
+			log.Info("Logging into Fritz!Box")
+			err := a.createSession()
+			if err != nil {
+				log.Error("Login failed: ", err)
+				a.updateTicker.Stop()
+				a.state = ERROR
+				return
+			}
+			log.Info("Logged In!")
+		}
+
 		log.Debug("Downloading Spectrum...")
 		err := a.collect()
 		if err != nil {
@@ -84,6 +96,13 @@ func (a *Application) collectionHandler() {
 			return
 		}
 	}
+}
+
+func (a *Application) createSession() error {
+	cred := a.config.Credentials
+	a.session = fritz.NewClient(cred.Endpoint, cred.Username, cred.Password)
+	err := a.session.Login()
+	return err
 }
 
 func (a *Application) collect() error {

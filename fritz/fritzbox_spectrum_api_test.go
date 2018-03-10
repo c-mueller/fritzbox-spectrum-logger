@@ -43,7 +43,7 @@ func TestDownloadSpectrum(t *testing.T) {
 		Endpoint: str,
 		Username: "",
 		Password: "",
-		tokenAge: 1,
+		TokenAge: 1,
 		client:   http.DefaultClient,
 		sessionInfo: &SessionInfo{
 			SID: "1234567890",

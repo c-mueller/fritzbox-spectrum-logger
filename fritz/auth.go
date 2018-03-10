@@ -25,6 +25,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // Creates a new Client instance.
@@ -44,20 +45,21 @@ func NewClient(endpoint, username, password string) *Session {
 // Attempts a Login with the Credentials set in the session.
 // To Perform other operations, like downloading a spectrum, you have to call this operation
 // A error is returned if the credentials are wrong or the Login could not get performed.
-func (c *Session) Login() error {
-	initialSession, err := c.getInitialSessionInfo()
+func (s *Session) Login() error {
+	initialSession, err := s.getInitialSessionInfo()
 	if err != nil {
 		return err
 	}
 	//Login is done at this point, because there is no authentication
 	if initialSession.Valid() {
-		c.sessionInfo = initialSession
+		s.sessionInfo = initialSession
+		s.TokenAge = time.Now().Unix()
 		return nil
 	}
 
-	responseString := fmt.Sprintf("%s-%s", initialSession.Challenge, hashChallenge(initialSession.Challenge, c.Password))
+	responseString := fmt.Sprintf("%s-%s", initialSession.Challenge, hashChallenge(initialSession.Challenge, s.Password))
 
-	err = c.internalLogin(responseString)
+	err = s.internalLogin(responseString)
 
 	if err != nil {
 		return err
@@ -66,14 +68,14 @@ func (c *Session) Login() error {
 	return nil
 }
 
-func (c *Session) internalLogin(challengeResponse string) error {
-	p, err := c.getLoginUrl()
+func (s *Session) internalLogin(challengeResponse string) error {
+	p, err := s.getLoginUrl()
 	if err != nil {
 		return err
 	}
 
 	data := url.Values{}
-	data.Add("username", c.Username)
+	data.Add("username", s.Username)
 	data.Add("response", challengeResponse)
 
 	req, err := http.NewRequest("POST", p.String(), strings.NewReader(data.Encode()))
@@ -83,7 +85,7 @@ func (c *Session) internalLogin(challengeResponse string) error {
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
 
-	resp, err := c.client.Do(req)
+	resp, err := s.client.Do(req)
 	if err != nil {
 		return err
 	}
@@ -91,25 +93,26 @@ func (c *Session) internalLogin(challengeResponse string) error {
 	if !info.Valid() {
 		return errors.New("fritz_auth: Login Failed. Check your credentials")
 	}
-	c.sessionInfo = info
+	s.sessionInfo = info
+	s.TokenAge = time.Now().Unix()
 	return nil
 }
 
-func (c *Session) getInitialSessionInfo() (*SessionInfo, error) {
-	p, err := c.getLoginUrl()
+func (s *Session) getInitialSessionInfo() (*SessionInfo, error) {
+	p, err := s.getLoginUrl()
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := c.client.Get(p.String())
+	resp, err := s.client.Get(p.String())
 	if err != nil {
 		return nil, err
 	}
 	return parseFromResponse(resp)
 }
 
-func (c *Session) getLoginUrl() (*url.URL, error) {
-	return c.getUrl("/login_sid.lua")
+func (s *Session) getLoginUrl() (*url.URL, error) {
+	return s.getUrl("/login_sid.lua")
 }
 
 func parseFromResponse(resp *http.Response) (*SessionInfo, error) {

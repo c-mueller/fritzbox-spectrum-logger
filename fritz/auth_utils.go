@@ -15,22 +15,8 @@
 
 package fritz
 
-import (
-	"fmt"
-	"net/url"
-)
+import "time"
 
-func (s *Session) getUrl(rawurl string) (*url.URL, error) {
-	base, err := url.Parse(fmt.Sprintf("http://%s", s.Endpoint))
-	if err != nil {
-		s.client = nil
-		return nil, err
-	}
-	loginPath, err := url.Parse(rawurl)
-	if err != nil {
-		s.client = nil
-		return nil, err
-	}
-
-	return base.ResolveReference(loginPath), nil
+func (s *Session) TokenTimedOut(maxAge int64) bool {
+	return (time.Now().Unix() - s.TokenAge) >= maxAge
 }

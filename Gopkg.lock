@@ -72,6 +72,7 @@
   branch = "master"
   name = "github.com/golang/freetype"
   packages = [
+    ".",
     "raster",
     "truetype"
   ]
@@ -249,6 +250,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "23f1f33bcbc5dabf37a6b2d96a93e7e1172b9c8ade651a3b73efcce6aa2dddd2"
+  inputs-digest = "4ce0f0b700fdfdb926e071d732dc419c70d997c98f71caf2e74a8af075e180b0"
   solver-name = "gps-cdcl"
   solver-version = 1

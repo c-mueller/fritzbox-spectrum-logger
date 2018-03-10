@@ -26,6 +26,8 @@ pipeline:
       # Compile static dependency file
       - cd application
       - rice embed-go
+      - cd ../fritz
+      - rice embed-go
   build:
     image: golang:${GO_VERSION}
     commands:

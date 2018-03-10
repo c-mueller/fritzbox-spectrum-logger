@@ -21,9 +21,9 @@ import (
 	"github.com/GeertJohan/go.rice"
 	"github.com/c-mueller/fritzbox-spectrum-logger/config"
 	"github.com/c-mueller/fritzbox-spectrum-logger/repository"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/op/go-logging"
-	"github.com/gin-contrib/cors"
 )
 
 var log = logging.MustGetLogger("server")

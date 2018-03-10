@@ -28,13 +28,13 @@ var errSessionTimedOut = errors.New("spectrum_dl: Downloading spectrum failed, m
 
 // This operation downloads the Spectrum from the Fritz!Box
 // A error gets returned if the download fails.
-func (c *Session) GetSpectrum() (*Spectrum, error) {
-	spcUrl, err := c.getSpectrumUrl()
+func (s *Session) GetSpectrum() (*Spectrum, error) {
+	spcUrl, err := s.getSpectrumUrl()
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := c.client.Get(spcUrl.String())
+	res, err := s.client.Get(spcUrl.String())
 	if err != nil {
 		return nil, err
 	}
@@ -55,8 +55,8 @@ func (c *Session) GetSpectrum() (*Spectrum, error) {
 	return spectrum, nil
 }
 
-func (c *Session) getSpectrumUrl() (*url.URL, error) {
-	return c.getUrl(fmt.Sprintf("/internet/dsl_spectrum.lua?sid=%s&useajax=1", c.sessionInfo.SID))
+func (s *Session) getSpectrumUrl() (*url.URL, error) {
+	return s.getUrl(fmt.Sprintf("/internet/dsl_spectrum.lua?sid=%s&useajax=1", s.sessionInfo.SID))
 }
 
 // Converts the given spectrum to a ByteArray

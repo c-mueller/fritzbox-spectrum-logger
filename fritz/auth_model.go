@@ -22,7 +22,7 @@ type Session struct {
 	Username    string
 	Password    string
 	sessionInfo *SessionInfo
-	tokenAge    int64
+	TokenAge    int64
 	client      *http.Client
 }
 

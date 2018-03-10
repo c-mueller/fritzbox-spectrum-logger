@@ -62,47 +62,63 @@ func (a *Application) collectionHandler() {
 	a.updateTicker = time.NewTicker(updateInterval)
 	a.state = LOGGING
 
-	log.Info("Logging into Fritz!Box")
-	err := a.createSession()
-	if err != nil {
-		log.Error("Login failed: ", err)
-		a.updateTicker.Stop()
-		a.state = ERROR
+	if !a.renewSession(true) {
 		return
 	}
-	log.Info("Logged In!")
+
+	renewalAttempts := 0
+	spectrumLoadErrors := 0
 
 	for range a.updateTicker.C {
 
 		if a.session.TokenTimedOut(int64(a.config.SessionRefreshInterval)) {
 			log.Info("Renewing Session...")
-			log.Info("Logging into Fritz!Box")
-			err := a.createSession()
-			if err != nil {
-				log.Error("Login failed: ", err)
+			renewalSuccessful := a.renewSession(false)
+			if !renewalSuccessful && renewalAttempts < a.config.SessionRenewalAttemptCount {
+				renewalAttempts++
+				continue
+			} else if !renewalSuccessful && renewalAttempts >= a.config.SessionRenewalAttemptCount {
+				log.Errorf("Logging Stopped because %d Login attempts in a row have failed!", spectrumLoadErrors)
 				a.updateTicker.Stop()
 				a.state = ERROR
 				return
 			}
-			log.Info("Logged In!")
 		}
+		renewalAttempts = 0
 
 		log.Debug("Downloading Spectrum...")
 		err := a.collect()
 		if err != nil {
+			spectrumLoadErrors++
 			log.Errorf("Could not download Spectrum. Aborting. Error: %v", err)
-			a.state = ERROR
-			a.updateTicker.Stop()
-			return
+			if spectrumLoadErrors >= a.config.MaxDownloadFails {
+				log.Errorf("Logging Stopped because %d Download attempts in a row have failed!", spectrumLoadErrors)
+				a.updateTicker.Stop()
+				a.state = ERROR
+				return
+			}
+		} else {
+			spectrumLoadErrors = 0
 		}
 	}
 }
 
-func (a *Application) createSession() error {
+func (a *Application) renewSession(failOnError bool) bool {
+	log.Info("Logging into Fritz!Box")
 	cred := a.config.Credentials
-	a.session = fritz.NewClient(cred.Endpoint, cred.Username, cred.Password)
-	err := a.session.Login()
-	return err
+	session := fritz.NewClient(cred.Endpoint, cred.Username, cred.Password)
+	err := session.Login()
+	if err != nil {
+		log.Error("Login failed: ", err)
+		if failOnError {
+			a.updateTicker.Stop()
+			a.state = ERROR
+		}
+		return false
+	}
+	a.session = session
+	log.Info("Logged In!")
+	return true
 }
 
 func (a *Application) collect() error {

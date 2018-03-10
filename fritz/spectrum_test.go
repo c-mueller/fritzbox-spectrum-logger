@@ -23,6 +23,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestDrawSpectrum(t *testing.T) {
@@ -32,7 +33,8 @@ func TestDrawSpectrum(t *testing.T) {
 
 	t.Log("Loading test Data")
 	data := loadTestData(t)
-	imgdata, _ := data.Render()
+	imgdata, err := data.Render()
+	assert.NoError(t, err)
 	fmt.Println(len(imgdata))
 
 	path := filepath.Join(tmpDir, "test.png")

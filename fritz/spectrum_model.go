@@ -55,5 +55,8 @@ type UpstreamRange struct {
 type renderConfig struct {
 	PrimaryColor   color.RGBA
 	SecondaryColor color.RGBA
+	PilotColor     color.RGBA
+	MinColor       color.RGBA
+	MaxColor       color.RGBA
 	SecondaryAreas []UpstreamRange
 }

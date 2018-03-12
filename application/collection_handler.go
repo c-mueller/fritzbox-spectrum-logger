@@ -24,8 +24,7 @@ import (
 
 func (a *Application) startCollecting(ctx *gin.Context) {
 	if a.state != LOGGING {
-		log.Info("Starting Spectrum Logging")
-		go a.collectionHandler()
+		a.startLogging()
 		ctx.JSON(200, InfoResponse{
 			State:   LOGGING.String(),
 			Message: "Collection Started!",
@@ -40,10 +39,7 @@ func (a *Application) startCollecting(ctx *gin.Context) {
 
 func (a *Application) stopCollecting(ctx *gin.Context) {
 	if a.state == LOGGING {
-		log.Info("Stopping Collector")
-		a.updateTicker.Stop()
-		log.Info("Collection Stopped!")
-		a.state = IDLE
+		a.stopLogging()
 		ctx.JSON(200, InfoResponse{
 			State:   a.state.String(),
 			Message: "Collection Stopped! State Change will occur soon!",
@@ -54,6 +50,18 @@ func (a *Application) stopCollecting(ctx *gin.Context) {
 			Message: "Not Logging. Cannot Stop.",
 		})
 	}
+}
+
+func (a *Application) startLogging() {
+	log.Info("Starting Spectrum Logging")
+	go a.collectionHandler()
+}
+
+func (a *Application) stopLogging() {
+	log.Info("Stopping Collector")
+	a.updateTicker.Stop()
+	log.Info("Collection Stopped!")
+	a.state = IDLE
 }
 
 func (a *Application) collectionHandler() {

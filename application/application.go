@@ -64,6 +64,11 @@ func (a *Application) Listen() error {
 
 	a.registerHTTPMappings(engine)
 
+	if a.config.Autolaunch {
+		log.Debug("Autolaunching Spectrum Logging")
+		a.startLogging()
+	}
+
 	log.Debug("Launched HTTP Server")
 	return engine.Run(a.bindAdr)
 }

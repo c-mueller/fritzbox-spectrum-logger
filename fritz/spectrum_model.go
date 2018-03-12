@@ -52,8 +52,20 @@ type UpstreamRange struct {
 	LastIndex  int `json:"LAST"`
 }
 
+type spectrumGraph struct {
+	PortIndex      int
+	Minimum        ValueList
+	Maximum        ValueList
+	Current        ValueList
+	PilotIndex     int
+	UpstreamRanges []UpstreamRange
+	RenderConfig   renderConfig
+}
+
 type renderConfig struct {
 	PrimaryColor   color.RGBA
 	SecondaryColor color.RGBA
-	SecondaryAreas []UpstreamRange
+	PilotColor     color.RGBA
+	MinColor       color.RGBA
+	MaxColor       color.RGBA
 }

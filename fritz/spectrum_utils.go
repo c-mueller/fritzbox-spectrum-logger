@@ -15,6 +15,32 @@
 
 package fritz
 
+func (p *SpectrumPort) toSNRSpectrum(portIdx int) *spectrumGraph {
+	graph := spectrumGraph{
+		Maximum:        p.SpectrumInfo.MaximumSNRValues,
+		Minimum:        p.SpectrumInfo.MinimumSNRValues,
+		Current:        p.SpectrumInfo.CurrentSNRValues,
+		UpstreamRanges: make([]UpstreamRange, 0),
+		PilotIndex:     -1,
+		PortIndex:      portIdx,
+		RenderConfig:   snrRenderConfig,
+	}
+	return &graph
+}
+
+func (p *SpectrumPort) toBitSpectrum(portIdx int) *spectrumGraph {
+	graph := spectrumGraph{
+		Maximum:        p.SpectrumInfo.MaximumBitValues,
+		Minimum:        p.SpectrumInfo.MinimumBitValues,
+		Current:        p.SpectrumInfo.CurrentBitValues,
+		UpstreamRanges: p.SpectrumInfo.UpstreamRanges,
+		PilotIndex:     p.SpectrumInfo.PilotToneIndex,
+		PortIndex:      portIdx,
+		RenderConfig:   bitRenderConfig,
+	}
+	return &graph
+}
+
 func (c ValueList) getMax() float64 {
 	max := 0
 	for _, v := range c {
@@ -37,8 +63,12 @@ func (s SpectrumPorts) getMaxCount() int {
 	return maxLen
 }
 
-func (r *renderConfig) useSecondary(idx int) bool {
-	for _, v := range r.SecondaryAreas {
+func (g *spectrumGraph) drawPilot() bool {
+	return g.PilotIndex != -1
+}
+
+func (g *spectrumGraph) useSecondary(idx int) bool {
+	for _, v := range g.UpstreamRanges {
 		if idx >= v.FirstIndex && idx <= v.LastIndex {
 			return true
 		}

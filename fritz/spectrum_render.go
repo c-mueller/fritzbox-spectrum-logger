@@ -16,26 +16,17 @@
 package fritz
 
 import (
+	"bytes"
 	"fmt"
+	"github.com/GeertJohan/go.rice"
 	"github.com/fogleman/gg"
+	"github.com/golang/freetype"
+	"github.com/golang/freetype/truetype"
 	"image/color"
 	"image/png"
+	"math"
 	"time"
-	"github.com/GeertJohan/go.rice"
-	"github.com/golang/freetype/truetype"
-	"bytes"
-	"github.com/golang/freetype"
 )
-
-const barWidth = 4
-const gridCount = 20
-
-var gray = color.RGBA{R: 200, G: 200, B: 200, A: 0}
-var darkGray = color.RGBA{R: 20, G: 20, B: 20, A: 0}
-var black = color.RGBA{R: 0, G: 0, B: 0, A: 0}
-var purple = color.RGBA{R: 255, G: 0, B: 255, A: 0}
-var green = color.RGBA{R: 0, G: 255, B: 0, A: 0}
-var blue = color.RGBA{R: 0, G: 0, B: 255}
 
 // Renders the spectrum to a PNG byte array
 func (s *Spectrum) Render() ([]byte, error) {
@@ -56,11 +47,12 @@ func (s *Spectrum) Render() ([]byte, error) {
 	img.Fill()
 
 	//Set Font
-	fontBox, err := rice.FindBox("font")
+	fontBox, err := rice.FindBox(fontBoxName)
 	if err != nil {
 		return nil, err
 	}
-	fontBytes, err := fontBox.Bytes("luxisr.ttf")
+
+	fontBytes, err := fontBox.Bytes(fontPath)
 	if err != nil {
 		return nil, err
 	}
@@ -80,21 +72,13 @@ func (s *Spectrum) Render() ([]byte, error) {
 		portHeading := fmt.Sprintf("Port #%d - %s - (From %s)", index, port.SpectrumInfo.ConnectionMode, spectrumTime)
 		img.DrawString(portHeading, 10, float64(15+index*560))
 
+		//TODO Support Multiple Ports
+
 		//Render SNR Spectrum
-		port.renderSpectrum(index, img, port.SpectrumInfo.CurrentSNRValues,
-			30, 20, renderConfig{
-				PrimaryColor:   purple,
-				SecondaryColor: purple,
-				SecondaryAreas: make([]UpstreamRange, 0),
-			})
+		port.toSNRSpectrum(index).render(30, 20, img)
 
 		//Render Bit Spectrum
-		port.renderSpectrum(index, img, port.SpectrumInfo.CurrentBitValues,
-			30, 300, renderConfig{
-				PrimaryColor:   blue,
-				SecondaryColor: green,
-				SecondaryAreas: port.SpectrumInfo.UpstreamRanges,
-			})
+		port.toBitSpectrum(index).render(30, 300, img)
 	}
 
 	outputBuffer := bytes.NewBuffer([]byte(""))
@@ -107,53 +91,62 @@ func (s *Spectrum) Render() ([]byte, error) {
 	return outputBuffer.Bytes(), nil
 }
 
-func (port *SpectrumPort) renderSpectrum(index int, img *gg.Context, data ValueList, startX, startY float64, config renderConfig) {
+func (g *spectrumGraph) render(startX, startY float64, img *gg.Context) {
 	setColor(img, gray)
-	img.DrawRectangle(startX, startY+(float64(index)*560), float64(len(port.SpectrumInfo.CurrentBitValues)*barWidth), 250)
+	img.DrawRectangle(startX, startY+(float64(g.PortIndex)*560), float64(len(g.Current)*barWidth), maxSpectrumHeight)
 	img.Fill()
 
-	maxHeight := float64(data.getMax() * 1.10)
-	length := float64(len(data))
+	maxHeight := float64(g.Current.getMax() * 1.10)
 
-	port.renderGrid(img, startX, startY, length, data)
+	g.renderGrid(startX, startY, img)
 
-	for idx, valueHeight := range data {
-		if config.useSecondary(idx) {
-			setColor(img, config.SecondaryColor)
+	for idx, valueHeight := range g.Current {
+		if g.useSecondary(idx) {
+			setColor(img, g.RenderConfig.SecondaryColor)
 		} else {
-			setColor(img, config.PrimaryColor)
+			setColor(img, g.RenderConfig.PrimaryColor)
 		}
-		height := (float64(valueHeight) / maxHeight) * 250.0
-		x, y := startX+float64(idx)*barWidth, startY+(float64(index * 560))+(250-height)
+		height := (float64(valueHeight) / maxHeight) * float64(maxSpectrumHeight)
+		x, y := startX+float64(idx)*barWidth, startY+(float64(g.PortIndex*560))+(maxSpectrumHeight-height)
 		img.DrawRectangle(x, y, barWidth, height)
 		img.Fill()
 	}
 
+	if g.drawPilot() {
+		setColor(img, g.RenderConfig.PilotColor)
+		x, y := startX+float64(g.PilotIndex)*barWidth, startY+(float64(g.PortIndex*560))
+		img.DrawRectangle(x, y, barWidth, maxSpectrumHeight)
+		img.Fill()
+	}
 }
 
-func (port *SpectrumPort) renderGrid(img *gg.Context, startX, startY, length float64, data ValueList) {
+func (g *spectrumGraph) renderGrid(startX, startY float64, img *gg.Context) {
 	//Calculate Maximum Horizontal Value
-	max := data.getMax() * 1.10
-	scale := int(max / gridCount)
+	length := float64(len(g.Current))
+	max := g.Current.getMax() * 1.10
+	scale := max / float64(horizontalGridCount)
 	if scale == 0 {
 		scale = 1
 	}
 
-	for i := 1; i <= (gridCount - 1); i++ {
-		setColor(img, darkGray)
-		//Draw Vertical lines of the grid
-		vX, vY := startX+float64(i)*(length/gridCount)*barWidth, startY
-		img.DrawLine(vX, vY, vX, vY+260)
+	setColor(img, darkGray)
+	//Draw Horizontal Lines of the grid
+	for i := 1; i <= (horizontalGridCount - 1); i++ {
+		hX, hY := startX-10, startY+((float64(i)/horizontalGridCount)*maxSpectrumHeight)
+		img.DrawLine(hX, hY, hX+length*barWidth+gridLineOffset, hY)
+		img.Stroke()
+		hLineText := int(math.Ceil(scale * float64(horizontalGridCount-i)))
+		img.DrawString(fmt.Sprintf("%d", hLineText), hX-20, hY)
+	}
+
+	//Draw Vertical lines of the grid
+	for i := 1; i <= (verticalGridCount - 1); i++ {
+		vX, vY := startX+float64(i)*(length/verticalGridCount)*barWidth, startY
+		img.DrawLine(vX, vY, vX, vY+maxSpectrumHeight+gridLineOffset)
 		img.Stroke()
 		//Draw Line Description
-		vLineValue := int64(length * (float64(i) / gridCount))
-		img.DrawString(fmt.Sprintf("%d", vLineValue), vX+5, vY+260+5)
-
-		//Draw Horizontal Lines of the grid
-		hX, hY := startX-10, startY+((float64(i)/gridCount)*250)
-		img.DrawLine(hX, hY, hX+length*barWidth+10, hY)
-		img.Stroke()
-		img.DrawString(fmt.Sprintf("%d", scale*(gridCount-i)), hX-20, hY)
+		vLineText := int64(math.Ceil(length * (float64(i) / verticalGridCount)))
+		img.DrawString(fmt.Sprintf("%d", vLineText), vX+5, vY+maxSpectrumHeight+gridLineOffset+5)
 	}
 }
 
@@ -162,7 +155,7 @@ func setColor(img *gg.Context, color color.RGBA) {
 }
 
 func (s *Spectrum) computeSize() (int, int) {
-	height := s.PortCount*(30+2*250+30) + 50
+	height := s.PortCount*(30+2*maxSpectrumHeight+30) + 50
 	width := 60 + barWidth*s.Ports.getMaxCount()
 	return width, height
 }

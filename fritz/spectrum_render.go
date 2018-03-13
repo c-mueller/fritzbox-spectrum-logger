@@ -72,11 +72,8 @@ func (s *Spectrum) Render() ([]byte, error) {
 		portHeading := fmt.Sprintf("Port #%d - %s - (From %s)", index, port.SpectrumInfo.ConnectionMode, spectrumTime)
 		img.DrawString(portHeading, 10, float64(15+index*560))
 
-		//TODO Support Multiple Ports
-
 		//Render SNR Spectrum
 		port.toSNRSpectrum(index).render(30, 20+float64(index*(30+2*maxSpectrumHeight+30)), img)
-
 		//Render Bit Spectrum
 		port.toBitSpectrum(index).render(30, 300+float64(index*(30+2*maxSpectrumHeight+30)), img)
 	}
@@ -92,31 +89,58 @@ func (s *Spectrum) Render() ([]byte, error) {
 }
 
 func (g *spectrumGraph) render(startX, startY float64, img *gg.Context) {
-	setColor(img, gray)
-	img.DrawRectangle(startX, startY, float64(len(g.Current)*barWidth), maxSpectrumHeight)
-	img.Fill()
-
-	maxHeight := float64(g.Current.getMax() * 1.10)
+	g.fillBackground(startX, startY, img)
 
 	g.renderGrid(startX, startY, img)
 
-	for idx, valueHeight := range g.Current {
-		if g.useSecondary(idx) {
-			setColor(img, g.RenderConfig.SecondaryColor)
-		} else {
-			setColor(img, g.RenderConfig.PrimaryColor)
-		}
-		height := (float64(valueHeight) / maxHeight) * float64(maxSpectrumHeight)
-		x, y := startX+float64(idx)*barWidth, startY+(maxSpectrumHeight-height)
-		img.DrawRectangle(x, y, barWidth, height)
-		img.Fill()
-	}
+	g.renderCurrent(startX, startY, img)
 
+	//Draw Minimum and maxiumum
+	g.renderLine(g.Minimum, g.RenderConfig.MinColor, startX, startY, img) // Minimum
+	g.renderLine(g.Maximum, g.RenderConfig.MaxColor, startX, startY, img) // Maximum
+
+	g.renderPilot(startX, startY, img)
+}
+
+func (g *spectrumGraph) renderLine(data ValueList, lineColor color.RGBA, startX, startY float64, img *gg.Context) {
+	maxHeight := float64(g.Current.getMax() * 1.10)
+	oldY := float64(0)
+	for idx, heightValue := range data {
+		setColor(img, lineColor)
+		height := (float64(heightValue) / maxHeight) * float64(maxSpectrumHeight)
+		x, y := startX+float64(idx)*barWidth, startY+(maxSpectrumHeight-height)
+		if idx != 0 && idx-1 != g.PilotIndex {
+			img.DrawRectangle(x, oldY, 1, y-oldY)
+		}
+		img.DrawRectangle(x, y, barWidth, 1)
+		img.Fill()
+		oldY = y
+	}
+}
+
+func (g *spectrumGraph) renderPilot(startX, startY float64, img *gg.Context) {
 	if g.drawPilot() {
 		setColor(img, g.RenderConfig.PilotColor)
 		x, y := startX+float64(g.PilotIndex)*barWidth, startY
 		img.DrawRectangle(x, y, barWidth, maxSpectrumHeight)
 		img.Fill()
+	}
+}
+
+func (g *spectrumGraph) renderCurrent(startX, startY float64, img *gg.Context) {
+	maxHeight := float64(g.Current.getMax() * 1.10)
+	for idx, heightValue := range g.Current {
+		if g.useSecondary(idx) {
+			setColor(img, g.RenderConfig.SecondaryColor)
+		} else {
+			setColor(img, g.RenderConfig.PrimaryColor)
+		}
+		height := (float64(heightValue) / maxHeight) * float64(maxSpectrumHeight)
+		x, y := startX+float64(idx)*barWidth, startY+(maxSpectrumHeight-height)
+		if heightValue != 0 {
+			img.DrawRectangle(x, y, barWidth, height)
+			img.Fill()
+		}
 	}
 }
 
@@ -129,7 +153,7 @@ func (g *spectrumGraph) renderGrid(startX, startY float64, img *gg.Context) {
 		scale = 1
 	}
 
-	setColor(img, darkGray)
+	setColor(img, g.RenderConfig.GridColor)
 	//Draw Horizontal Lines of the grid
 	for i := 1; i <= (horizontalGridCount - 1); i++ {
 		hX, hY := startX-10, startY+((float64(i)/horizontalGridCount)*maxSpectrumHeight)
@@ -148,4 +172,10 @@ func (g *spectrumGraph) renderGrid(startX, startY float64, img *gg.Context) {
 		vLineText := int64(math.Ceil(length * (float64(i) / verticalGridCount)))
 		img.DrawString(fmt.Sprintf("%d", vLineText), vX+5, vY+maxSpectrumHeight+gridLineOffset+5)
 	}
+}
+
+func (g *spectrumGraph) fillBackground(startX, startY float64, img *gg.Context) {
+	setColor(img, g.RenderConfig.BackgroundColor)
+	img.DrawRectangle(startX, startY, float64(len(g.Current)*barWidth), maxSpectrumHeight)
+	img.Fill()
 }

@@ -26,13 +26,33 @@ import (
 	"testing"
 )
 
+const singlePortSpectrumPath = "testdata/example_spectrum.json"
+const multiPortSpectrumPath = "testdata/example_spectrum_multiport.json"
+
 func TestDrawSpectrum(t *testing.T) {
 	tmpDir := filet.TmpDir(t, "")
 	t.Log("Using tmpdir", tmpDir)
 	//defer filet.CleanUp(t)
 
 	t.Log("Loading test Data")
-	data := loadTestData(t)
+	data := loadTestData(t, singlePortSpectrumPath)
+	imgdata, err := data.Render()
+	assert.NoError(t, err)
+	fmt.Println(len(imgdata))
+
+	path := filepath.Join(tmpDir, "test.png")
+	file, _ := os.Create(path)
+	file.Write(imgdata)
+	file.Close()
+}
+
+func TestDrawSpectrum_MultiPort(t *testing.T) {
+	tmpDir := filet.TmpDir(t, "")
+	t.Log("Using tmpdir", tmpDir)
+	//defer filet.CleanUp(t)
+
+	t.Log("Loading test Data")
+	data := loadTestData(t, multiPortSpectrumPath)
 	imgdata, err := data.Render()
 	assert.NoError(t, err)
 	fmt.Println(len(imgdata))
@@ -45,15 +65,15 @@ func TestDrawSpectrum(t *testing.T) {
 
 func BenchmarkRenderSpeed(b *testing.B) {
 	b.Log("Loading test Data")
-	data := loadTestData(nil)
+	data := loadTestData(nil, singlePortSpectrumPath)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		data.Render()
 	}
 }
 
-func loadTestData(t *testing.T) *Spectrum {
-	file, err := os.Open("testdata/example_spectrum.json")
+func loadTestData(t *testing.T, path string) *Spectrum {
+	file, err := os.Open(path)
 	if err != nil {
 		t.Log(err)
 		t.FailNow()

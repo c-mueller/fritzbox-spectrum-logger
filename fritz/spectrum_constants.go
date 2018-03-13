@@ -26,6 +26,7 @@ const verticalGridCount = 8
 const fontBoxName = "font"
 const fontPath = "luxisr.ttf"
 
+var orange = color.RGBA{R: 255, G: 161, B: 0, A: 0} //rgb(255, 161, 0)
 var gray = color.RGBA{R: 200, G: 200, B: 200, A: 0}
 var darkGray = color.RGBA{R: 20, G: 20, B: 20, A: 0}
 var black = color.RGBA{R: 0, G: 0, B: 0, A: 0}
@@ -35,16 +36,20 @@ var green = color.RGBA{R: 0, G: 255, B: 0, A: 0}
 var blue = color.RGBA{R: 0, G: 0, B: 255}
 
 var bitRenderConfig = renderConfig{
-	PrimaryColor:   blue,
-	SecondaryColor: green,
-	PilotColor:     purple,
-	MinColor:       red,
-	MaxColor:       red,
+	PrimaryColor:    blue,
+	SecondaryColor:  green,
+	PilotColor:      purple,
+	MinColor:        red,
+	MaxColor:        black,
+	BackgroundColor: gray,
+	GridColor:       darkGray,
 }
 
 var snrRenderConfig = renderConfig{
-	PrimaryColor:   purple,
-	SecondaryColor: purple,
-	MinColor:       red,
-	MaxColor:       red,
+	PrimaryColor:    orange,
+	SecondaryColor:  orange,
+	MinColor:        red,
+	MaxColor:        black,
+	BackgroundColor: gray,
+	GridColor:       darkGray,
 }

@@ -63,9 +63,11 @@ type spectrumGraph struct {
 }
 
 type renderConfig struct {
-	PrimaryColor   color.RGBA
-	SecondaryColor color.RGBA
-	PilotColor     color.RGBA
-	MinColor       color.RGBA
-	MaxColor       color.RGBA
+	PrimaryColor    color.RGBA
+	SecondaryColor  color.RGBA
+	PilotColor      color.RGBA
+	MinColor        color.RGBA
+	MaxColor        color.RGBA
+	GridColor       color.RGBA
+	BackgroundColor color.RGBA
 }

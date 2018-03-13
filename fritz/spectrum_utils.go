@@ -15,6 +15,11 @@
 
 package fritz
 
+import (
+	"github.com/fogleman/gg"
+	"image/color"
+)
+
 func (p *SpectrumPort) toSNRSpectrum(portIdx int) *spectrumGraph {
 	graph := spectrumGraph{
 		Maximum:        p.SpectrumInfo.MaximumSNRValues,
@@ -74,4 +79,15 @@ func (g *spectrumGraph) useSecondary(idx int) bool {
 		}
 	}
 	return false
+}
+
+
+func setColor(img *gg.Context, color color.RGBA) {
+	img.SetRGB255(int(color.R), int(color.G), int(color.B))
+}
+
+func (s *Spectrum) computeSize() (int, int) {
+	height := s.PortCount*(30+2*maxSpectrumHeight+30) + 50
+	width := 60 + barWidth*s.Ports.getMaxCount()
+	return width, height
 }

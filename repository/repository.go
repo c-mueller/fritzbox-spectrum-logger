@@ -60,7 +60,7 @@ func (r *Repository) GetAllSpectrumKeys() (SpectraKeys, error) {
 	return keys, nil
 }
 
-func (r *Repository) GetSpectraForTimestamp(timestamp int64) (*fritz.Spectrum, error) {
+func (r *Repository) GetSpectrumForTimestamp(timestamp int64) (*fritz.Spectrum, error) {
 	t := time.Unix(timestamp, 0)
 	d, m, y := t.Day(), int(t.Month()), t.Year()
 	return r.GetSpectrum(d, m, y, timestamp)
@@ -90,16 +90,16 @@ func (r *Repository) GetSpectrum(day, month, year int, timestamp int64) (*fritz.
 	return spectrum, nil
 }
 
-func (r *Repository) GetSpectraForDay(day, month, year int) ([]*fritz.Spectrum, error) {
-	data := make([]*fritz.Spectrum, 0)
+func (r *Repository) GetTimestampsForDay(day, month, year int) ([]int64, error) {
+	data := make([]int64, 0)
 
 	err := r.forEachSpectrumInDay(year, month, day, func(dayBucket *bolt.Bucket, k, v []byte) error {
-		var spectrum *fritz.Spectrum
-		err := json.Unmarshal(v, &spectrum)
+		timestampString := string(k)
+		timestamp, err := strconv.ParseInt(timestampString, 10, 64)
 		if err != nil {
 			return err
 		}
-		data = append(data, spectrum)
+		data = append(data, timestamp)
 		return nil
 	})
 	if err != nil {

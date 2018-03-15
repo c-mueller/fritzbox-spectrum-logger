@@ -1,5 +1,5 @@
 // Fritz!Box Spectrum Logger (https://github.com/c-mueller/fritzbox-spectrum-logger)
-// Copyright (c) 2018 Christian Müller<cmueller.dev@gmail.com>.
+// Copyright (c) 2018 Christian Müller <cmueller.dev@gmail.com>.
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by

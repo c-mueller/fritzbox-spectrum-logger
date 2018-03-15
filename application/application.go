@@ -1,5 +1,5 @@
 // Fritz!Box Spectrum Logger (https://github.com/c-mueller/fritzbox-spectrum-logger).
-// Copyright (c) 2018 Christian Müller<cmueller.dev@gmail.com>.
+// Copyright (c) 2018 Christian Müller <cmueller.dev@gmail.com>.
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -90,8 +90,8 @@ func (a *Application) registerHTTPMappings(engine *gin.Engine) {
 	//Spectra Retrieval
 	engine.GET("/api/spectra", a.getValidDates)
 	engine.GET("/api/spectra/:year/:month/:day", a.listSpectraForDay)
-	engine.GET("/api/spectra/:year/:month/:day/:timestamp", a.getRawSpectrum)
-	engine.GET("/api/spectra/:year/:month/:day/:timestamp/img", a.getRenderedSpectrum)
+	engine.GET("/api/spectrum/:timestamp", a.getJsonSpectrum)
+	engine.GET("/api/spectrum/:timestamp/img", a.getRenderedSpectrum)
 
 	//Configuration Operations
 	engine.POST("/api/config", a.updateConfig)

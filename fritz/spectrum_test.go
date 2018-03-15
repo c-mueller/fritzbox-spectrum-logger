@@ -1,5 +1,5 @@
 // Fritz!Box Spectrum Logger (https://github.com/c-mueller/fritzbox-spectrum-logger).
-// Copyright (c) 2018 Christian Müller<cmueller.dev@gmail.com>.
+// Copyright (c) 2018 Christian Müller <cmueller.dev@gmail.com>.
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@ package fritz
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/Flaque/filet"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
@@ -32,13 +31,16 @@ const multiPortSpectrumPath = "testdata/example_spectrum_multiport.json"
 func TestDrawSpectrum(t *testing.T) {
 	tmpDir := filet.TmpDir(t, "")
 	t.Log("Using tmpdir", tmpDir)
-	//defer filet.CleanUp(t)
+	//Comment out the next line to Investigate the render Output
+	defer filet.CleanUp(t)
 
 	t.Log("Loading test Data")
 	data := loadTestData(t, singlePortSpectrumPath)
 	imgdata, err := data.Render()
 	assert.NoError(t, err)
-	fmt.Println(len(imgdata))
+	t.Log("Data length:", len(imgdata), "Bytes")
+
+	assert.True(t, len(imgdata) > 50000)
 
 	path := filepath.Join(tmpDir, "test.png")
 	file, _ := os.Create(path)
@@ -49,13 +51,16 @@ func TestDrawSpectrum(t *testing.T) {
 func TestDrawSpectrum_MultiPort(t *testing.T) {
 	tmpDir := filet.TmpDir(t, "")
 	t.Log("Using tmpdir", tmpDir)
-	//defer filet.CleanUp(t)
+	//Comment out the next line to Investigate the render Output
+	defer filet.CleanUp(t)
 
 	t.Log("Loading test Data")
 	data := loadTestData(t, multiPortSpectrumPath)
 	imgdata, err := data.Render()
 	assert.NoError(t, err)
-	fmt.Println(len(imgdata))
+	t.Log("Data length:", len(imgdata), "Bytes")
+
+	assert.True(t, len(imgdata) > 50000)
 
 	path := filepath.Join(tmpDir, "test.png")
 	file, _ := os.Create(path)
@@ -63,9 +68,18 @@ func TestDrawSpectrum_MultiPort(t *testing.T) {
 	file.Close()
 }
 
-func BenchmarkRenderSpeed(b *testing.B) {
+func BenchmarkRenderSpeed_SinglePort(b *testing.B) {
 	b.Log("Loading test Data")
 	data := loadTestData(nil, singlePortSpectrumPath)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		data.Render()
+	}
+}
+
+func BenchmarkRenderSpeed_MultiPort(b *testing.B) {
+	b.Log("Loading test Data")
+	data := loadTestData(nil, multiPortSpectrumPath)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		data.Render()

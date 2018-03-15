@@ -1,0 +1,20 @@
+.date-button-group {
+  margin-top: 2%;
+  width: 100%;
+}
+
+#selection-table {
+  width: 100%;
+}
+
+#selection-table-left {
+  width: 25%;
+}
+
+#selection-table-right {
+  width: 75%;
+}
+
+td, th {
+  vertical-align: top;
+}

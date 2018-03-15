@@ -13,6 +13,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+export interface TimestampList {
+  timestamps: number[];
+  timestamp: number;
+  requested_day: DateKey;
+}
+
 export interface StatusResponse {
   state: string;
   uptime: number;
@@ -38,6 +44,11 @@ export interface RepoStats {
 export interface LatestSpectrum {
   timestamp: number;
   date: DateKey;
+}
+
+export interface SpectraKeyList {
+  timestamp: number;
+  keys: DateKey[];
 }
 
 export interface DateKey {

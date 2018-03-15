@@ -1,5 +1,5 @@
 // Fritz!Box Spectrum Logger (https://github.com/c-mueller/fritzbox-spectrum-logger).
-// Copyright (c) 2018 Christian Müller<cmueller.dev@gmail.com>.
+// Copyright (c) 2018 Christian Müller <cmueller.dev@gmail.com>.
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -58,6 +58,12 @@ func (r *Repository) GetAllSpectrumKeys() (SpectraKeys, error) {
 	sort.Sort(keys)
 
 	return keys, nil
+}
+
+func (r *Repository) GetSpectraForTimestamp(timestamp int64) (*fritz.Spectrum, error) {
+	t := time.Unix(timestamp, 0)
+	d, m, y := t.Day(), int(t.Month()), t.Year()
+	return r.GetSpectrum(d, m, y, timestamp)
 }
 
 func (r *Repository) GetSpectrum(day, month, year int, timestamp int64) (*fritz.Spectrum, error) {

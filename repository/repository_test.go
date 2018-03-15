@@ -1,5 +1,5 @@
 // Fritz!Box Spectrum Logger (https://github.com/c-mueller/fritzbox-spectrum-logger).
-// Copyright (c) 2018 Christian Müller<cmueller.dev@gmail.com>.
+// Copyright (c) 2018 Christian Müller <cmueller.dev@gmail.com>.
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -126,27 +126,47 @@ func TestRepository_GetAllSpectrumKeys(t *testing.T) {
 }
 
 func TestRepository_GetSpectraForDay(t *testing.T) {
-	//tmpdir := filet.TmpDir(t, "")
-	//defer filet.CleanUp(t)
-	//
-	//repo, err := NewRepository(filepath.Join(tmpdir, "test_db.db"))
-	//assert.NoErrorf(t, err, "Initialization Failed")
-	//
-	//spectrum := loadTestSpectrum(t)
-	//
-	//insertSpectra(spectrum, repo, t, 1000, 6)
-	//
-	//for i := 1; i <= 5; i++ {
-	//	s, err := repo.GetSpectraForDay(i, 3, 2018)
-	//	assert.NoError(t, err, "Retrieving Spectras failed")
-	//	//assert.Equal(t, 4, len(s))
-	//
-	//	for _, v := range s {
-	//		assert.Equal(t, 1, v.PortCount)
-	//		assert.NotEqual(t, 0, v.Ports[0].SpectrumInfo.PilotToneIndex)
-	//	}
-	//}
-	//repo.Close()
+	tmpdir := filet.TmpDir(t, "")
+	defer filet.CleanUp(t)
+
+	repo, err := NewRepository(filepath.Join(tmpdir, "test_db.db"))
+	assert.NoErrorf(t, err, "Initialization Failed")
+
+	spectrum := loadTestSpectrum(t)
+
+	insertSpectra(spectrum, repo, t, 1000, 6)
+
+	for i := 1; i <= 5; i++ {
+		s, err := repo.GetSpectraForDay(i, 3, 2018)
+		assert.NoError(t, err, "Retrieving Spectras failed")
+		//assert.Equal(t, 4, len(s))
+
+		for _, v := range s {
+			assert.Equal(t, 1, v.PortCount)
+			assert.NotEqual(t, 0, v.Ports[0].SpectrumInfo.PilotToneIndex)
+		}
+	}
+	repo.Close()
+}
+
+func TestRepository_GetSpectrumForTimestamp(t *testing.T) {
+	tmpdir := filet.TmpDir(t, "")
+	defer filet.CleanUp(t)
+
+	repo, err := NewRepository(filepath.Join(tmpdir, "test_db.db"))
+	assert.NoErrorf(t, err, "Initialization Failed")
+
+	spectrum := loadTestSpectrum(t)
+
+	err = repo.Insert(spectrum)
+	assert.NoError(t, err)
+
+	key, err := repo.GetSpectraForTimestamp(1516233800)
+	assert.NoError(t, err)
+	assert.Equal(t, key.PortCount, 1)
+	assert.Equal(t, key.Timestamp, int64(1516233800))
+
+	repo.Close()
 }
 
 func TestRepository_GetSpectraForDayByKeys(t *testing.T) {
@@ -249,7 +269,7 @@ func BenchmarkGetByKey(b *testing.B) {
 
 func insertSpectra(spectrum *fritz.Spectrum, repo *Repository, t testing.TB, count, hourMultiplier int) {
 	for i := 0; i < count; i++ {
-		timestamp := time.Now()
+		timestamp := time.Date(2018, 2, 14, 0, 0, 0, 0, time.UTC)
 		timestamp = timestamp.Add(time.Duration(i*hourMultiplier) * time.Hour)
 		spectrum.Timestamp = timestamp.Unix()
 		err := repo.Insert(spectrum)

@@ -42,15 +42,11 @@ func (a *Application) listSpectraForDay(ctx *gin.Context) {
 		ctx.String(404, "")
 		return
 	}
-	spectra, err := a.repo.GetSpectraForSpectrumKey(key)
+	timestamps, err := a.repo.GetTimestampsForSpectrumKey(key)
 	if err != nil {
 		log.Errorf("Spectra Retrieval failed: %s", err)
 		ctx.String(404, "")
 		return
-	}
-	timestamps := make([]int64, 0)
-	for _, v := range spectra {
-		timestamps = append(timestamps, v.Timestamp)
 	}
 	ctx.JSON(200, TimestampResponse{
 		Timestamps:       timestamps,

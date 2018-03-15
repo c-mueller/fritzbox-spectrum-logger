@@ -17,23 +17,14 @@ package repository
 
 import (
 	"github.com/boltdb/bolt"
-	"github.com/c-mueller/fritzbox-spectrum-logger/fritz"
 )
 
-func (r *Repository) GetSpectraForSpectrumKey(k SpectrumKey) ([]*fritz.Spectrum, error) {
+func (r *Repository) GetTimestampsForSpectrumKey(k SpectrumKey) ([]int64, error) {
 	if !k.IsValid() {
 		return nil, InvalidDateKey
 	}
 	y, m, d := k.GetIntegerValues()
-	return r.GetSpectraForDay(d, m, y)
-}
-
-func (r *Repository) GetSpectrumBySpectrumKey(k *SpectrumKey, timestamp int64) (*fritz.Spectrum, error) {
-	if !k.IsValid() {
-		return nil, InvalidDateKey
-	}
-	y, m, d := k.GetIntegerValues()
-	return r.GetSpectrum(d, m, y, timestamp)
+	return r.GetTimestampsForDay(d, m, y)
 }
 
 func (r *Repository) forEachSpectrumInDay(y, m, d int, operator func(dayBucket *bolt.Bucket, k, v []byte) error) error {

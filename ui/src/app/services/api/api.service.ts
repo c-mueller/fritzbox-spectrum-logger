@@ -16,7 +16,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
-import {InfoResponse, StatResponse, StatusResponse} from './model';
+import {DateKey, InfoResponse, SpectraKeyList, StatResponse, StatusResponse, TimestampList} from './model';
 
 @Injectable()
 export class ApiService {
@@ -24,6 +24,14 @@ export class ApiService {
   private endpoint = environment.host;
 
   constructor(private http: HttpClient) {
+  }
+
+  getSpectrumKeys() {
+    return this.http.get<SpectraKeyList>(this.endpoint + '/spectra');
+  }
+
+  getTimestampsForKey(key: DateKey) {
+    return this.http.get<TimestampList>(this.endpoint + '/spectra/' + key.year + '/' + key.month + '/' + key.day);
   }
 
   startLogging() {

@@ -1,3 +1,54 @@
-<p>
-  spectra works!
-</p>
+<div class="row">
+  <div class="card border-primary col-sm-12 col-sm-offset-3">
+    <div class="card-body">
+      <p>Select a Date:</p>
+      <div class="card-text">
+        <div class="container">
+          <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-3">
+              <p>Date</p>
+              <div *ngFor="let e of keys.keys" class="date-button-group">
+                <button class="btn btn-danger btn-block" type="button" [value]="e" (click)="selectDateKey(e)"
+                        [disabled]="keysEqual(e, selectedKey)">
+                  {{e.day}}.{{e.month}}.{{e.year}}
+                </button>
+              </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-9" *ngIf="timestampList.length != 0 && !loading">
+              <p>Time</p>
+              <div *ngFor="let t of timestampList; let i = index" [attr.data-index]="i" [hidden]="t.length == 0"
+                   class="date-button-group">
+                <button type="button" class="btn btn-outline-primary btn-block" (click)="expandBlock(i)"
+                        [attr.aria-expanded]="expanded[i]" aria-controls="block">
+                  {{formatTimeIndex(i)}} - Count: {{t.length}}
+                </button>
+                <div id="block" [ngbCollapse]="!expanded[i]">
+                  <div class="card">
+                    <div class="card-body">
+                      <div class="container">
+                        <div class="row">
+                          <div class="col-xs-12 col-sm-6 col-md-3" *ngFor="let quarter of [0,1,2,3]">
+                            <p>{{getTimeRange(quarter,i)}}</p>
+                            <div class="btn-group-vertical" style="width: 100%">
+                              <button type="button" class="btn btn-block btn-outline-warning"
+                                      *ngFor="let j of getForQuarter(quarter,t)" (click)="showSpectrum(j)">
+                                {{formatTime(j)}}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <td *ngIf="loading" class="col-xs-12 col-sm-6 col-md-9">
+              <h2 style="text-align: center;">Loading...</h2>
+            </td>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

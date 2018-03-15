@@ -60,9 +60,9 @@ func (a *Application) listSpectraForDay(ctx *gin.Context) {
 }
 
 func (a *Application) getJsonSpectrum(ctx *gin.Context) {
-	key := getSpectrumKeyFormContext(ctx)
 	timestampString := ctx.Param("timestamp")
 	timestamp, err := strconv.ParseInt(timestampString, 10, 64)
+	key := repository.GetFromTimestamp(timestamp)
 	if !key.IsValid() || err != nil {
 		log.Errorf("A Invalid Key was requested: %s - Timestamp: %s", key.String(), timestampString)
 		ctx.String(404, "")
@@ -78,9 +78,9 @@ func (a *Application) getJsonSpectrum(ctx *gin.Context) {
 }
 
 func (a *Application) getRenderedSpectrum(ctx *gin.Context) {
-	key := getSpectrumKeyFormContext(ctx)
 	timestampString := ctx.Param("timestamp")
 	timestamp, err := strconv.ParseInt(timestampString, 10, 64)
+	key := repository.GetFromTimestamp(timestamp)
 	if !key.IsValid() || err != nil {
 		log.Errorf("A Invalid Key was requested: %s - Timestamp: %s", key.String(), timestampString)
 		ctx.String(404, "")

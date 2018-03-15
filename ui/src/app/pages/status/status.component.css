@@ -5,3 +5,11 @@
 .table-row {
   width: 50%;
 }
+
+#toggle-status-btn {
+  margin-top: 1%;
+}
+
+#refresh-block {
+  align-items: right;
+}

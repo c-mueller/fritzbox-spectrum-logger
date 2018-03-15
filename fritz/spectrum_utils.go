@@ -81,7 +81,6 @@ func (g *spectrumGraph) useSecondary(idx int) bool {
 	return false
 }
 
-
 func setColor(img *gg.Context, color color.RGBA) {
 	img.SetRGB255(int(color.R), int(color.G), int(color.B))
 }

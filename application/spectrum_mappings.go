@@ -64,7 +64,7 @@ func (a *Application) getJsonSpectrum(ctx *gin.Context) {
 		ctx.String(404, "")
 		return
 	}
-	spectrum, err := a.repo.GetSpectrumBySpectrumKey(&key, timestamp)
+	spectrum, err := a.repo.GetSpectrumForTimestamp(timestamp)
 	if err != nil {
 		log.Errorf("Spectra Retrieval failed: %s", err)
 		ctx.String(404, "")
@@ -82,7 +82,7 @@ func (a *Application) getRenderedSpectrum(ctx *gin.Context) {
 		ctx.String(404, "")
 		return
 	}
-	spectrum, err := a.repo.GetSpectrumBySpectrumKey(&key, timestamp)
+	spectrum, err := a.repo.GetSpectrumForTimestamp(timestamp)
 	if err != nil {
 		log.Errorf("Spectra Retrieval failed: %s", err)
 		ctx.String(404, "")

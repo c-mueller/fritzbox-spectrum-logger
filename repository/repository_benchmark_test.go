@@ -99,7 +99,7 @@ func Benchmark_Retrieve(b *testing.B) {
 
 	spectrum := loadTestSpectrum(b)
 
-	insertSpectra(spectrum, repo, b, 50000, 1)
+	insertSpectra(spectrum, repo, b, 5000, 1)
 	keys, err := repo.GetAllSpectrumKeys()
 	assert.NoError(b, err)
 

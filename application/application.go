@@ -74,6 +74,7 @@ func (a *Application) Listen() error {
 }
 
 func (a *Application) registerHTTPMappings(engine *gin.Engine) {
+	// Register Ui Mappings (if present)
 	ui, err := rice.FindBox("ui-dist")
 	if err == nil {
 		engine.StaticFS("/ui", ui.HTTPBox())
@@ -82,16 +83,20 @@ func (a *Application) registerHTTPMappings(engine *gin.Engine) {
 	} else {
 		log.Warning("This is a Development Binary. This Means the WebApplication is not available on <URL>/ui")
 	}
+
 	//Status Informations
 	engine.GET("/api/status", a.getStatus)
 	engine.GET("/api/stats", a.getStats)
 	engine.GET("/api/config", a.getConfiguration)
 
-	//Spectra Retrieval
+	//Spectra Listing
 	engine.GET("/api/spectra", a.getValidDates)
 	engine.GET("/api/spectra/:year/:month/:day", a.listSpectraForDay)
+
+	//Spectrum Retrieval
 	engine.GET("/api/spectrum/:timestamp", a.getJsonSpectrum)
 	engine.GET("/api/spectrum/:timestamp/img", a.getRenderedSpectrum)
+	engine.GET("/api/spectrum/:timestamp/neighbours", a.getNeighbours)
 
 	//Configuration Operations
 	engine.POST("/api/config", a.updateConfig)

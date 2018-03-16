@@ -19,7 +19,7 @@ import (
 	"github.com/boltdb/bolt"
 )
 
-func (r *Repository) GetTimestampsForSpectrumKey(k SpectrumKey) ([]int64, error) {
+func (r *Repository) GetTimestampsForSpectrumKey(k SpectrumKey) (TimestampArray, error) {
 	if !k.IsValid() {
 		return nil, InvalidDateKey
 	}

@@ -27,6 +27,8 @@ import {ConfigComponent} from './pages/config/config.component';
 import {SpectraComponent} from './pages/spectra/spectra.component';
 import {HttpClientModule} from '@angular/common/http';
 import {ApiService} from './services/api/api.service';
+import {SpectrumViewComponent} from './pages/spectrum-view/spectrum-view.component';
+
 
 const appRoutes: Routes = [
   {
@@ -36,6 +38,10 @@ const appRoutes: Routes = [
   {
     path: 'spectra',
     component: SpectraComponent
+  },
+  {
+    path: 'spectrum/:timestamp',
+    component: SpectrumViewComponent
   },
   {
     path: 'config',
@@ -64,6 +70,7 @@ const appRoutes: Routes = [
     SpectraComponent,
     StatusComponent,
     NotFoundComponent,
+    SpectrumViewComponent,
   ],
   imports: [
     BrowserModule,

@@ -19,6 +19,12 @@ export interface TimestampList {
   requested_day: DateKey;
 }
 
+export interface NeighboursResponse {
+  previous_timestamp: number;
+  next_timestamp: number;
+  request_timestamp: number;
+}
+
 export interface StatusResponse {
   state: string;
   uptime: number;

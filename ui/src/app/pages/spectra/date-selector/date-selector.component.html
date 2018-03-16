@@ -1,4 +1,4 @@
-/*
+<!--
 * Fritz!Box Spectrum Logger (https://github.com/c-mueller/fritzbox-spectrum-logger).
 * Copyright (c) 2018 Christian Müller <cmueller.dev@gmail.com>.
 *
@@ -13,25 +13,11 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+-->
 
-.date-button-group {
-  margin-top: 2%;
-  width: 100%;
-}
-
-#selection-table {
-  width: 100%;
-}
-
-#selection-table-left {
-  width: 25%;
-}
-
-#selection-table-right {
-  width: 75%;
-}
-
-td, th {
-  vertical-align: top;
-}
+<div *ngFor="let e of validDates" class="date-button-group">
+  <button class="btn btn-danger btn-block" type="button" [value]="e" (click)="selectDateKey(e)"
+          [disabled]="keysEqual(e, selectedKey)">
+  {{getDateString(e)}}
+  </button>
+</div>

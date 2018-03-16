@@ -29,13 +29,13 @@ import (
 )
 
 // Renders the spectrum to a PNG byte array
-func (s *Spectrum) Render() ([]byte, error) {
+func (s *Spectrum) Render(scaled bool) ([]byte, error) {
 	w, h := s.computeSize()
-
-	img := gg.NewContext(w*2, h*2)
-	img.Scale(2, 2)
-
-	//img := gg.NewContext(w, h)
+	img := gg.NewContext(w, h)
+	if scaled {
+		img = gg.NewContext(w*2, h*2)
+		img.Scale(2, 2)
+	}
 
 	img.SetFillRuleEvenOdd()
 	img.SetLineCapSquare()
@@ -46,24 +46,26 @@ func (s *Spectrum) Render() ([]byte, error) {
 	img.DrawRectangle(0, 0, float64(w), float64(h))
 	img.Fill()
 
-	//Set Font
-	fontBox, err := rice.FindBox("font")
-	if err != nil {
-		return nil, err
-	}
+	if scaled {
+		//Set Font
+		fontBox, err := rice.FindBox("font")
+		if err != nil {
+			return nil, err
+		}
 
-	fontBytes, err := fontBox.Bytes(fontPath)
-	if err != nil {
-		return nil, err
+		fontBytes, err := fontBox.Bytes(fontPath)
+		if err != nil {
+			return nil, err
+		}
+		font, err := freetype.ParseFont(fontBytes)
+		if err != nil {
+			return nil, err
+		}
+		img.SetFontFace(truetype.NewFace(font, &truetype.Options{
+			Size: 12,
+			DPI:  144,
+		}))
 	}
-	font, err := freetype.ParseFont(fontBytes)
-	if err != nil {
-		return nil, err
-	}
-	img.SetFontFace(truetype.NewFace(font, &truetype.Options{
-		Size: 12,
-		DPI:  144,
-	}))
 
 	for index, port := range s.Ports {
 		// Draw Port Number
@@ -79,7 +81,7 @@ func (s *Spectrum) Render() ([]byte, error) {
 	}
 
 	outputBuffer := bytes.NewBuffer([]byte(""))
-	err = png.Encode(outputBuffer, img.Image())
+	err := png.Encode(outputBuffer, img.Image())
 
 	if err != nil {
 		return nil, err

@@ -14,24 +14,6 @@
 * You should have received a copy of the GNU General Public License
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
-
-.date-button-group {
-  margin-top: 2%;
-  width: 100%;
-}
-
-#selection-table {
-  width: 100%;
-}
-
-#selection-table-left {
-  width: 25%;
-}
-
-#selection-table-right {
-  width: 75%;
-}
-
-td, th {
-  vertical-align: top;
+h1 {
+  text-align: center;
 }

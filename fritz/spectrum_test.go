@@ -28,39 +28,62 @@ import (
 const singlePortSpectrumPath = "testdata/example_spectrum.json"
 const multiPortSpectrumPath = "testdata/example_spectrum_multiport.json"
 
+const cleanup = false
+
 func TestDrawSpectrum(t *testing.T) {
-	tmpDir := filet.TmpDir(t, "")
-	t.Log("Using tmpdir", tmpDir)
-	//Comment out the next line to Investigate the render Output
-	defer filet.CleanUp(t)
+	testRendering(t, cleanup, false, singlePortSpectrumPath, func(t *testing.T, data []byte) {
+		assert.True(t, len(data) > 20000)
+	})
+}
 
-	t.Log("Loading test Data")
-	data := loadTestData(t, singlePortSpectrumPath)
-	imgdata, err := data.Render()
-	assert.NoError(t, err)
-	t.Log("Data length:", len(imgdata), "Bytes")
-
-	assert.True(t, len(imgdata) > 50000)
-
-	path := filepath.Join(tmpDir, "test.png")
-	file, _ := os.Create(path)
-	file.Write(imgdata)
-	file.Close()
+func TestDrawSpectrum_Scaled(t *testing.T) {
+	testRendering(t, cleanup, true, singlePortSpectrumPath, func(t *testing.T, data []byte) {
+		assert.True(t, len(data) > 50000)
+	})
 }
 
 func TestDrawSpectrum_MultiPort(t *testing.T) {
+	testRendering(t, cleanup, false, multiPortSpectrumPath, func(t *testing.T, data []byte) {
+		assert.True(t, len(data) > 40000)
+	})
+}
+func TestDrawSpectrum_MultiPort_Scaled(t *testing.T) {
+	testRendering(t, cleanup, true, multiPortSpectrumPath, func(t *testing.T, data []byte) {
+		assert.True(t, len(data) > 100000)
+	})
+}
+
+func BenchmarkRenderSpeed_SinglePort(b *testing.B) {
+	benchmarkRendering(b, false, singlePortSpectrumPath)
+}
+
+func BenchmarkRenderSpeed_MultiPort(b *testing.B) {
+	benchmarkRendering(b, false, multiPortSpectrumPath)
+}
+
+func BenchmarkRenderSpeed_SinglePort_Scaled(b *testing.B) {
+	benchmarkRendering(b, true, singlePortSpectrumPath)
+}
+
+func BenchmarkRenderSpeed_MultiPort_Scaled(b *testing.B) {
+	benchmarkRendering(b, true, multiPortSpectrumPath)
+}
+
+func testRendering(t *testing.T, cleanup, scaled bool, spectrumpath string, validator func(t *testing.T, data []byte)) {
 	tmpDir := filet.TmpDir(t, "")
 	t.Log("Using tmpdir", tmpDir)
 	//Comment out the next line to Investigate the render Output
-	defer filet.CleanUp(t)
+	if cleanup {
+		defer filet.CleanUp(t)
+	}
 
 	t.Log("Loading test Data")
-	data := loadTestData(t, multiPortSpectrumPath)
-	imgdata, err := data.Render()
+	data := loadTestData(t, spectrumpath)
+	imgdata, err := data.Render(scaled)
 	assert.NoError(t, err)
 	t.Log("Data length:", len(imgdata), "Bytes")
 
-	assert.True(t, len(imgdata) > 50000)
+	validator(t, imgdata)
 
 	path := filepath.Join(tmpDir, "test.png")
 	file, _ := os.Create(path)
@@ -68,21 +91,12 @@ func TestDrawSpectrum_MultiPort(t *testing.T) {
 	file.Close()
 }
 
-func BenchmarkRenderSpeed_SinglePort(b *testing.B) {
+func benchmarkRendering(b *testing.B, scaled bool, path string) {
 	b.Log("Loading test Data")
-	data := loadTestData(nil, singlePortSpectrumPath)
+	data := loadTestData(nil, path)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		data.Render()
-	}
-}
-
-func BenchmarkRenderSpeed_MultiPort(b *testing.B) {
-	b.Log("Loading test Data")
-	data := loadTestData(nil, multiPortSpectrumPath)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		data.Render()
+		data.Render(scaled)
 	}
 }
 

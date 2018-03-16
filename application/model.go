@@ -39,6 +39,12 @@ type StatusResponse struct {
 	Uptime int64  `json:"uptime"`
 }
 
+type NeighboursResponse struct {
+	PreviousTimestamp int64 `json:"previous_timestamp"`
+	NextTimestamp     int64 `json:"next_timestamp"`
+	RequestTimestamp  int64 `json:"request_timestamp"`
+}
+
 type StatResponse struct {
 	SpectrumCount int64                    `json:"spectrum_count"`
 	Latest        *LatestSpectrumResponse  `json:"latest"`

@@ -25,8 +25,8 @@ import (
 func (a *Application) getValidDates(ctx *gin.Context) {
 	keys, err := a.repo.GetAllSpectrumKeys()
 	if err != nil {
-		log.Errorf("Failed to Retrieve Keys: %v", err)
-		ctx.String(500, "")
+		sendError(ctx, 500, "Failed to Retrieve Keys: %s", err.Error())
+		return
 	}
 	response := KeysResponse{
 		Keys:             keys,
@@ -38,14 +38,12 @@ func (a *Application) getValidDates(ctx *gin.Context) {
 func (a *Application) listSpectraForDay(ctx *gin.Context) {
 	key := getSpectrumKeyFormContext(ctx)
 	if !key.IsValid() {
-		log.Errorf("A Invalid Key was requested: %s", key.String())
-		ctx.String(404, "")
+		sendError(ctx, 404, "A Invalid Key was requested: %s", key.String())
 		return
 	}
 	timestamps, err := a.repo.GetTimestampsForSpectrumKey(key)
 	if err != nil {
-		log.Errorf("Spectra Retrieval failed: %s", err)
-		ctx.String(404, "")
+		sendError(ctx, 404, "Spectra Retrieval Failed: %s", err.Error())
 		return
 	}
 	ctx.JSON(200, TimestampResponse{
@@ -55,19 +53,55 @@ func (a *Application) listSpectraForDay(ctx *gin.Context) {
 	})
 }
 
+func (a *Application) getNeighbours(ctx *gin.Context) {
+	timestampString := ctx.Param("timestamp")
+	timestamp, err := strconv.ParseInt(timestampString, 10, 64)
+	key := repository.GetFromTimestamp(timestamp)
+	if !key.IsValid() || err != nil {
+		sendError(ctx, 404, "A Invalid Key was requested: %s - Timestamp: %s", key.String(), timestampString)
+		return
+	}
+
+	keys, err := a.repo.GetTimestampsForSpectrumKey(key)
+	if err != nil {
+		sendError(ctx, 404, "Retrieving the Neighbours for the Timestamp %d has failed", timestamp)
+		return
+	}
+
+	index := keys.Search(timestamp)
+	if keys[index] != timestamp {
+		sendError(ctx, 404, "No spectrum found with timestamp %d", timestamp)
+		return
+	}
+	previous, next := int64(index-1), int64(index+1)
+	if previous < 0 {
+		previous = -1
+	} else {
+		previous = keys[previous]
+	}
+	if next >= int64(keys.Len()) {
+		next = -1
+	} else {
+		next = keys[next]
+	}
+	ctx.JSON(200, NeighboursResponse{
+		PreviousTimestamp: previous,
+		NextTimestamp:     next,
+		RequestTimestamp:  time.Now().Unix(),
+	})
+}
+
 func (a *Application) getJsonSpectrum(ctx *gin.Context) {
 	timestampString := ctx.Param("timestamp")
 	timestamp, err := strconv.ParseInt(timestampString, 10, 64)
 	key := repository.GetFromTimestamp(timestamp)
 	if !key.IsValid() || err != nil {
-		log.Errorf("A Invalid Key was requested: %s - Timestamp: %s", key.String(), timestampString)
-		ctx.String(404, "")
+		sendError(ctx, 404, "A Invalid Key was requested: %s - Timestamp: %s", key.String(), timestampString)
 		return
 	}
 	spectrum, err := a.repo.GetSpectrumForTimestamp(timestamp)
 	if err != nil {
-		log.Errorf("Spectra Retrieval failed: %s", err)
-		ctx.String(404, "")
+		sendError(ctx, 404, "Spectra Retrieval Failed: %s", err.Error())
 		return
 	}
 	ctx.JSON(200, spectrum)
@@ -78,33 +112,18 @@ func (a *Application) getRenderedSpectrum(ctx *gin.Context) {
 	timestamp, err := strconv.ParseInt(timestampString, 10, 64)
 	key := repository.GetFromTimestamp(timestamp)
 	if !key.IsValid() || err != nil {
-		log.Errorf("A Invalid Key was requested: %s - Timestamp: %s", key.String(), timestampString)
-		ctx.String(404, "")
+		sendError(ctx, 404, "A Invalid Key was requested: %s - Timestamp: %s", key.String(), timestampString)
 		return
 	}
 	spectrum, err := a.repo.GetSpectrumForTimestamp(timestamp)
 	if err != nil {
-		log.Errorf("Spectra Retrieval failed: %s", err)
-		ctx.String(404, "")
+		sendError(ctx, 404, "Spectra Retrieval Failed: %s", err.Error())
 		return
 	}
 	image, err := spectrum.Render()
 	if err != nil {
-		log.Errorf("Rendering The spectrum failed", err)
-		ctx.String(500, "")
+		sendError(ctx, 500, "Spectra Rendering has Failed: %s", err.Error())
 		return
 	}
 	ctx.Data(200, "image/png", image)
-}
-
-func getSpectrumKeyFormContext(ctx *gin.Context) repository.SpectrumKey {
-	year := ctx.Param("year")
-	month := ctx.Param("month")
-	day := ctx.Param("day")
-	key := repository.SpectrumKey{
-		Year:  year,
-		Month: month,
-		Day:   day,
-	}
-	return key
 }

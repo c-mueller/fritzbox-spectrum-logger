@@ -1,0 +1,50 @@
+<!--
+* Fritz!Box Spectrum Logger (https://github.com/c-mueller/fritzbox-spectrum-logger).
+* Copyright (c) 2018 Christian Müller <cmueller.dev@gmail.com>.
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, version 3.
+*
+* This program is distributed in the hope that it will be useful, but
+* WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+* General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+<div>
+  <div *ngIf="loading">
+    <h1>Loading Spectrum...</h1>
+  </div>
+  <div *ngIf="!loading" class="container">
+    <div class="row">
+      <div class="card border-primary col-sm-12 col-sm-offset-3">
+        <div class="card-body">
+          <a [href]="getImageUrl()" target="_blank">
+            <img [src]="data" style="width: 100%"/>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="card border-primary col-sm-12 col-sm-offset-3">
+        <div class="card-body btn-group col-xs-12">
+          <button type="button" class="btn btn-primary col-sm-4"
+                  [disabled]="this.neighbours.previous_timestamp == -1"
+                  (click)="navigateTo(this.neighbours.previous_timestamp)">
+            Previous ({{formatTimestamp(this.neighbours.previous_timestamp)}})
+          </button>
+          <button class="btn btn-primary col-sm-4">
+            Current: {{formatTimestamp(timestamp)}}
+          </button>
+          <button type="button" class="btn btn-primary col-sm-4" [disabled]="this.neighbours.next_timestamp == -1"
+                  (click)="navigateTo(this.neighbours.next_timestamp)">
+            Next ({{formatTimestamp(this.neighbours.next_timestamp)}})
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

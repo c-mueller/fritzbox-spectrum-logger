@@ -17,6 +17,7 @@ import {Component, OnInit} from '@angular/core';
 import {ApiService} from '../../services/api/api.service';
 import {DateKey, SpectraKeyList} from '../../services/api/model';
 import {sprintf} from 'sprintf-js';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-spectra',
@@ -31,7 +32,8 @@ export class SpectraComponent implements OnInit {
   public timestampList: number[][] = [];
   public expanded: boolean[] = [];
 
-  constructor(private api: ApiService) {
+  constructor(private api: ApiService,
+              private router: Router) {
   }
 
   selectDateKey(e: DateKey) {
@@ -42,7 +44,7 @@ export class SpectraComponent implements OnInit {
       this.clearTimestampList();
       for (const date of data.timestamps) {
         const d = new Date(date * 1000);
-        this.timestampList[d.getUTCHours()].push(date);
+        this.timestampList[d.getHours()].push(date);
       }
       this.loading = false;
     });
@@ -65,7 +67,6 @@ export class SpectraComponent implements OnInit {
     this.expanded[i] = true;
   }
 
-
   fetchKeys() {
     this.api.getSpectrumKeys().subscribe(e => {
       this.keys = e;
@@ -78,14 +79,21 @@ export class SpectraComponent implements OnInit {
   }
 
   showSpectrum(timestamp: number) {
-    console.log(timestamp);
+    this.router.navigate(['/spectrum', timestamp]);
   }
 
   keysEqual(a: DateKey, b: DateKey): boolean {
     return a != null && b != null && a.year === b.year && a.month === b.month && a.day === b.day;
   }
 
-  getTimeRange(quarter: number, hour: number) {
+  getDateString(key: DateKey): string {
+    const month = parseInt(key.month, 10);
+    const year = parseInt(key.year, 10);
+    const day = parseInt(key.day, 10);
+    return sprintf('%02d.%02d.%04d', day, month, year);
+  }
+
+  getTimeRangeStringForQuarter(quarter: number, hour: number) {
     let toHour = hour;
     let toMinute = (quarter + 1) * 15;
     if (toMinute >= 60) {
@@ -95,28 +103,28 @@ export class SpectraComponent implements OnInit {
     return sprintf('%02d:%02d to %02d:%02d', hour, quarter * 15, toHour, toMinute);
   }
 
-  getForQuarter(quarter: number, timestamps: number[]): number[] {
+  filterTimestampsByQuarter(quarter: number, timestamps: number[]): number[] {
     let data: number[] = [];
     for (let v of timestamps) {
-      if (this.getQuarterTime(v) === quarter) {
+      if (this.getHourQuarterForTimestamp(v) === quarter) {
         data.push(v);
       }
     }
     return data;
   }
 
-  getQuarterTime(timestamp: number): number {
+  getHourQuarterForTimestamp(timestamp: number): number {
     const d = new Date(timestamp * 1000);
-    return Math.floor(d.getUTCMinutes() / (60 / 4));
+    return Math.floor(d.getMinutes() / (60 / 4));
   }
 
-  formatTimeIndex(i: number): string {
+  formatHourIndexTime(i: number): string {
     return sprintf('%02d:00', i);
   }
 
-  formatTime(timestamp: number): string {
+  formatSpectrumButtonTime(timestamp: number): string {
     const date = new Date(timestamp * 1000);
-    return sprintf('%02d:%02d:%02d', date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+    return sprintf('%02d:%02d:%02d', date.getHours(), date.getMinutes(), date.getSeconds());
   }
 
 }

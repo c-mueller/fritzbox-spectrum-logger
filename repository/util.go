@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"strconv"
 	"time"
+	"sort"
 )
 
 func GetFromTimestamp(timestamp int64) SpectrumKey {
@@ -54,6 +55,24 @@ func (sk *SpectrumKey) IsValid() bool {
 
 func (sk *SpectrumKey) String() string {
 	return fmt.Sprintf("Year: %s Month: %s Day: %s", sk.Year, sk.Month, sk.Day)
+}
+
+func (ta TimestampArray) Search(value int64) int {
+	return sort.Search(ta.Len(), func(i int) bool {
+		return ta[i] >= value
+	})
+}
+
+func (ta TimestampArray) Len() int {
+	return len(ta)
+}
+
+func (ta TimestampArray) Swap(i, j int) {
+	ta[i], ta[j] = ta[j], ta[i]
+}
+
+func (ta TimestampArray) Less(i, j int) bool {
+	return ta[i] < ta[j]
 }
 
 func (k SpectraKeys) Len() int {

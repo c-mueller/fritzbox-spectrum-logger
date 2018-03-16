@@ -90,8 +90,8 @@ func (r *Repository) GetSpectrum(day, month, year int, timestamp int64) (*fritz.
 	return spectrum, nil
 }
 
-func (r *Repository) GetTimestampsForDay(day, month, year int) ([]int64, error) {
-	data := make([]int64, 0)
+func (r *Repository) GetTimestampsForDay(day, month, year int) (TimestampArray, error) {
+	data := make(TimestampArray, 0)
 
 	err := r.forEachSpectrumInDay(year, month, day, func(dayBucket *bolt.Bucket, k, v []byte) error {
 		timestampString := string(k)
@@ -105,6 +105,8 @@ func (r *Repository) GetTimestampsForDay(day, month, year int) ([]int64, error) 
 	if err != nil {
 		return nil, err
 	}
+
+	sort.Sort(data)
 
 	return data, nil
 }

@@ -24,7 +24,7 @@ const horizontalGridCount = 4
 const verticalGridCount = 8
 
 const fontBoxName = "font"
-const fontPath = "luxisr.ttf"
+const fontPath = "noto-mono.ttf"
 
 var orange = color.RGBA{R: 255, G: 161, B: 0, A: 0} //rgb(255, 161, 0)
 var gray = color.RGBA{R: 200, G: 200, B: 200, A: 0}

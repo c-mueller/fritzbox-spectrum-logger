@@ -78,53 +78,20 @@ export class SpectraComponent implements OnInit {
     this.collapseAll();
   }
 
+  onDropdownClick(toggleValue: boolean, idx: number) {
+    this.collapseAll();
+    if (!toggleValue) {
+      this.expandBlock(idx);
+    }
+  }
+
   showSpectrum(timestamp: number) {
     this.router.navigate(['/spectrum', timestamp]);
-  }
-
-  keysEqual(a: DateKey, b: DateKey): boolean {
-    return a != null && b != null && a.year === b.year && a.month === b.month && a.day === b.day;
-  }
-
-  getDateString(key: DateKey): string {
-    const month = parseInt(key.month, 10);
-    const year = parseInt(key.year, 10);
-    const day = parseInt(key.day, 10);
-    return sprintf('%02d.%02d.%04d', day, month, year);
-  }
-
-  getTimeRangeStringForQuarter(quarter: number, hour: number) {
-    let toHour = hour;
-    let toMinute = (quarter + 1) * 15;
-    if (toMinute >= 60) {
-      toMinute = 0;
-      toHour = ((toHour + 1) % 24);
-    }
-    return sprintf('%02d:%02d to %02d:%02d', hour, quarter * 15, toHour, toMinute);
-  }
-
-  filterTimestampsByQuarter(quarter: number, timestamps: number[]): number[] {
-    let data: number[] = [];
-    for (let v of timestamps) {
-      if (this.getHourQuarterForTimestamp(v) === quarter) {
-        data.push(v);
-      }
-    }
-    return data;
   }
 
   getHourQuarterForTimestamp(timestamp: number): number {
     const d = new Date(timestamp * 1000);
     return Math.floor(d.getMinutes() / (60 / 4));
-  }
-
-  formatHourIndexTime(i: number): string {
-    return sprintf('%02d:00', i);
-  }
-
-  formatSpectrumButtonTime(timestamp: number): string {
-    const date = new Date(timestamp * 1000);
-    return sprintf('%02d:%02d:%02d', date.getHours(), date.getMinutes(), date.getSeconds());
   }
 
 }

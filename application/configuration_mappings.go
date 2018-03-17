@@ -33,7 +33,7 @@ func (a *Application) getStatus(ctx *gin.Context) {
 func (a *Application) getStats(ctx *gin.Context) {
 	stats, err := a.repo.GetStatistics()
 	if err != nil {
-		sendError(ctx,500,"Internal Server Error!")
+		sendError(ctx, 500, "Internal Server Error!")
 		return
 	}
 	if a.latest == nil {

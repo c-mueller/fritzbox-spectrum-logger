@@ -28,6 +28,10 @@ import {SpectraComponent} from './pages/spectra/spectra.component';
 import {HttpClientModule} from '@angular/common/http';
 import {ApiService} from './services/api/api.service';
 import {SpectrumViewComponent} from './pages/spectrum-view/spectrum-view.component';
+import {DateSelectorComponent} from './pages/spectra/date-selector/date-selector.component';
+import {SpectraHourSelectorComponent} from './pages/spectra/spectra-hour-selector/spectra-hour-selector.component';
+import {QuarterTimestampSelectorComponent} from './pages/spectra/quarter-timestamp-selector/quarter-timestamp-selector.component';
+import {SpectrumPaginationComponent} from './pages/spectrum-view/spectrum-pagination/spectrum-pagination.component';
 
 
 const appRoutes: Routes = [
@@ -71,6 +75,10 @@ const appRoutes: Routes = [
     StatusComponent,
     NotFoundComponent,
     SpectrumViewComponent,
+    DateSelectorComponent,
+    SpectraHourSelectorComponent,
+    QuarterTimestampSelectorComponent,
+    SpectrumPaginationComponent,
   ],
   imports: [
     BrowserModule,

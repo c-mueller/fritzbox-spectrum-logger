@@ -17,7 +17,7 @@
 
 <div *ngFor="let e of validDates" class="date-button-group">
   <button class="btn btn-danger btn-block" type="button" [value]="e" (click)="selectDateKey(e)"
-          [disabled]="keysEqual(e, selectedKey)">
+          [disabled]="keysEqual(e, selectedDateKey)">
   {{getDateString(e)}}
   </button>
 </div>

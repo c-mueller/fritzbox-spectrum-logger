@@ -27,6 +27,8 @@ export class DateSelectorComponent implements OnInit {
   @Input('dates') public validDates: DateKey[];
   @Output('selectedDate') public selectedDateEmitter = new EventEmitter<DateKey>();
 
+  public selectedDateKey: DateKey = {month: "0", year: "0", day: "0"};
+
   constructor() {
   }
 
@@ -34,6 +36,7 @@ export class DateSelectorComponent implements OnInit {
   }
 
   selectDateKey(e: DateKey) {
+    this.selectedDateKey = e;
     this.selectedDateEmitter.emit(e);
   }
 

@@ -14,6 +14,21 @@
 * You should have received a copy of the GNU General Public License
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
-<p>
-  spectrum-pagination works!
-</p>
+<div class="row" style="margin-top: 1%">
+  <div class="card border-primary col-sm-12 col-sm-offset-3">
+    <div class="card-body btn-group col-xs-12">
+      <button type="button" class="btn btn-primary col-sm-4"
+              [disabled]="this.neighbours.previous_timestamp == -1"
+              (click)="emitTimestampChangeEvent(this.neighbours.previous_timestamp)">
+        Previous ({{formatTimestamp(this.neighbours.previous_timestamp)}})
+      </button>
+      <button class="btn btn-primary col-sm-4" (click)="this.fetchNeighbours()">
+        Current: {{formatTimestamp(timestamp)}}
+      </button>
+      <button type="button" class="btn btn-primary col-sm-4" [disabled]="this.neighbours.next_timestamp == -1"
+              (click)="emitTimestampChangeEvent(this.neighbours.next_timestamp)">
+        Next ({{formatTimestamp(this.neighbours.next_timestamp)}})
+      </button>
+    </div>
+  </div>
+</div>

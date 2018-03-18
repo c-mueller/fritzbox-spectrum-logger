@@ -18,11 +18,11 @@ workspace:
 
 pipeline:
   build_ui:
-    image: alexsuch/angular-cli:6.0-chromium
+    image: halive/random-images:angular-cli-v6-beta6
     commands:
       # Build the UI
       - cd ui
-      - npm install
+      - yarn install
       - ng build --prod
       # Copy built artifact for static linking
       - cd dist

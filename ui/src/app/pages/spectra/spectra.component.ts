@@ -88,10 +88,4 @@ export class SpectraComponent implements OnInit {
   showSpectrum(timestamp: number) {
     this.router.navigate(['/spectrum', timestamp]);
   }
-
-  getHourQuarterForTimestamp(timestamp: number): number {
-    const d = new Date(timestamp * 1000);
-    return Math.floor(d.getMinutes() / (60 / 4));
-  }
-
 }

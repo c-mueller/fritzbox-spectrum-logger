@@ -17,9 +17,9 @@ package repository
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 	"time"
-	"sort"
 )
 
 func GetFromTimestamp(timestamp int64) SpectrumKey {

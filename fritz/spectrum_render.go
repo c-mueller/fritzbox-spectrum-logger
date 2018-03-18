@@ -18,14 +18,14 @@ package fritz
 import (
 	"bytes"
 	"fmt"
+	"github.com/GeertJohan/go.rice"
 	"github.com/fogleman/gg"
+	"github.com/golang/freetype"
+	"github.com/golang/freetype/truetype"
 	"image/color"
 	"image/png"
 	"math"
 	"time"
-	"github.com/GeertJohan/go.rice"
-	"github.com/golang/freetype"
-	"github.com/golang/freetype/truetype"
 )
 
 // Renders the spectrum to a PNG byte array

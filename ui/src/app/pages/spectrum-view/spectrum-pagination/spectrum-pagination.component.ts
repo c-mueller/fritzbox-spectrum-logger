@@ -13,29 +13,18 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package application
+import { Component, OnInit } from '@angular/core';
 
-import (
-	"fmt"
-	"github.com/c-mueller/fritzbox-spectrum-logger/repository"
-	"github.com/gin-gonic/gin"
-)
+@Component({
+  selector: 'app-spectrum-pagination',
+  templateUrl: './spectrum-pagination.component.html',
+  styleUrls: ['./spectrum-pagination.component.css']
+})
+export class SpectrumPaginationComponent implements OnInit {
 
-func sendError(ctx *gin.Context, code int, format string, data ...interface{}) {
-	message := fmt.Sprintf(format, data...)
-	log.Error(message)
-	ctx.String(code, fmt.Sprintf("%d: %s", code, message))
-	return
-}
+  constructor() { }
 
-func getSpectrumKeyFormContext(ctx *gin.Context) repository.SpectrumKey {
-	year := ctx.Param("year")
-	month := ctx.Param("month")
-	day := ctx.Param("day")
-	key := repository.SpectrumKey{
-		Year:  year,
-		Month: month,
-		Day:   day,
-	}
-	return key
+  ngOnInit() {
+  }
+
 }

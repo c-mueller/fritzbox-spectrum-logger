@@ -108,6 +108,7 @@ func (a *Application) getJsonSpectrum(ctx *gin.Context) {
 }
 
 func (a *Application) getRenderedSpectrum(ctx *gin.Context) {
+	scaled := ctx.Query("scaled")
 	timestampString := ctx.Param("timestamp")
 	timestamp, err := strconv.ParseInt(timestampString, 10, 64)
 	key := repository.GetFromTimestamp(timestamp)
@@ -120,7 +121,7 @@ func (a *Application) getRenderedSpectrum(ctx *gin.Context) {
 		sendError(ctx, 404, "Spectra Retrieval Failed: %s", err.Error())
 		return
 	}
-	image, err := spectrum.Render(false)
+	image, err := spectrum.Render(scaled == "true")
 	if err != nil {
 		sendError(ctx, 500, "Spectra Rendering has Failed: %s", err.Error())
 		return

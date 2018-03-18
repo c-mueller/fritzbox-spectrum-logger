@@ -15,36 +15,22 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <div>
-  <div *ngIf="loading">
+  <div *ngIf="initialLoading">
     <h1>Loading Spectrum...</h1>
   </div>
-  <div *ngIf="!loading" class="container">
+  <div *ngIf="!initialLoading" class="container">
     <div class="row">
       <div class="card border-primary col-sm-12 col-sm-offset-3">
         <div class="card-body">
+          <h4 *ngIf="!loading" style="text-align: center">Current Timestamp: {{formatTimestamp(timestamp)}}</h4>
+          <h4 *ngIf="loading" style="text-align: center">Fetching Timestamp: {{formatTimestamp(timestamp)}}</h4>
           <a [href]="getImageUrl()" target="_blank">
             <img [src]="data" style="width: 100%"/>
           </a>
         </div>
       </div>
     </div>
-    <div class="row">
-      <div class="card border-primary col-sm-12 col-sm-offset-3">
-        <div class="card-body btn-group col-xs-12">
-          <button type="button" class="btn btn-primary col-sm-4"
-                  [disabled]="this.neighbours.previous_timestamp == -1"
-                  (click)="navigateTo(this.neighbours.previous_timestamp)">
-            Previous ({{formatTimestamp(this.neighbours.previous_timestamp)}})
-          </button>
-          <button class="btn btn-primary col-sm-4">
-            Current: {{formatTimestamp(timestamp)}}
-          </button>
-          <button type="button" class="btn btn-primary col-sm-4" [disabled]="this.neighbours.next_timestamp == -1"
-                  (click)="navigateTo(this.neighbours.next_timestamp)">
-            Next ({{formatTimestamp(this.neighbours.next_timestamp)}})
-          </button>
-        </div>
-      </div>
-    </div>
+    <app-spectrum-pagination [timestamp]="this.timestamp"
+                             (onTimestampChange)="navigateTo($event)"></app-spectrum-pagination>
   </div>
 </div>

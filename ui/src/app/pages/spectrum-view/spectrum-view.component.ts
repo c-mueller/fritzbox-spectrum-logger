@@ -13,25 +13,24 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ApiService} from '../../services/api/api.service';
 import {environment} from '../../../environments/environment';
 import {sprintf} from 'sprintf-js';
-import {NeighboursResponse} from '../../services/api/model';
 
 @Component({
   selector: 'app-spectrum-view',
   templateUrl: './spectrum-view.component.html',
   styleUrls: ['./spectrum-view.component.css']
 })
-export class SpectrumViewComponent implements OnInit {
+export class SpectrumViewComponent implements OnInit, OnDestroy {
 
   private subscription: any;
   public timestamp: number;
+  public initialLoading = true;
   public loading = true;
   public data: string;
-  public neighbours: NeighboursResponse;
 
   constructor(private route: ActivatedRoute,
               private router: Router,
@@ -53,6 +52,10 @@ export class SpectrumViewComponent implements OnInit {
     });
   }
 
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+  }
+
   requestImage() {
     this.api.getSpectrumImage(this.timestamp).subscribe(image => {
         const reader = new FileReader();
@@ -62,10 +65,8 @@ export class SpectrumViewComponent implements OnInit {
 
         if (image) {
           reader.readAsDataURL(image);
+          this.initialLoading = false;
           this.loading = false;
-          this.api.getSpectrumNeighbours(this.timestamp).subscribe(e => {
-            this.neighbours = e;
-          });
         } else {
           this.router.navigate(['/404']);
         }
@@ -91,5 +92,4 @@ export class SpectrumViewComponent implements OnInit {
     const date = new Date(timestamp * 1000);
     return sprintf('%02d:%02d:%02d', date.getHours(), date.getMinutes(), date.getSeconds());
   }
-
 }

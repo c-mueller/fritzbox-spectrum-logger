@@ -13,30 +13,34 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package application
+package main
 
 import (
-	"errors"
+	"os"
+	"github.com/op/go-logging"
 )
 
-type APIState int
+var format = logging.MustStringFormatter(
+	`%{color}[%{time:15:04:05} - %{level}] - %{module}:%{color:reset} %{message}`,
+)
 
-const IDLE APIState = iota
-const LOGGING APIState = IDLE + 1
-const ERROR APIState = LOGGING + 1
+var log = logging.MustGetLogger("main")
 
-var InvalidBodyError = errors.New("application: Could not deserialize request body. The body has to be JSON")
-var JSONParsingError = errors.New("application: Could not parse JSON")
-var FileSystemError = errors.New("application: Fileaccess has failed")
+func initializeLogger() {
+	stdoutBackend := logging.NewLogBackend(os.Stdout, "", 0)
 
-func (s APIState) String() string {
-	if s == IDLE {
-		return "IDLE"
-	} else if s == LOGGING {
-		return "LOGGING"
-	} else if s == ERROR {
-		return "ERROR"
+	backendFormatter := logging.NewBackendFormatter(stdoutBackend, format)
+
+	leveledBackend := logging.AddModuleLevel(backendFormatter)
+
+	if *debug {
+		leveledBackend.SetLevel(logging.DEBUG, "")
+	} else if *verbose {
+		leveledBackend.SetLevel(logging.INFO, "")
 	} else {
-		return "ILLEGAL"
+		leveledBackend.SetLevel(logging.ERROR, "")
 	}
+
+	logging.SetBackend(leveledBackend)
+	log.Debug("Initialized Logger")
 }

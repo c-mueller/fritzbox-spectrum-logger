@@ -15,10 +15,26 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<div *ngFor="let e of validDates" class="date-button-group">
-  <button class="btn btn-danger btn-block" type="button" [value]="e" (click)="selectDateKey(e)"
-          [disabled]="keysEqual(e, selectedDateKey)">
-  {{getDateString(e)}}
+<div *ngFor="let yearKey of yearMap.keys()">
+  <button class="btn btn-info btn-block date-button-group" type="button" [attr.aria-expanded]="selectedYear == yearKey"
+          (click)="selectYear(yearKey)">
+    {{yearKey}}
   </button>
+  <div *ngFor="let keys of groupDateKeysByMonth(yearMap.get(yearKey)); let i = index" [hidden]="keys.length == 0"
+       [ngbCollapse]="!(selectedYear == yearKey)">
+    <button class="btn btn-light btn-block date-button-group" type="button" [attr.aria-expanded]="selectedMonth == i"
+            (click)="selectMonth(i)">
+      {{i}}
+    </button>
+    <div [ngbCollapse]="!(selectedMonth == i)">
+      <div *ngFor="let e of keys" class="date-button-group">
+        <button class="btn btn-danger btn-block" type="button" [value]="e" (click)="selectDateKey(e)"
+                [disabled]="keysEqual(e, selectedDateKey)">
+          {{getDateString(e)}}
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
-q
+
+

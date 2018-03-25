@@ -13,10 +13,23 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package application
+package main
 
-import "testing"
+import (
+	"gopkg.in/alecthomas/kingpin.v2"
+	"github.com/c-mueller/fritzbox-spectrum-logger/server"
+)
 
-func TestApplication_Init(t *testing.T) {
+var (
+	serverCmd    = kingpin.Command("server", "Run server")
+	serverConfig = serverCmd.Flag("config",
+		"Path to the config file").Default("config.yml").ExistingFile()
+)
 
+func launchServer() {
+	srv := server.LaunchApplication(*serverConfig)
+	err := srv.Listen()
+	if err != nil {
+		log.Error(err.Error())
+	}
 }

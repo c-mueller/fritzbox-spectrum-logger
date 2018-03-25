@@ -26,7 +26,7 @@ pipeline:
       - ng build --prod
       # Copy built artifact for static linking
       - cd dist
-      - cp -r * ../../application/ui-dist
+      - cp -r * ../../server/ui-dist
   load_deps:
     image: golang:${GO_VERSION}
     commands:
@@ -38,7 +38,7 @@ pipeline:
       # Install Dependencies
       - dep ensure -v
       # Compile static dependency file
-      - cd application
+      - cd server
       - rice embed-go
       - cd ../fritz
       - rice embed-go

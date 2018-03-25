@@ -13,29 +13,30 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package application
+package server
 
 import (
-	"fmt"
-	"github.com/c-mueller/fritzbox-spectrum-logger/repository"
-	"github.com/gin-gonic/gin"
+	"errors"
 )
 
-func sendError(ctx *gin.Context, code int, format string, data ...interface{}) {
-	message := fmt.Sprintf(format, data...)
-	log.Error(message)
-	ctx.String(code, fmt.Sprintf("%d: %s", code, message))
-	return
-}
+type APIState int
 
-func getSpectrumKeyFormContext(ctx *gin.Context) repository.SpectrumKey {
-	year := ctx.Param("year")
-	month := ctx.Param("month")
-	day := ctx.Param("day")
-	key := repository.SpectrumKey{
-		Year:  year,
-		Month: month,
-		Day:   day,
+const IDLE APIState = iota
+const LOGGING APIState = IDLE + 1
+const ERROR APIState = LOGGING + 1
+
+var InvalidBodyError = errors.New("server: Could not deserialize request body. The body has to be JSON")
+var JSONParsingError = errors.New("server: Could not parse JSON")
+var FileSystemError = errors.New("server: Fileaccess has failed")
+
+func (s APIState) String() string {
+	if s == IDLE {
+		return "IDLE"
+	} else if s == LOGGING {
+		return "LOGGING"
+	} else if s == ERROR {
+		return "ERROR"
+	} else {
+		return "ILLEGAL"
 	}
-	return key
 }

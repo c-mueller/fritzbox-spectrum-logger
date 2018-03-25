@@ -13,21 +13,25 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
 import {DateKey} from "../../../services/api/model";
 import {sprintf} from "sprintf-js";
+import {validate} from "codelyzer/walkerFactory/walkerFn";
 
 @Component({
   selector: 'app-date-selector',
   templateUrl: './date-selector.component.html',
   styleUrls: ['./date-selector.component.css']
 })
-export class DateSelectorComponent implements OnInit {
-
+export class DateSelectorComponent implements OnInit, OnChanges {
   @Input('dates') public validDates: DateKey[];
   @Output('selectedDate') public selectedDateEmitter = new EventEmitter<DateKey>();
 
   public selectedDateKey: DateKey = {month: "0", year: "0", day: "0"};
+  public yearMap: Map<string, DateKey[]>;
+
+  public selectedYear: string = null;
+  public selectedMonth: number = null;
 
   constructor() {
   }
@@ -35,9 +39,61 @@ export class DateSelectorComponent implements OnInit {
   ngOnInit() {
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    this.yearMap = this.groupDateKeysByYear(this.validDates);
+    this.selectedYear = null;
+    this.selectedMonth = null;
+  }
+
+  selectYear(year: string) {
+    this.selectedMonth = null;
+    if (this.selectedYear == year) {
+      this.selectedYear = null;
+      return;
+    }
+    this.selectedYear = year;
+  }
+
+  selectMonth(month: number) {
+    if (this.selectedMonth == month) {
+      this.selectedMonth = null;
+      return;
+    }
+    this.selectedMonth = month;
+  }
+
   selectDateKey(e: DateKey) {
     this.selectedDateKey = e;
     this.selectedDateEmitter.emit(e);
+  }
+
+  groupDateKeysByYear(keys: DateKey[]): Map<string, DateKey[]> {
+    let data: Map<string, DateKey[]> = new Map<string, DateKey[]>();
+
+    for (let key of keys) {
+      let map = data.get(key.year);
+      if (map === undefined) {
+        map = [];
+      }
+      map.push(key);
+      data.set(key.year, map);
+    }
+    return data;
+  }
+
+  groupDateKeysByMonth(keys: DateKey[]): DateKey[][] {
+    let data: DateKey[][] = [
+      [], [], [],
+      [], [], [],
+      [], [], [],
+      [], [], []
+    ];
+
+    for (let key of keys) {
+      data[+key.month].push(key);
+    }
+
+    return data;
   }
 
   getDateString(key: DateKey): string {
@@ -50,5 +106,4 @@ export class DateSelectorComponent implements OnInit {
   keysEqual(a: DateKey, b: DateKey): boolean {
     return a != null && b != null && a.year === b.year && a.month === b.month && a.day === b.day;
   }
-
 }

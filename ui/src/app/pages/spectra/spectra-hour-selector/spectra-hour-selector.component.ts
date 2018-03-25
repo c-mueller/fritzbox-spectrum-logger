@@ -34,7 +34,6 @@ export class SpectraHourSelectorComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log(this.timeIndex)
   }
 
   onSpectrumSelect(timestamp: number) {

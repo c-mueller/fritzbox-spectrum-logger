@@ -27,10 +27,23 @@ var (
 )
 
 func main() {
+	cliCommand := kingpin.Parse()
 	initializeLogger()
 
-	switch kingpin.Parse() {
-	case "server":
-		launchServer()
+	switch cliCommand {
+	case "server config":
+		launchServerWithConfig()
+	case "server env":
+		launchServerFromEnvironment()
+	case "version":
+		versionInfo()
+	case "generate-config yaml":
+		generateYaml()
+	case "generate-config docker":
+		generateDockerfileCommands()
+	case "generate-config bash":
+		generateBash()
+	case "generate-config fish":
+		generateFish()
 	}
 }

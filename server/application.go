@@ -45,6 +45,23 @@ func LaunchApplication(configPath string) *Application {
 	}
 }
 
+func LaunchFromEnvironment() *Application {
+	log.Debug("Loading configuration from the application environment")
+	cfg, err := config.FromEnvironment()
+	if err != nil {
+		log.Error("Opening of the Config failed")
+		log.Error(err.Error())
+		return nil
+	}
+	return &Application{
+		config:            *cfg,
+		bindAdr:           cfg.BindAddress,
+		state:             IDLE,
+		startTime:         time.Now(),
+		sessionLogCounter: 0,
+	}
+}
+
 func (a *Application) Listen() error {
 	log.Debug("Launching server...")
 	log.Debug("Initializing repository (Datastore)")

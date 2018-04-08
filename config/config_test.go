@@ -17,6 +17,8 @@ package config
 
 import (
 	"github.com/Flaque/filet"
+	"github.com/stretchr/testify/assert"
+	"os"
 	"path/filepath"
 	"testing"
 )
@@ -53,4 +55,25 @@ func TestConfig_Handling(t *testing.T) {
 	} else if cfg.Credentials != cfg2.Credentials {
 		t.FailNow()
 	}
+}
+
+func Test_LoadFromEnv(t *testing.T) {
+	const dbPathTestValue = "myspectra.db"
+	const fritzCredsUsernameTestValue = "caaarl"
+	const fritzCredsPasswordTestValue = "passw0rd"
+	const endpointDefault = "192.168.178.1"
+
+	os.Setenv("DB_PATH", dbPathTestValue)
+	os.Setenv("AUTOLAUNCH", "true")
+	os.Setenv("FRITZ_USERNAME", fritzCredsUsernameTestValue)
+	os.Setenv("FRITZ_PASSWORD", fritzCredsPasswordTestValue)
+
+	cfg, err := FromEnvironment()
+	assert.NoError(t, err)
+
+	assert.True(t, cfg.Autolaunch)
+	assert.Equal(t, cfg.DatabasePath, dbPathTestValue)
+	assert.Equal(t, cfg.Credentials.Username, fritzCredsUsernameTestValue)
+	assert.Equal(t, cfg.Credentials.Password, fritzCredsPasswordTestValue)
+	assert.Equal(t, cfg.Credentials.Endpoint, endpointDefault)
 }

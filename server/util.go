@@ -13,22 +13,29 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package cmd
+package server
 
 import (
 	"fmt"
-
-	"github.com/spf13/cobra"
+	"github.com/c-mueller/fritzbox-spectrum-logger/repository"
+	"github.com/gin-gonic/gin"
 )
 
-var dumpCmd = &cobra.Command{
-	Use:   "dump",
-	Short: "Dump (Export) all spectrums stored in a database",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("dump called")
-	},
+func sendError(ctx *gin.Context, code int, format string, data ...interface{}) {
+	message := fmt.Sprintf(format, data...)
+	log.Error(message)
+	ctx.String(code, fmt.Sprintf("%d: %s", code, message))
+	return
 }
 
-func init() {
-	RootCmd.AddCommand(dumpCmd)
+func getSpectrumKeyFormContext(ctx *gin.Context) repository.SpectrumKey {
+	year := ctx.Param("year")
+	month := ctx.Param("month")
+	day := ctx.Param("day")
+	key := repository.SpectrumKey{
+		Year:  year,
+		Month: month,
+		Day:   day,
+	}
+	return key
 }

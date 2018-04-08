@@ -13,24 +13,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package main
+package server
 
-import (
-	"gopkg.in/alecthomas/kingpin.v2"
-)
+import "testing"
 
-var (
-	verbose = kingpin.Flag("verbose",
-		"Run command with verbose output").Short('v').Default("false").Bool()
-	debug = kingpin.Flag("debug",
-		"Run command in debug mode (includes verbose mode)").Short('d').Default("false").Bool()
-)
+func TestApplication_Init(t *testing.T) {
 
-func main() {
-	initializeLogger()
-
-	switch kingpin.Parse() {
-	case "server":
-		launchServer()
-	}
 }

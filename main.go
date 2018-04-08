@@ -32,5 +32,7 @@ func main() {
 	switch kingpin.Parse() {
 	case "server":
 		launchServer()
+	case "version":
+		versionInfo()
 	}
 }

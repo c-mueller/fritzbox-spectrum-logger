@@ -30,6 +30,8 @@ pipeline:
   load_deps:
     image: golang:${GO_VERSION}
     commands:
+      # Install Fish shell
+      - apt-get update && apt-get install -y fish
       # Install Rice
       - go get github.com/GeertJohan/go.rice
       - go get github.com/GeertJohan/go.rice/rice
@@ -38,13 +40,8 @@ pipeline:
       # Install Dependencies
       - dep ensure -v
       # Compile static dependency file
-      - cd server
-      - rice embed-go
-      - cd ../fritz
-      - rice embed-go
-  build:
-    image: golang:${GO_VERSION}
-    commands:
+      - ./embed_resources.fish
+      # Build the Application
       - go build -v
   test_and_benchmark:
     image: golang:${GO_VERSION}
@@ -54,6 +51,16 @@ pipeline:
     image: halive/git-cloc:latest
     commands:
       - cloc $(git ls-files)
+  github_release:
+    image: plugins/github-release
+    secrets: [ github_token ]
+    files:
+      - fritzbox-spectrum-logger
+    checksum:
+      - sha256
+      - sha512
+    when:
+      event: tag
 
 matrix:
   GO_VERSION:

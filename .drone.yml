@@ -51,6 +51,11 @@ pipeline:
     image: halive/git-cloc:latest
     commands:
       - cloc $(git ls-files)
+  application_version_info:
+    image: ubuntu:16.04
+    commands:
+      - cp fritzbox-spectrum-logger /usr/bin/
+      - fritzbox-spectrum-logger version
   github_release:
     image: plugins/github-release
     secrets: [ github_token ]

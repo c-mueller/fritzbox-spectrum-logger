@@ -38,6 +38,12 @@
   version = "v1.3.1"
 
 [[projects]]
+  name = "github.com/caarlos0/env"
+  packages = ["."]
+  revision = "7cd7992b3bc86f920394f8de92c13900da1a46b7"
+  version = "v3.2.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/daaku/go.zipexe"
   packages = ["."]
@@ -189,6 +195,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "f84d408cd2efd757ef6e3a1880208f1aeafb94100bd4514c5217c7fe241455cb"
+  inputs-digest = "1e1e0a847323e25dbb40c93c3d9ce03ca778591f4421bd3b37510924b5cdfa64"
   solver-name = "gps-cdcl"
   solver-version = 1

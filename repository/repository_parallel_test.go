@@ -25,6 +25,12 @@ import (
 	"time"
 )
 
+const retrievalOuterCycleCount = 40
+const retrievalInnerCycleCount = 250
+
+const insertionOuterCycleCount = 25
+const insertionInnerCycleCount = 125
+
 func Test_Parallel_Usage(t *testing.T) {
 	tmpdir := filet.TmpDir(t, "")
 	defer filet.CleanUp(t)
@@ -59,10 +65,11 @@ func handleInsertions(t *testing.T, repo *Repository, wg *sync.WaitGroup) {
 	spectrum := loadTestSpectrum(t)
 	defer wg.Done()
 	cnt := 0
-	for i := 0; i < 50; i++ {
+
+	for i := 0; i < insertionOuterCycleCount; i++ {
 		executions := int64(0)
 		timeSum := int64(0)
-		for j := 0; j < 250; j++ {
+		for j := 0; j < insertionInnerCycleCount; j++ {
 			spectrum.Timestamp = spectrum.Timestamp + int64(j+i*1000)
 
 			ts := time.Now()
@@ -84,10 +91,10 @@ func handleInsertions(t *testing.T, repo *Repository, wg *sync.WaitGroup) {
 
 func handleRetrievals(t *testing.T, repo *Repository, wg *sync.WaitGroup) {
 	defer wg.Done()
-	for i := 0; i < 80; i++ {
+	for i := 0; i < retrievalOuterCycleCount; i++ {
 		executions := int64(0)
 		timeSum := int64(0)
-		for j := 0; j < 500; j++ {
+		for j := 0; j < retrievalInnerCycleCount; j++ {
 			ts := time.Now()
 			_, err := repo.GetAllSpectrumKeys()
 			timeSum += time.Since(ts).Nanoseconds()

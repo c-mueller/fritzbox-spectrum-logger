@@ -16,6 +16,7 @@
 package config
 
 import (
+	"github.com/caarlos0/env"
 	"github.com/op/go-logging"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
@@ -24,24 +25,48 @@ import (
 
 var log = logging.MustGetLogger("config")
 
+var DefaultConfig = Configuration{
+	BindAddress:                defaultBindAddress,
+	DatabasePath:               defaultDbPath,
+	Autolaunch:                 defaultAutoLaunch,
+	SessionRenewalAttemptCount: defaultSessionRefreshAttempts,
+	MaxDownloadFails:           defaultMaxDownloadFails,
+	UpdateInterval:             defaultInterval,
+	SessionRefreshInterval:     defaultSessionRefreshInterval,
+	Credentials: RouterCredentials{
+		Endpoint: defaultEndpoint,
+	},
+}
+
+func FromEnvironment() (*Configuration, error) {
+	data := &Configuration{}
+	creds := RouterCredentials{}
+
+	err := env.Parse(&creds)
+	if err != nil {
+		return nil, err
+	}
+
+	err = env.Parse(data)
+	if err != nil {
+		return nil, err
+	}
+
+	data.Credentials = creds
+
+	return data, nil
+}
+
 func ReadOrCreate(path string) (*Configuration, error) {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		log.Debug("Creating new Configuration")
-		cfg := Configuration{
-			cfgPath:                    path,
-			BindAddress:                defaultBindAddress,
-			DatabasePath:               defaultDbPath,
-			AskForPassword:             defaultAskForPassword,
-			Autolaunch:                 defaultAutoLaunch,
-			SessionRenewalAttemptCount: defaultSessionRefreshAttempts,
-			MaxDownloadFails:           defaultMaxDownloadFails,
-			UpdateInterval:             defaultInterval,
-			SessionRefreshInterval:     defaultSessionRefreshInterval,
-			Credentials: RouterCredentials{
-				Endpoint: defaultEndpoint,
-			},
-		}
+
 		log.Debug("Writing new Configuration")
+
+		var cfg Configuration
+		cfg = DefaultConfig
+		cfg.cfgPath = path
+
 		err = cfg.Write()
 		if err != nil {
 			return nil, err
@@ -78,16 +103,14 @@ func (c *Configuration) Update(cfg *Configuration) {
 }
 
 func (c *Configuration) Write() error {
+	// Close write if the object comes from the environment
+	if c.cfgPath == "" {
+		return nil
+	}
+
 	var data []byte
 	var err error
-
-	if !c.AskForPassword {
-		data, err = yaml.Marshal(c)
-	} else {
-		c2 := *c
-		c2.Credentials.Password = ""
-		data, err = yaml.Marshal(c2)
-	}
+	data, err = yaml.Marshal(c)
 	if err != nil {
 		return err
 	}

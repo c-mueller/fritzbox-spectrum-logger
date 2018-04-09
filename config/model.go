@@ -20,26 +20,24 @@ const defaultInterval = 60
 const defaultSessionRefreshInterval = 3600
 const defaultSessionRefreshAttempts = 5
 const defaultMaxDownloadFails = 5
-const defaultAskForPassword = false
 const defaultAutoLaunch = false
 const defaultDbPath = "spectra.db"
 const defaultEndpoint = "192.168.178.1"
 
 type Configuration struct {
 	Credentials                RouterCredentials `yaml:"credentials" json:"credentials"`
-	DatabasePath               string            `yaml:"database_path" json:"database_path"`
-	UpdateInterval             int               `yaml:"update_interval" json:"update_interval"`
-	AskForPassword             bool              `yaml:"ask_for_password" json:"ask_for_password"`
-	Autolaunch                 bool              `yaml:"autolaunch" json:"autolaunch"`
-	BindAddress                string            `yaml:"bind_address" json:"bind_address"`
-	SessionRefreshInterval     int               `yaml:"session_refresh_interval" json:"session_refresh_interval"`
-	SessionRenewalAttemptCount int               `yaml:"session_refresh_attempts" json:"session_refresh_attempts" `
-	MaxDownloadFails           int               `yaml:"max_download_fails" json:"max_download_fails"`
+	DatabasePath               string            `yaml:"database_path" json:"database_path" env:"DB_PATH" envDefault:"spectra.db"`
+	UpdateInterval             int               `yaml:"update_interval" json:"update_interval" env:"UPDATE_INTERVAL" envDefault:"60"`
+	Autolaunch                 bool              `yaml:"autolaunch" json:"autolaunch" env:"AUTOLAUNCH" envDefault:"false"`
+	BindAddress                string            `yaml:"bind_address" json:"bind_address" env:"ENDPOINT_URL" envDefault:":8080"`
+	SessionRefreshInterval     int               `yaml:"session_refresh_interval" json:"session_refresh_interval" env:"SESSION_REFRESH_INTERVAL" envDefault:"3600"`
+	SessionRenewalAttemptCount int               `yaml:"session_refresh_attempts" json:"session_refresh_attempts" env:"SESSION_REFRESH_ATTEMPTS" envDefault:"5"`
+	MaxDownloadFails           int               `yaml:"max_download_fails" json:"max_download_fails" env:"MAX_DOWNLOAD_FAILS" envDefault:"5"`
 	cfgPath                    string
 }
 
 type RouterCredentials struct {
-	Endpoint string `yaml:"endpoint" json:"endpoint"`
-	Username string `yaml:"username" json:"username"`
-	Password string `yaml:"password" json:"password"`
+	Endpoint string `yaml:"endpoint" json:"endpoint" env:"FRITZ_ENDPOINT" envDefault:"192.168.178.1"`
+	Username string `yaml:"username" json:"username" env:"FRITZ_USERNAME"`
+	Password string `yaml:"password" json:"password" env:"FRITZ_PASSWORD"`
 }

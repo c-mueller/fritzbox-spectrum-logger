@@ -16,18 +16,28 @@
 package main
 
 import (
-	"gopkg.in/alecthomas/kingpin.v2"
 	"github.com/c-mueller/fritzbox-spectrum-logger/server"
+	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 var (
 	serverCmd    = kingpin.Command("server", "Run server")
 	serverConfig = serverCmd.Flag("config",
 		"Path to the config file").Default("config.yml").ExistingFile()
+
+	serverEnvCmd = serverCmd.Command("env", "Launch from environment configuration")
 )
 
-func launchServer() {
+func launchServerWithConfig() {
 	srv := server.LaunchApplication(*serverConfig)
+	err := srv.Listen()
+	if err != nil {
+		log.Error(err.Error())
+	}
+}
+
+func launchServerFromEnvironment() {
+	srv := server.LaunchFromEnvironment()
 	err := srv.Listen()
 	if err != nil {
 		log.Error(err.Error())

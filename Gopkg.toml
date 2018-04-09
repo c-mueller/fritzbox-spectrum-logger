@@ -14,6 +14,10 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 [[constraint]]
+  name = "github.com/caarlos0/env"
+  version = "v3.2.0"
+
+[[constraint]]
   name = "github.com/boltdb/bolt"
   version = "v1.3.1"
 

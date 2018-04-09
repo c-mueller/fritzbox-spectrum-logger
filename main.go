@@ -31,8 +31,18 @@ func main() {
 
 	switch kingpin.Parse() {
 	case "server":
-		launchServer()
+		launchServerWithConfig()
+	case "server env":
+		launchServerFromEnvironment()
 	case "version":
 		versionInfo()
+	case "generate-config yaml":
+		generateYaml()
+	case "generate-config docker":
+		generateDockerfileCommands()
+	case "generate-config bash":
+		generateBash()
+	case "generate-config fish":
+		generateFish()
 	}
 }

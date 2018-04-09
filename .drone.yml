@@ -38,11 +38,11 @@ pipeline:
       # Install Godep
       - go get -u github.com/golang/dep/cmd/dep
       # Install Dependencies
-      - dep ensure -v
+      - ./update_deps.fish
       # Compile static dependency file
       - ./embed_resources.fish
       # Build the Application
-      - go build -v
+      - ./build.fish
   test_and_benchmark:
     image: golang:${GO_VERSION}
     commands:

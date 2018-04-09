@@ -16,8 +16,8 @@
 package main
 
 import (
-	"os"
 	"github.com/op/go-logging"
+	"os"
 )
 
 var format = logging.MustStringFormatter(

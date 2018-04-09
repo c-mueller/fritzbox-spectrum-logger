@@ -27,10 +27,11 @@ var (
 )
 
 func main() {
+	cliCommand := kingpin.Parse()
 	initializeLogger()
 
-	switch kingpin.Parse() {
-	case "server":
+	switch cliCommand {
+	case "server config":
 		launchServerWithConfig()
 	case "server env":
 		launchServerFromEnvironment()

@@ -21,15 +21,18 @@ import (
 )
 
 var (
-	serverCmd    = kingpin.Command("server", "Run server")
-	serverConfig = serverCmd.Flag("config",
+	serverCmd       = kingpin.Command("server", "Run server")
+	serverConfigCmd = serverCmd.Command("config", "Run server with config file")
+	serverConfig    = serverConfigCmd.Arg("config-file",
 		"Path to the config file").Default("config.yml").ExistingFile()
 
 	serverEnvCmd = serverCmd.Command("env", "Launch from environment configuration")
 )
 
 func launchServerWithConfig() {
+	log.Debug("Creating application instance...")
 	srv := server.LaunchApplication(*serverConfig)
+	log.Debug("Launching server...")
 	err := srv.Listen()
 	if err != nil {
 		log.Error(err.Error())
@@ -37,7 +40,9 @@ func launchServerWithConfig() {
 }
 
 func launchServerFromEnvironment() {
+	log.Debug("Creating Application instance...")
 	srv := server.LaunchFromEnvironment()
+	log.Debug("Launching server...")
 	err := srv.Listen()
 	if err != nil {
 		log.Error(err.Error())

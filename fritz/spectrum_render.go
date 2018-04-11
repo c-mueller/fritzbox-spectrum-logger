@@ -105,7 +105,7 @@ func (g *spectrumGraph) render(startX, startY float64, img *gg.Context) {
 }
 
 func (g *spectrumGraph) renderLine(data ValueList, lineColor color.RGBA, startX, startY float64, img *gg.Context) {
-	maxHeight := float64(g.Current.getMax() * 1.10)
+	maxHeight := g.computeMaxHeightValue()
 	oldY := float64(0)
 	for idx, heightValue := range data {
 		setColor(img, lineColor)
@@ -130,7 +130,8 @@ func (g *spectrumGraph) renderPilot(startX, startY float64, img *gg.Context) {
 }
 
 func (g *spectrumGraph) renderCurrent(startX, startY float64, img *gg.Context) {
-	maxHeight := float64(g.Current.getMax() * 1.10)
+	maxHeight := g.computeMaxHeightValue()
+
 	for idx, heightValue := range g.Current {
 		if g.useSecondary(idx) {
 			setColor(img, g.RenderConfig.SecondaryColor)
@@ -149,7 +150,8 @@ func (g *spectrumGraph) renderCurrent(startX, startY float64, img *gg.Context) {
 func (g *spectrumGraph) renderGrid(startX, startY float64, img *gg.Context) {
 	//Calculate Maximum Horizontal Value
 	length := float64(len(g.Current))
-	max := g.Current.getMax() * 1.10
+
+	max := g.computeMaxHeightValue()
 	scale := max / float64(horizontalGridCount)
 	if scale == 0 {
 		scale = 1
@@ -174,6 +176,14 @@ func (g *spectrumGraph) renderGrid(startX, startY float64, img *gg.Context) {
 		vLineText := int64(math.Ceil(length * (float64(i) / verticalGridCount)))
 		img.DrawString(fmt.Sprintf("%d", vLineText), vX+5, vY+maxSpectrumHeight+gridLineOffset+5)
 	}
+}
+
+func (g *spectrumGraph) computeMaxHeightValue() float64 {
+	// Use 110% of the maximum value as maximum value of the scale
+	// Using the current value causes the Maximum to be out of the grid
+	// in case the maximum of the 'Maximum' list is bigger then 110% of the
+	// maximum in the 'Current' list
+	return float64(g.Maximum.getMax() * 1.10)
 }
 
 func (g *spectrumGraph) fillBackground(startX, startY float64, img *gg.Context) {

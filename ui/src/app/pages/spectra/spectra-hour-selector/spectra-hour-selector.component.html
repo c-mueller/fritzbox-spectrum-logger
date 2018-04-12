@@ -15,8 +15,7 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<button type="button" class="btn btn-outline-primary btn-block" (click)="onToggleCollapse()"
-        [attr.aria-expanded]="!collapsed" aria-controls="block">
+<button type="button" class="btn btn-outline-primary btn-block" (click)="onToggleCollapse()" aria-controls="block">
   {{formatHourIndexTime(timeIndex)}} - Count: {{timestamps.length}}
 </button>
 <div id="block" [ngbCollapse]="collapsed">

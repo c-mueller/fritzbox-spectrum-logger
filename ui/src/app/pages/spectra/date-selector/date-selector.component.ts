@@ -15,8 +15,7 @@
 
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
 import {DateKey} from "../../../services/api/model";
-import {sprintf} from "sprintf-js";
-import {validate} from "codelyzer/walkerFactory/walkerFn";
+import {NgbDateStruct} from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
   selector: 'app-date-selector',
@@ -27,80 +26,39 @@ export class DateSelectorComponent implements OnInit, OnChanges {
   @Input('dates') public validDates: DateKey[];
   @Output('selectedDate') public selectedDateEmitter = new EventEmitter<DateKey>();
 
-  public selectedDateKey: DateKey = {month: "0", year: "0", day: "0"};
-  public yearMap: Map<string, DateKey[]>;
+  public selectedDateKey: DateKey = {month: "1", year: "2018", day: "1"};
+  public minDate: NgbDateStruct = {month: 1, year: 2018, day: 1};
 
-  public selectedYear: string = null;
-  public selectedMonth: number = null;
+  public dateEnabledCallback: (value: NgbDateStruct, current: { year: number; month: number; }) => boolean = (value) => {
+    let dk = this.toDateKey(value);
 
-  constructor() {
+    for (let e of this.validDates) {
+      if (this.keysEqual(e, dk)) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  onDateSelect(value: NgbDateStruct) {
+    let dk = this.toDateKey(value);
+    this.selectedDateEmitter.emit(dk);
   }
 
   ngOnInit() {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.yearMap = this.groupDateKeysByYear(this.validDates);
-    this.selectedYear = null;
-    this.selectedMonth = null;
+    this.minDate = this.toDateStruct(this.validDates[0]);
   }
 
-  selectYear(year: string) {
-    this.selectedMonth = null;
-    if (this.selectedYear == year) {
-      this.selectedYear = null;
-      return;
-    }
-    this.selectedYear = year;
+  toDateKey(value: NgbDateStruct): DateKey {
+    return {year: "" + value.year, month: "" + value.month, day: "" + value.day};
   }
 
-  selectMonth(month: number) {
-    if (this.selectedMonth == month) {
-      this.selectedMonth = null;
-      return;
-    }
-    this.selectedMonth = month;
-  }
-
-  selectDateKey(e: DateKey) {
-    this.selectedDateKey = e;
-    this.selectedDateEmitter.emit(e);
-  }
-
-  groupDateKeysByYear(keys: DateKey[]): Map<string, DateKey[]> {
-    let data: Map<string, DateKey[]> = new Map<string, DateKey[]>();
-
-    for (let key of keys) {
-      let map = data.get(key.year);
-      if (map === undefined) {
-        map = [];
-      }
-      map.push(key);
-      data.set(key.year, map);
-    }
-    return data;
-  }
-
-  groupDateKeysByMonth(keys: DateKey[]): DateKey[][] {
-    let data: DateKey[][] = [
-      [], [], [],
-      [], [], [],
-      [], [], [],
-      [], [], []
-    ];
-
-    for (let key of keys) {
-      data[+key.month].push(key);
-    }
-
-    return data;
-  }
-
-  getDateString(key: DateKey): string {
-    const month = parseInt(key.month, 10);
-    const year = parseInt(key.year, 10);
-    const day = parseInt(key.day, 10);
-    return sprintf('%02d.%02d.%04d', day, month, year);
+  toDateStruct(value: DateKey): NgbDateStruct {
+    return {year: +value.year, month: +value.month, day: +value.day};
   }
 
   keysEqual(a: DateKey, b: DateKey): boolean {

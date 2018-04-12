@@ -16,8 +16,8 @@
 -->
 <p>{{getTimeRangeStringForQuarter(qIdx,hIdx)}}</p>
 <div class="btn-group-vertical" style="width: 100%">
-  <button type="button" class="btn btn-block btn-outline-warning"
-          *ngFor="let j of timestamps" (click)="onItemSelected(j)">
+  <button type="button" class="btn btn-block btn-outline-warning" *ngFor="let j of timestamps"
+          (click)="onItemSelected(j)">
     {{formatSpectrumButtonTime(j)}}
   </button>
 </div>

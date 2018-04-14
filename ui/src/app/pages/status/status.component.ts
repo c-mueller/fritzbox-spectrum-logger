@@ -25,10 +25,10 @@ import {sprintf} from 'sprintf-js';
 })
 export class StatusComponent implements OnInit {
 
-  status: StatusResponse = {state: '', uptime: -1};
-  stats: StatResponse = {latest: null, spectrum_count: -1, stats: null};
+  status: StatusResponse = {state: '', uptime: 0};
+  stats: StatResponse = {latest: null, spectrum_count: 0, stats: null};
 
-  numberWithDots = (x) => {
+  numberWithDots = (x: number) => {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
 

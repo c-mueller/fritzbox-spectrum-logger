@@ -15,8 +15,5 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<ngb-datepicker style="background-color: #b2b2b2" [markDisabled]="dateEnabledCallback" [minDate]="minDate"
-                (select)="onDateSelect($event)"></ngb-datepicker>
-
-
-
+<ngb-datepicker style="background-color: #b2b2b2" [markDisabled]="dateEnabledCallback" [maxDate]="maxDate"
+                [minDate]="minDate" (select)="onDateSelect($event)"></ngb-datepicker>

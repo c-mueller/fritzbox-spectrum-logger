@@ -28,6 +28,7 @@ export class DateSelectorComponent implements OnInit, OnChanges {
 
   public selectedDateKey: DateKey = {month: "1", year: "2018", day: "1"};
   public minDate: NgbDateStruct = {month: 1, year: 2018, day: 1};
+  public maxDate: NgbDateStruct = {month: 12, year: 2018, day: 31};
 
   public dateEnabledCallback: (value: NgbDateStruct, current: { year: number; month: number; }) => boolean = (value) => {
     let dk = this.toDateKey(value);
@@ -51,6 +52,7 @@ export class DateSelectorComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     this.minDate = this.toDateStruct(this.validDates[0]);
+    this.maxDate = this.toDateStruct(this.validDates[this.validDates.length - 1])
   }
 
   toDateKey(value: NgbDateStruct): DateKey {

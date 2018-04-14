@@ -16,6 +16,4 @@
 export const environment = {
   production: false,
   host: 'http://127.0.0.1:8080/api'
-  // Uncomment the following line for Production builds once angular handles environments properly again
-  // host: '../api'
 };

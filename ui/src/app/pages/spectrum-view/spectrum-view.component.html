@@ -15,17 +15,17 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <div>
-  <div *ngIf="initialLoading">
+  <div *ngIf="initialLoading" class="centered-text">
     <h1>Loading Spectrum...</h1>
   </div>
   <div *ngIf="!initialLoading" class="container">
     <div class="row">
       <div class="card border-primary col-sm-12 col-sm-offset-3">
         <div class="card-body">
-          <h4 *ngIf="!loading" style="text-align: center">Current Timestamp: {{formatTimestamp(timestamp)}}</h4>
-          <h4 *ngIf="loading" style="text-align: center">Fetching Timestamp: {{formatTimestamp(timestamp)}}</h4>
+          <h4 *ngIf="!loading" class="centered-text">Current Timestamp: {{formatTimestamp(timestamp)}}</h4>
+          <h4 *ngIf="loading" class="centered-text">Fetching Timestamp: {{formatTimestamp(timestamp)}}</h4>
           <a [href]="getImageUrl()" target="_blank">
-            <img [src]="data" style="width: 100%"/>
+            <img [src]="data" class="full-width"/>
           </a>
         </div>
       </div>

@@ -16,17 +16,16 @@
 -->
 <div class="row">
   <div class="card border-primary col-sm-12 col-sm-offset-3">
-    <div class="card-body">
-      <h3>Select a Date:</h3>
-      <div class="card-text">
-        <div class="container">
-          <div class="row">
-            <div class="col-xs-12 col-sm-6 col-md-3">
-              <p>Date</p>
-              <app-date-selector [dates]="keys.keys" (selectedDate)="selectDateKey($event)"></app-date-selector>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-9" *ngIf="timestampList.length != 0 && !loading">
-              <p>Time</p>
+    <div class="card-body card-text">
+      <div class="container">
+        <div class="row">
+          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3">
+            <p>Date</p>
+            <app-date-selector [dates]="keys.keys" (selectedDate)="selectDateKey($event)"></app-date-selector>
+          </div>
+          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-9">
+            <p>Time</p>
+            <div *ngIf="timestampList.length != 0 && !loading">
               <div *ngFor="let t of timestampList; let i = index" [attr.data-index]="i" [hidden]="t.length == 0"
                    class="date-button-group">
                 <app-spectra-hour-selector [collapsed]="!expanded[i]" [timeIndex]="i"
@@ -35,9 +34,9 @@
                                            (spectrumSelect)="showSpectrum($event)"></app-spectra-hour-selector>
               </div>
             </div>
-            <td *ngIf="loading" class="col-xs-12 col-sm-6 col-md-9">
-              <h2 style="text-align: center;">Loading...</h2>
-            </td>
+            <div *ngIf="loading" class="col-xs-12 ">
+              <h2 class="loading-header" style="">Loading...</h2>
+            </div>
           </div>
         </div>
       </div>

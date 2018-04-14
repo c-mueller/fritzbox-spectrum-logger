@@ -15,7 +15,7 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <p>{{getTimeRangeStringForQuarter(qIdx,hIdx)}}</p>
-<div class="btn-group-vertical" style="width: 100%">
+<div class="btn-group-vertical full-width">
   <button type="button" class="btn btn-block btn-outline-warning" *ngFor="let j of timestamps"
           (click)="onItemSelected(j)">
     {{formatSpectrumButtonTime(j)}}

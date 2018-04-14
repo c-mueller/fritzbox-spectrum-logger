@@ -19,16 +19,14 @@
   {{formatHourIndexTime(timeIndex)}} - Count: {{timestamps.length}}
 </button>
 <div id="block" [ngbCollapse]="collapsed">
-  <div class="card">
-    <div class="card-body">
-      <div class="container">
-        <div class="row">
-          <div class="col-xs-12 col-sm-6 col-md-3" *ngFor="let quarter of [0,1,2,3]">
-            <app-quarter-timestamp-selector [quarterNumber]="quarter"
-                                            [timestamps]="filterTimestampsByQuarter(quarter,timestamps)"
-                                            [hourNumber]="timeIndex"
-                                            (onSelect)="onSpectrumSelect($event)"></app-quarter-timestamp-selector>
-          </div>
+  <div class="card card-body">
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-12 col-sm-6 col-md-3" *ngFor="let quarter of [0,1,2,3]">
+          <app-quarter-timestamp-selector [quarterNumber]="quarter"
+                                          [timestamps]="filterTimestampsByQuarter(quarter,timestamps)"
+                                          [hourNumber]="timeIndex"
+                                          (onSelect)="onSpectrumSelect($event)"></app-quarter-timestamp-selector>
         </div>
       </div>
     </div>

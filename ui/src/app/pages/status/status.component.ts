@@ -16,6 +16,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ApiService} from '../../services/api/api.service';
 import {StatResponse, StatusResponse} from '../../services/api/model';
+import {sprintf} from 'sprintf-js';
 
 @Component({
   selector: 'app-status',
@@ -26,6 +27,18 @@ export class StatusComponent implements OnInit {
 
   status: StatusResponse = {state: '', uptime: -1};
   stats: StatResponse = {latest: null, spectrum_count: -1, stats: null};
+
+  numberWithDots = (x) => {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  };
+
+  formatDuration = (x: number) => {
+    const hours = Math.floor(x / 3600);
+    const minutes = Math.floor((x - (hours * 3600)) / 60);
+    const seconds = x - (hours * 3600) - (minutes * 60);
+
+    return sprintf("%02d:%02d:%02d", hours, minutes, seconds);
+  };
 
   constructor(private api: ApiService) {
   }

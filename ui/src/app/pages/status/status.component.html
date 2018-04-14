@@ -20,7 +20,6 @@
       <button class="btn btn-dark float-md-right" type="button" (click)="refresh()">Refresh</button>
       <h4 class="card-title">Logger Status</h4>
 
-      <!--<p class="card-text">-->
       <div class="card-text">
         <h5>Status</h5>
         <table class="table table-hover">
@@ -31,7 +30,7 @@
           </tr>
           <tr>
             <td scope="col" class="table-row">Uptime</td>
-            <td scope="col" class="table-row">{{ status.uptime }}</td>
+            <td scope="col" class="table-row">{{ formatDuration(status.uptime) }}</td>
           </tr>
           </tbody>
         </table>
@@ -40,11 +39,11 @@
           <tbody>
           <tr>
             <td scope="col" class="table-row">Spectras Downloaded (Current Session)</td>
-            <td scope="col" class="table-row">{{ stats.spectrum_count }}</td>
+            <td scope="col" class="table-row">{{ numberWithDots(stats.stats.total_count) }}</td>
           </tr>
           <tr>
             <td scope="col" class="table-row">Total Spectras</td>
-            <td scope="col" class="table-row"> {{ stats.stats.total_count }}</td>
+            <td scope="col" class="table-row"> {{ numberWithDots(stats.stats.total_count) }}</td>
           </tr>
           <tr>
             <td scope="col" class="table-row">First Entry</td>
@@ -57,7 +56,6 @@
           </tbody>
         </table>
       </div>
-      <!--</p>-->
     </div>
   </div>
   <button type="button" class="btn btn-primary btn-lg btn-block" id="toggle-status-btn" (click)="this.toggleLogging()">

@@ -28,3 +28,4 @@ echo // LAST EXECUTION: (date) GIT REVISION: (git rev-parse HEAD) >> dep_info.go
 echo "package main" >> dep_info.go
 echo "" >> dep_info.go
 echo var depInfo = `(dep status -json)` >> dep_info.go
+echo var uiShaSum = `(tar cv server/ui-dist/ | sha256sum | sed 's| ||g; s|-||g')` >> dep_info.go

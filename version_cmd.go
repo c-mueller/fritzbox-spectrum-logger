@@ -22,7 +22,7 @@ import (
 	"strings"
 )
 
-const versionDetailsFormat = "%-16s %-64s\n"
+const versionDetailsFormat = "%-16s %s\n"
 
 var (
 	versionCmd = kingpin.Command("version", "Show 'statusbar' version information")
@@ -62,6 +62,7 @@ func versionInfo() {
 	fmt.Printf(versionDetailsFormat, "GITHUB", "https://github.com/c-mueller/fritzbox-spectrum-logger")
 	fmt.Printf(versionDetailsFormat, "VERSION", version)
 	fmt.Printf(versionDetailsFormat, "REVISION", revision)
+	fmt.Printf(versionDetailsFormat, "WEB-UI REVISION", uiShaSum)
 	fmt.Printf(versionDetailsFormat, "BUILD NUMBER", buildNumber)
 	fmt.Printf(versionDetailsFormat, "BUILD TIMESTAMP", buildTimestamp)
 	fmt.Printf(versionDetailsFormat, "LIB COUNT", fmt.Sprintf("%d", len(*deps)))

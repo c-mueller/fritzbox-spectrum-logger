@@ -34,6 +34,10 @@ type Application struct {
 	latest            *LatestSpectrumResponse
 }
 
+type ComparisonRequest struct {
+	Timestamps []int64 `json:"timestamps"`
+}
+
 type StatusResponse struct {
 	State  string `json:"state"`
 	Uptime int64  `json:"uptime"`

@@ -18,7 +18,48 @@ package fritz
 import (
 	"github.com/fogleman/gg"
 	"image/color"
+	"github.com/GeertJohan/go.rice"
+	"github.com/golang/freetype"
+	"github.com/golang/freetype/truetype"
 )
+
+func initializeImageContext(w, h int, scaled bool) (*gg.Context, error) {
+	img := gg.NewContext(w, h)
+	if scaled {
+		img = gg.NewContext(w*2, h*2)
+		img.Scale(2, 2)
+	}
+	img.SetFillRuleEvenOdd()
+	img.SetLineCapSquare()
+	img.SetLineWidth(1.0)
+	//Fill the background white
+	img.SetColor(color.White)
+	img.DrawRectangle(0, 0, float64(w), float64(h))
+	img.Fill()
+
+	if scaled {
+		//Set Font
+		fontBox, err := rice.FindBox("font")
+		if err != nil {
+			return nil, err
+		}
+
+		fontBytes, err := fontBox.Bytes(fontPath)
+		if err != nil {
+			return nil, err
+		}
+		font, err := freetype.ParseFont(fontBytes)
+		if err != nil {
+			return nil, err
+		}
+		img.SetFontFace(truetype.NewFace(font, &truetype.Options{
+			Size: 12,
+			DPI:  144,
+		}))
+	}
+
+	return img, nil
+}
 
 func (p *SpectrumPort) toSNRSpectrum(portIdx int) *spectrumGraph {
 	graph := spectrumGraph{
@@ -95,4 +136,56 @@ func (s *Spectrum) computeSize() (int, int) {
 	height := s.PortCount*(30+2*maxSpectrumHeight+30) + 50
 	width := 60 + barWidth*s.Ports.getMaxCount()
 	return width, height
+}
+
+func (c ComparisonSet) computeComparisonDimensions(scaled bool) (int, int) {
+
+	graphWidth := barWidth * c.getMaxEntryCount()
+
+	// Left offset + SNR Graph + center offset + Bit Graph
+	width := 60 + graphWidth + 70 + graphWidth
+
+	// Top Offset + Graph Row
+	height := 50 + (30+maxSpectrumHeight+30)*len(c)
+
+	return width, height
+}
+
+func (c ComparisonSet) getMaxEntryCount() int {
+	max := 0
+
+	for _, v := range c {
+		current := v.Ports.getMaxCount()
+		if max < current {
+			max = current
+		}
+	}
+
+	return max
+}
+
+func (c ComparisonSet) getBitMaxHeight() float64 {
+	maxHeight := float64(0)
+
+	for _, v := range c {
+		current := v.Ports[0].toBitSpectrum(comparisonPortIndex).computeMaxHeightValue()
+		if maxHeight < current {
+			maxHeight = current
+		}
+	}
+
+	return maxHeight
+}
+
+func (c ComparisonSet) getSNRMaxHeight() float64 {
+	maxHeight := float64(0)
+
+	for _, v := range c {
+		current := v.Ports[0].toSNRSpectrum(comparisonPortIndex).computeMaxHeightValue()
+		if maxHeight < current {
+			maxHeight = current
+		}
+	}
+
+	return maxHeight
 }

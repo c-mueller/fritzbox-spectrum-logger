@@ -26,9 +26,23 @@ import (
 )
 
 const singlePortSpectrumPath = "testdata/example_spectrum.json"
+const singlePortComparisonAPath = "testdata/example_spectrum_comparison_a.json"
+const singlePortComparisonBPath = "testdata/example_spectrum_comparison_b.json"
 const multiPortSpectrumPath = "testdata/example_spectrum_multiport.json"
 
 const cleanup = false
+
+func TestDrawComparison(t *testing.T) {
+	testComparison(t, false, func(t *testing.T, data []byte) {
+		assert.True(t, len(data) > 20000)
+	})
+}
+
+func TestDrawComparison_Scaled(t *testing.T) {
+	testComparison(t, true, func(t *testing.T, data []byte) {
+		assert.True(t, len(data) > 50000)
+	})
+}
 
 func TestDrawSpectrum(t *testing.T) {
 	testRendering(t, cleanup, false, singlePortSpectrumPath, func(t *testing.T, data []byte) {
@@ -111,4 +125,24 @@ func loadTestData(t *testing.T, path string) *Spectrum {
 	file.Close()
 	err = json.Unmarshal(data, &result)
 	return result
+}
+
+func testComparison(t *testing.T, scaled bool, validate func(t *testing.T, data []byte)) {
+	tmpDir := filet.TmpDir(t, "")
+	t.Log("Using tmpdir", tmpDir)
+	//Comment out the next line to Investigate the render Output
+	if cleanup {
+		defer filet.CleanUp(t)
+	}
+	t.Log("Loading test Data")
+	spectrumB := loadTestData(t, singlePortComparisonAPath)
+	spectrumC := loadTestData(t, singlePortComparisonBPath)
+	comparison := ComparisonSet{*spectrumB, *spectrumC}
+	imgdata, err := comparison.RenderComparison(scaled)
+	assert.NoError(t, err)
+	validate(t, imgdata)
+	path := filepath.Join(tmpDir, "test.png")
+	file, _ := os.Create(path)
+	file.Write(imgdata)
+	file.Close()
 }

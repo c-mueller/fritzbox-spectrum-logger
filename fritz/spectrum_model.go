@@ -18,6 +18,7 @@ package fritz
 import "image/color"
 
 type SpectrumPorts []SpectrumPort
+type ComparisonSet []Spectrum
 type ValueList []int
 
 type Spectrum struct {

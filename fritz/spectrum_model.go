@@ -53,13 +53,16 @@ type UpstreamRange struct {
 }
 
 type spectrumGraph struct {
-	PortIndex      int
-	Minimum        ValueList
-	Maximum        ValueList
-	Current        ValueList
-	PilotIndex     int
-	UpstreamRanges []UpstreamRange
-	RenderConfig   renderConfig
+	PortIndex         int
+	Minimum           ValueList
+	Maximum           ValueList
+	Current           ValueList
+	PilotIndex        int
+	UpstreamRanges    []UpstreamRange
+	CarrierMultiplier float64
+	ValueMultiplier   float64
+	ValueHeading      string
+	RenderConfig      renderConfig
 }
 
 type renderConfig struct {

@@ -18,14 +18,15 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"gopkg.in/alecthomas/kingpin.v2"
 	"strings"
+
+	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 const versionDetailsFormat = "%-16s %s\n"
 
 var (
-	versionCmd = kingpin.Command("version", "Show 'statusbar' version information")
+	versionCmd = kingpin.Command("version", "Show 'Fritz!Box Spectrum Logger' version information")
 
 	version        = "master"
 	revision       = "dev"

@@ -135,7 +135,7 @@ func (g *spectrumGraph) renderGrid(startX, startY, max float64, img *gg.Context)
 	}
 
 	//Draw Vertical lines of the grid
-	for i := 0; i <= (verticalGridCount + 1); i++ {
+	for i := 0; i <= (verticalGridCount); i++ {
 		vX, vY := startX+float64(i)*(length/verticalGridCount)*barWidth, startY
 		img.DrawLine(vX, vY, vX, vY+maxSpectrumHeight+gridLineOffset)
 		img.Stroke()

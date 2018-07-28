@@ -22,26 +22,32 @@ import (
 
 func (p *SpectrumPort) toSNRSpectrum(portIdx int) *spectrumGraph {
 	graph := spectrumGraph{
-		Maximum:        p.SpectrumInfo.MaximumSNRValues,
-		Minimum:        p.SpectrumInfo.MinimumSNRValues,
-		Current:        p.SpectrumInfo.CurrentSNRValues,
-		UpstreamRanges: make([]UpstreamRange, 0),
-		PilotIndex:     -1,
-		PortIndex:      portIdx,
-		RenderConfig:   snrRenderConfig,
+		Maximum:           p.SpectrumInfo.MaximumSNRValues,
+		Minimum:           p.SpectrumInfo.MinimumSNRValues,
+		Current:           p.SpectrumInfo.CurrentSNRValues,
+		UpstreamRanges:    make([]UpstreamRange, 0),
+		PilotIndex:        -1,
+		PortIndex:         portIdx,
+		RenderConfig:      snrRenderConfig,
+		CarrierMultiplier: float64(p.SpectrumInfo.TonesPerSNRValue),
+		ValueMultiplier:   0.5,
+		ValueHeading:      "dB",
 	}
 	return &graph
 }
 
 func (p *SpectrumPort) toBitSpectrum(portIdx int) *spectrumGraph {
 	graph := spectrumGraph{
-		Maximum:        p.SpectrumInfo.MaximumBitValues,
-		Minimum:        p.SpectrumInfo.MinimumBitValues,
-		Current:        p.SpectrumInfo.CurrentBitValues,
-		UpstreamRanges: p.SpectrumInfo.UpstreamRanges,
-		PilotIndex:     p.SpectrumInfo.PilotToneIndex,
-		PortIndex:      portIdx,
-		RenderConfig:   bitRenderConfig,
+		Maximum:           p.SpectrumInfo.MaximumBitValues,
+		Minimum:           p.SpectrumInfo.MinimumBitValues,
+		Current:           p.SpectrumInfo.CurrentBitValues,
+		UpstreamRanges:    p.SpectrumInfo.UpstreamRanges,
+		PilotIndex:        p.SpectrumInfo.PilotToneIndex,
+		PortIndex:         portIdx,
+		RenderConfig:      bitRenderConfig,
+		CarrierMultiplier: float64(p.SpectrumInfo.TonesPerBATValue),
+		ValueMultiplier:   1.0,
+		ValueHeading:      "Bits",
 	}
 	return &graph
 }

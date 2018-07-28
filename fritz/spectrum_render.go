@@ -22,6 +22,7 @@ import (
 	"github.com/fogleman/gg"
 	"github.com/golang/freetype"
 	"github.com/golang/freetype/truetype"
+	"github.com/dustin/go-humanize"
 	"image/color"
 	"image/png"
 	"math"
@@ -75,9 +76,9 @@ func (s *Spectrum) Render(scaled bool) ([]byte, error) {
 		img.DrawString(portHeading, 10, float64(15+index*560))
 
 		//Render SNR Spectrum
-		port.toSNRSpectrum(index).render(30, 20+float64(index*(30+2*maxSpectrumHeight+30)), img)
+		port.toSNRSpectrum(index).render(30, 20+float64(index*(30+2*maxSpectrumHeight+30)), -1, img)
 		//Render Bit Spectrum
-		port.toBitSpectrum(index).render(30, 300+float64(index*(30+2*maxSpectrumHeight+30)), img)
+		port.toBitSpectrum(index).render(30, 300+float64(index*(30+2*maxSpectrumHeight+30)), -1, img)
 	}
 
 	outputBuffer := bytes.NewBuffer([]byte(""))
@@ -90,22 +91,25 @@ func (s *Spectrum) Render(scaled bool) ([]byte, error) {
 	return outputBuffer.Bytes(), nil
 }
 
-func (g *spectrumGraph) render(startX, startY float64, img *gg.Context) {
+func (g *spectrumGraph) render(startX, startY, maxHeight float64, img *gg.Context) {
 	g.fillBackground(startX, startY, img)
 
-	g.renderGrid(startX, startY, img)
+	if maxHeight <= 0 {
+		maxHeight = g.computeMaxHeightValue()
+	}
 
-	g.renderCurrent(startX, startY, img)
+	g.renderGrid(startX, startY, maxHeight, img)
+
+	g.renderCurrent(startX, startY, maxHeight, img)
 
 	//Draw Minimum and maxiumum
-	g.renderLine(g.Minimum, g.RenderConfig.MinColor, startX, startY, img) // Minimum
-	g.renderLine(g.Maximum, g.RenderConfig.MaxColor, startX, startY, img) // Maximum
+	g.renderLine(g.Minimum, g.RenderConfig.MinColor, startX, startY, maxHeight, img) // Minimum
+	g.renderLine(g.Maximum, g.RenderConfig.MaxColor, startX, startY, maxHeight, img) // Maximum
 
 	g.renderPilot(startX, startY, img)
 }
 
-func (g *spectrumGraph) renderLine(data ValueList, lineColor color.RGBA, startX, startY float64, img *gg.Context) {
-	maxHeight := g.computeMaxHeightValue()
+func (g *spectrumGraph) renderLine(data ValueList, lineColor color.RGBA, startX, startY, maxHeight float64, img *gg.Context) {
 	oldY := float64(0)
 	for idx, heightValue := range data {
 		setColor(img, lineColor)
@@ -129,9 +133,7 @@ func (g *spectrumGraph) renderPilot(startX, startY float64, img *gg.Context) {
 	}
 }
 
-func (g *spectrumGraph) renderCurrent(startX, startY float64, img *gg.Context) {
-	maxHeight := g.computeMaxHeightValue()
-
+func (g *spectrumGraph) renderCurrent(startX, startY, maxHeight float64, img *gg.Context) {
 	for idx, heightValue := range g.Current {
 		if g.useSecondary(idx) {
 			setColor(img, g.RenderConfig.SecondaryColor)
@@ -147,11 +149,10 @@ func (g *spectrumGraph) renderCurrent(startX, startY float64, img *gg.Context) {
 	}
 }
 
-func (g *spectrumGraph) renderGrid(startX, startY float64, img *gg.Context) {
+func (g *spectrumGraph) renderGrid(startX, startY, max float64, img *gg.Context) {
 	//Calculate Maximum Horizontal Value
 	length := float64(len(g.Current))
 
-	max := g.computeMaxHeightValue()
 	scale := max / float64(horizontalGridCount)
 	if scale == 0 {
 		scale = 1
@@ -163,18 +164,19 @@ func (g *spectrumGraph) renderGrid(startX, startY float64, img *gg.Context) {
 		hX, hY := startX-10, startY+((float64(i)/horizontalGridCount)*maxSpectrumHeight)
 		img.DrawLine(hX, hY, hX+length*barWidth+gridLineOffset, hY)
 		img.Stroke()
-		hLineText := int(math.Ceil(scale * float64(horizontalGridCount-i)))
-		img.DrawString(fmt.Sprintf("%d", hLineText), hX-20, hY)
+		hLineText := math.Ceil(scale*float64(horizontalGridCount-i)) * g.ValueMultiplier
+		img.DrawString(fmt.Sprintf("%s", humanize.Ftoa(hLineText)), hX-20, hY)
 	}
 
 	//Draw Vertical lines of the grid
-	for i := 1; i <= (verticalGridCount - 1); i++ {
+	for i := 0; i <= (verticalGridCount + 1); i++ {
 		vX, vY := startX+float64(i)*(length/verticalGridCount)*barWidth, startY
 		img.DrawLine(vX, vY, vX, vY+maxSpectrumHeight+gridLineOffset)
 		img.Stroke()
 		//Draw Line Description
-		vLineText := int64(math.Ceil(length * (float64(i) / verticalGridCount)))
-		img.DrawString(fmt.Sprintf("%d", vLineText), vX+5, vY+maxSpectrumHeight+gridLineOffset+5)
+		vLineText := fmt.Sprintf("%d", int64(math.Ceil(length*(float64(i)/verticalGridCount))*g.CarrierMultiplier))
+		tW, tH := img.MeasureString(vLineText)
+		img.DrawString(vLineText, vX-(tW/2), vY+maxSpectrumHeight+gridLineOffset+tH)
 	}
 }
 

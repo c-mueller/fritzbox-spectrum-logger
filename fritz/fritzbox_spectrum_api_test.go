@@ -51,6 +51,9 @@ func TestDownloadSpectrum(t *testing.T) {
 	}
 
 	spc, err := session.GetSpectrum()
+
+	t.Logf("%+v",spc)
+
 	assert.NoError(t, err)
 	assert.Equal(t, 1, spc.PortCount)
 }

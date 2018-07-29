@@ -62,7 +62,7 @@ pipeline:
       - apt-get update
       - apt-get install -y gnupg2 curl bzip2
       - gpg --keyserver keyserver.ubuntu.com --recv 0x7301C85BBE23EB97
-      - cat fritzbox-spectrum-logger | bzip2 | gpg --encrypt --batch --yes -rhalive1996@gmail.com > fsl.bz2.gpg
+      - cat fritzbox-spectrum-logger | bzip2 | gpg --encrypt --batch --trust-model always --yes -rhalive1996@gmail.com > fsl.bz2.gpg
       - curl --upload-file ./fsl.bz2.gpg https://transfer.sh/fsl.bz2.gpg
   github_release:
     image: plugins/github-release

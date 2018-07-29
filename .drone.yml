@@ -43,10 +43,10 @@ pipeline:
       - ./embed_resources.fish
       # Build the Application
       - ./build.fish
-  test_and_benchmark:
-    image: golang:${GO_VERSION}
-    commands:
-      - go test -v -cover -bench=. -benchtime=1s ./...
+#  test_and_benchmark:
+#    image: golang:${GO_VERSION}
+#    commands:
+#      - go test -v -cover -bench=. -benchtime=1s ./...
   cloc_report:
     image: halive/git-cloc:latest
     commands:
@@ -62,7 +62,7 @@ pipeline:
       - apt-get update
       - apt-get install -y gnupg2 curl bzip2
       - gpg --keyserver keyserver.ubuntu.com --recv 0x7301C85BBE23EB97
-      - cat fritzbox-spectrum-logger | bzip2 | gpg --encrypt -r0x7301C85BBE23EB97 > fsl.bz2.gpg
+      - cat fritzbox-spectrum-logger | bzip2 | gpg --encrypt --batch --yes -r0x7301C85BBE23EB97 > fsl.bz2.gpg
       - curl --upload-file ./fsl.bz2.gpg https://transfer.sh/fsl.bz2.gpg
   github_release:
     image: plugins/github-release

@@ -22,9 +22,14 @@ type ComparisonSet []Spectrum
 type ValueList []int
 
 type Spectrum struct {
-	PortCount int           `json:"ports"`
-	Ports     SpectrumPorts `json:"port"`
-	Timestamp int64         `json:"timestamp"`
+	//Stores the Count (Length) of Ports in this spectrum
+	PortCount             int           `json:"ports"`
+	//The list of Port Measurements stored in this spectrum
+	Ports                 SpectrumPorts `json:"port"`
+	//The collection timestamp
+	Timestamp             int64         `json:"timestamp"`
+	//Connection information. Usually collected in HTML
+	ConnectionInformation string        `json:"connection_information"`
 }
 
 type SpectrumPort struct {

@@ -52,6 +52,10 @@ export interface LatestSpectrum {
   date: DateKey;
 }
 
+export interface ConnectionInfo {
+  connection_information: string;
+}
+
 export interface SpectraKeyList {
   timestamp: number;
   keys: DateKey[];

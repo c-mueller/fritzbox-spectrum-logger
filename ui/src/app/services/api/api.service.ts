@@ -16,7 +16,15 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
-import {DateKey, InfoResponse, NeighboursResponse, SpectraKeyList, StatResponse, StatusResponse, TimestampList} from './model';
+import {
+  DateKey,
+  InfoResponse,
+  NeighboursResponse,
+  SpectraKeyList,
+  StatResponse,
+  StatusResponse,
+  TimestampList
+} from './model';
 
 @Injectable()
 export class ApiService {
@@ -40,6 +48,10 @@ export class ApiService {
 
   getSpectrumImage(timestamp: number) {
     return this.http.get(this.endpoint + '/spectrum/' + timestamp + '/img', {responseType: 'blob'});
+  }
+
+  getSpectrum(timestamp: number) {
+    return this.http.get(this.endpoint + '/spectrum/' + timestamp)
   }
 
   startLogging() {

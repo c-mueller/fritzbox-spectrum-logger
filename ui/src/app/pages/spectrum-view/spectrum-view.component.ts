@@ -18,6 +18,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {ApiService} from '../../services/api/api.service';
 import {environment} from '../../../environments/environment';
 import {sprintf} from 'sprintf-js';
+import {ConnectionInfo} from "../../services/api/model";
 
 @Component({
   selector: 'app-spectrum-view',
@@ -31,6 +32,7 @@ export class SpectrumViewComponent implements OnInit, OnDestroy {
   public initialLoading = true;
   public loading = true;
   public data: string;
+  public connectionInfo: ConnectionInfo;
 
   constructor(private route: ActivatedRoute,
               private router: Router,
@@ -74,6 +76,14 @@ export class SpectrumViewComponent implements OnInit, OnDestroy {
       err => {
         this.router.navigate(['/404']);
       });
+    this.api.getSpectrum(this.timestamp).subscribe((data: ConnectionInfo) => {
+        console.log(data);
+        this.connectionInfo = data;
+      }, err => {
+        console.log(err);
+        this.connectionInfo = { connection_information: ""};
+      }
+    )
   }
 
   navigateTo(timestamp: number) {

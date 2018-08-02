@@ -21,3 +21,18 @@
 .full-width {
   width: 100%;
 }
+
+.conn-info {
+  text-align: center;
+}
+h1.conn-info {
+  font-size: 15px;
+}
+table.conn-info {
+  width: 100%;
+
+}
+
+.top-margin {
+  margin-top: 1%;
+}

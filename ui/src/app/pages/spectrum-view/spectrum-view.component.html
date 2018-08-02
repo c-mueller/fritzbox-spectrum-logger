@@ -32,5 +32,12 @@
     </div>
     <app-spectrum-pagination [timestamp]="this.timestamp"
                              (onTimestampChange)="navigateTo($event)"></app-spectrum-pagination>
+    <div class="row top-margin">
+      <div class="card border-primary col-sm-12 col-sm-offset-3">
+        <div class="card-body conn-info" [innerHTML]="connectionInfo.connection_information">
+
+        </div>
+      </div>
+    </div>
   </div>
 </div>

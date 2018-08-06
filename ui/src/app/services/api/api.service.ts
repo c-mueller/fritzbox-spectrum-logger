@@ -17,7 +17,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
 import {
-  DateKey,
+  DateKey, FSLConfiguration,
   InfoResponse,
   NeighboursResponse,
   SpectraKeyList,
@@ -32,6 +32,10 @@ export class ApiService {
   private endpoint = environment.host;
 
   constructor(private http: HttpClient) {
+  }
+
+  getConfiguration() {
+    return this.http.get<FSLConfiguration>(this.endpoint+'/config')
   }
 
   getSpectrumKeys() {

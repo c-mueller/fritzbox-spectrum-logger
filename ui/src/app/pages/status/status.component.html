@@ -47,11 +47,19 @@
           </tr>
           <tr>
             <td scope="col" class="table-row">First Entry</td>
-            <td scope="col" class="table-row">{{ toTime(stats.stats.first_spectrum) }}</td>
+            <td scope="col" class="table-row">
+              <button class="btn btn-primary btn-block" (click)="loadSpectrum(stats.stats.first_spectrum)">
+                {{toTime(stats.stats.first_spectrum)}}
+              </button>
+            </td>
           </tr>
           <tr>
             <td scope="col" class="table-row">Latest Entry</td>
-            <td scope="col" class="table-row">{{ toTime(stats.stats.latest_spectrum) }}</td>
+            <td scope="col" class="table-row">
+              <button class="btn btn-primary btn-block" (click)="loadSpectrum(stats.stats.latest_spectrum)">
+                {{ toTime(stats.stats.latest_spectrum) }}
+              </button>
+            </td>
           </tr>
           </tbody>
         </table>

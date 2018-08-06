@@ -15,5 +15,5 @@
 
 export const environment = {
   production: false,
-  host: 'http://127.0.0.1:8080/api'
+  host: 'http://archie:8080/api'
 };

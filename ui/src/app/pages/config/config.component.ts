@@ -13,7 +13,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {FSLConfiguration} from "../../services/api/model";
+import {ApiService} from "../../services/api/api.service";
 
 @Component({
   selector: 'app-config',
@@ -22,9 +24,21 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ConfigComponent implements OnInit {
 
-  constructor() { }
+  currentConfig: FSLConfiguration = null;
+  loading: boolean = true;
+  error: boolean = false;
+
+  constructor(private api: ApiService) {
+  }
 
   ngOnInit() {
+    this.api.getConfiguration().subscribe(e => {
+      this.currentConfig = e;
+      this.loading = false;
+    }, err => {
+      this.loading = false;
+      this.error = true;
+    })
   }
 
 }

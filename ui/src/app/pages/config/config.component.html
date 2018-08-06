@@ -14,6 +14,77 @@
 * You should have received a copy of the GNU General Public License
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
-<p>
-  config works!
-</p>
+<div *ngIf="loading" class="centered-text">
+  <h1>Loading Configuration...</h1>
+</div>
+<div *ngIf="error" class="centered-text">
+  <h1>Failed to load Configuration!</h1>
+</div>
+<div class="row">
+  <div class="card border-primary col-sm-12 col-sm-offset-3">
+    <div class="card-body">
+      <h4 class="card-title">Current Configuration</h4>
+      <h5>Fritz!Box Credentials</h5>
+      <table class="table table-hover">
+        <tbody>
+        <tr>
+          <td scope="col" class="table-row">Fritz!Box Endpoint</td>
+          <td scope="col" class="table-row">{{ currentConfig.credentials.endpoint }}</td>
+        </tr>
+        <tr>
+          <td scope="col" class="table-row">Fritz!Box Username</td>
+          <td scope="col" class="table-row">{{ currentConfig.credentials.username }}</td>
+        </tr>
+        <tr>
+          <td scope="col" class="table-row">Fritz!Box Password</td>
+          <td scope="col" class="table-row">{{ currentConfig.credentials.password }}</td>
+        </tr>
+        </tbody>
+      </table>
+      <h5>Logging Configuration</h5>
+      <table class="table table-hover">
+        <tbody>
+        <tr>
+          <td scope="col" class="table-row">Maximum Download Fails</td>
+          <td scope="col" class="table-row">{{ currentConfig.max_download_fails }}</td>
+        </tr>
+        <tr>
+          <td scope="col" class="table-row">Session Refresh Interval (in Seconds)</td>
+          <td scope="col" class="table-row">{{ currentConfig.session_refresh_interval }}</td>
+        </tr>
+        <tr>
+          <td scope="col" class="table-row">Maximum Session Retry Count</td>
+          <td scope="col" class="table-row">{{ currentConfig.session_refresh_attempts }}</td>
+        </tr>
+        <tr>
+          <td scope="col" class="table-row">Update Interval (in Seconds)</td>
+          <td scope="col" class="table-row">{{ currentConfig.update_interval }}</td>
+        </tr>
+        </tbody>
+      </table>
+      <h5>Server Configuration</h5>
+      <table class="table table-hover">
+        <tbody>
+        <tr>
+          <td scope="col" class="table-row">Autostart</td>
+          <td scope="col" class="table-row" *ngIf="currentConfig.autolaunch">
+            Active
+          </td>
+          <td scope="col" class="table-row" *ngIf="!currentConfig.autolaunch">
+            Not Active
+          </td>
+        </tr>
+        <tr>
+          <td scope="col" class="table-row">Logger HTTP Endpoint</td>
+          <td scope="col" class="table-row">{{ currentConfig.bind_address }}</td>
+        </tr>
+        <tr>
+          <td scope="col" class="table-row">BoltDB Storage Path</td>
+          <td scope="col" class="table-row">{{ currentConfig.database_path }}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+

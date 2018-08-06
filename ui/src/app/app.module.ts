@@ -22,7 +22,6 @@ import {RouterModule, Routes} from '@angular/router';
 import {NotFoundComponent} from './pages/not-found/not-found.component';
 import {StatusComponent} from './pages/status/status.component';
 import {HashLocationStrategy, LocationStrategy} from '@angular/common';
-import {AboutComponent} from './pages/about/about.component';
 import {ConfigComponent} from './pages/config/config.component';
 import {SpectraComponent} from './pages/spectra/spectra.component';
 import {HttpClientModule} from '@angular/common/http';
@@ -52,10 +51,6 @@ const appRoutes: Routes = [
     component: ConfigComponent
   },
   {
-    path: 'about',
-    component: AboutComponent
-  },
-  {
     path: '',
     redirectTo: '/status',
     pathMatch: 'full'
@@ -69,7 +64,6 @@ const appRoutes: Routes = [
 @NgModule({
   declarations: [
     AppComponent,
-    AboutComponent,
     ConfigComponent,
     SpectraComponent,
     StatusComponent,

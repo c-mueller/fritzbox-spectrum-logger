@@ -13,6 +13,23 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+export interface FSLConfiguration {
+  autolaunch: boolean;
+  bind_address: string;
+  credentials: Credentials;
+  database_path: string;
+  max_download_fails: number;
+  session_refresh_attempts: number;
+  session_refresh_interval: number;
+  update_interval: number;
+}
+
+export interface Credentials {
+  endpoint: string;
+  username: string;
+  password: string;
+}
+
 export interface TimestampList {
   timestamps: number[];
   timestamp: number;

@@ -17,6 +17,7 @@ import {Component, EventEmitter, Input, OnChanges, OnInit, Output} from '@angula
 import {ApiService} from "../../../services/api/api.service";
 import {NeighboursResponse} from "../../../services/api/model";
 import {sprintf} from "sprintf-js";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-spectrum-pagination',
@@ -30,7 +31,9 @@ export class SpectrumPaginationComponent implements OnInit, OnChanges {
 
   public neighbours: NeighboursResponse = {previous_timestamp: -1, next_timestamp: -1, request_timestamp: -1};
 
-  constructor(private api: ApiService) {
+  constructor(
+    private api: ApiService
+  ) {
   }
 
   ngOnInit() {

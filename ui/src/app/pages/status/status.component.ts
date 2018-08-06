@@ -17,6 +17,7 @@ import {Component, OnInit} from '@angular/core';
 import {ApiService} from '../../services/api/api.service';
 import {StatResponse, StatusResponse} from '../../services/api/model';
 import {sprintf} from 'sprintf-js';
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-status',
@@ -40,7 +41,10 @@ export class StatusComponent implements OnInit {
     return sprintf("%02d:%02d:%02d", hours, minutes, seconds);
   };
 
-  constructor(private api: ApiService) {
+  constructor(
+    private api: ApiService,
+    private router: Router
+  ) {
   }
 
   toggleLogging() {
@@ -63,6 +67,10 @@ export class StatusComponent implements OnInit {
 
   ngOnInit() {
     this.refresh();
+  }
+
+  loadSpectrum(timestamp: number) {
+    this.router.navigate(['/spectrum', timestamp]);
   }
 
   private updateStats() {

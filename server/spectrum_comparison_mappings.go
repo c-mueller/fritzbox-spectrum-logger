@@ -16,10 +16,10 @@
 package server
 
 import (
-	"github.com/gin-gonic/gin"
-	"io/ioutil"
 	"encoding/json"
 	"github.com/c-mueller/fritzbox-spectrum-logger/fritz"
+	"github.com/gin-gonic/gin"
+	"io/ioutil"
 )
 
 func (a *Application) getSpectraComparison(ctx *gin.Context) {
@@ -48,7 +48,7 @@ func (a *Application) getSpectraComparison(ctx *gin.Context) {
 
 	imageBytes, err := spectraCollection.RenderComparison(false)
 	if err != nil {
-		ctx.String(500,"")
+		ctx.String(500, "")
 		return
 	}
 	ctx.Data(200, "image/png", imageBytes)

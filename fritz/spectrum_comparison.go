@@ -17,11 +17,11 @@ package fritz
 
 import (
 	"bytes"
+	"fmt"
+	"image/color"
 	"image/png"
 	"sort"
 	"time"
-	"fmt"
-	"image/color"
 )
 
 const comparisonPortIndex = 0

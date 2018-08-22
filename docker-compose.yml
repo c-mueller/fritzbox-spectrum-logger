@@ -1,0 +1,12 @@
+version: '3.4'
+
+services:
+  application:
+    image: halive/fsl:latest
+    environment:
+      AUTOLAUNCH: true
+      FRITZ_ENDPOINT: "192.168.178.1"
+      FRITZ_USERNAME: ""
+      FRITZ_PASSWORD: ""
+    ports:
+    - "8080:80"

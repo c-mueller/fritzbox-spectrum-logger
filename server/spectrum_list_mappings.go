@@ -16,10 +16,10 @@
 package server
 
 import (
-	"github.com/gin-gonic/gin"
-	"time"
-	"strconv"
 	"github.com/c-mueller/fritzbox-spectrum-logger/repository"
+	"github.com/gin-gonic/gin"
+	"strconv"
+	"time"
 )
 
 func (a *Application) getValidDates(ctx *gin.Context) {

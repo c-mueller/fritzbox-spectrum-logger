@@ -16,11 +16,11 @@
 package fritz
 
 import (
-	"github.com/fogleman/gg"
-	"image/color"
 	"github.com/GeertJohan/go.rice"
+	"github.com/fogleman/gg"
 	"github.com/golang/freetype"
 	"github.com/golang/freetype/truetype"
+	"image/color"
 )
 
 func initializeImageContext(w, h int, scaled bool) (*gg.Context, error) {

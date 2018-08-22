@@ -18,8 +18,8 @@ package fritz
 import (
 	"bytes"
 	"fmt"
-		"github.com/fogleman/gg"
-			"github.com/dustin/go-humanize"
+	"github.com/dustin/go-humanize"
+	"github.com/fogleman/gg"
 	"image/color"
 	"image/png"
 	"math"
@@ -29,7 +29,7 @@ import (
 // Renders the spectrum to a PNG byte array
 func (s *Spectrum) Render(scaled bool) ([]byte, error) {
 	w, h := s.computeSize()
-	img,err := initializeImageContext(w, h, scaled)
+	img, err := initializeImageContext(w, h, scaled)
 	if err != nil {
 		return nil, err
 	}

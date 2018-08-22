@@ -23,13 +23,13 @@ type ValueList []int
 
 type Spectrum struct {
 	//Stores the Count (Length) of Ports in this spectrum
-	PortCount             int           `json:"ports"`
+	PortCount int `json:"ports"`
 	//The list of Port Measurements stored in this spectrum
-	Ports                 SpectrumPorts `json:"port"`
+	Ports SpectrumPorts `json:"port"`
 	//The collection timestamp
-	Timestamp             int64         `json:"timestamp"`
+	Timestamp int64 `json:"timestamp"`
 	//Connection information. Usually collected in HTML
-	ConnectionInformation string        `json:"connection_information"`
+	ConnectionInformation string `json:"connection_information"`
 }
 
 type SpectrumPort struct {

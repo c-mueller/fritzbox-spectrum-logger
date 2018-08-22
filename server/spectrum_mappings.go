@@ -16,10 +16,10 @@
 package server
 
 import (
+	"github.com/c-mueller/fritzbox-spectrum-logger/fritz"
 	"github.com/c-mueller/fritzbox-spectrum-logger/repository"
 	"github.com/gin-gonic/gin"
 	"strconv"
-	"github.com/c-mueller/fritzbox-spectrum-logger/fritz"
 )
 
 func (a *Application) getJsonSpectrum(ctx *gin.Context) {
@@ -57,7 +57,7 @@ func (a *Application) getConnectionInformation(ctx *gin.Context) {
 	ctx.Data(200, "text/html", []byte(spectrum.ConnectionInformation))
 }
 
-func (a *Application) getSpectrumFromParameters(ctx *gin.Context) (*fritz.Spectrum) {
+func (a *Application) getSpectrumFromParameters(ctx *gin.Context) *fritz.Spectrum {
 	timestampString := ctx.Param("timestamp")
 	timestamp, err := strconv.ParseInt(timestampString, 10, 64)
 	key := repository.GetFromTimestamp(timestamp)

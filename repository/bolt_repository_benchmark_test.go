@@ -29,7 +29,7 @@ func Benchmark_Insert(b *testing.B) {
 	dir, err := ioutil.TempDir("", "")
 	assert.NoError(b, err, "Creating tempdir failed")
 
-	repo, err := NewRepository(filepath.Join(dir, "test_db.db"))
+	repo, err := NewBoltRepository(filepath.Join(dir, "test_db.db"))
 	assert.NoError(b, err, "Opening Repo Failed")
 
 	spectrum := loadTestSpectrum(b)
@@ -60,7 +60,7 @@ func Benchmark_Get_Timestamps(b *testing.B) {
 	dir, err := ioutil.TempDir("", "")
 	assert.NoError(b, err, "Creating tempdir failed")
 
-	repo, err := NewRepository(filepath.Join(dir, "test_db.db"))
+	repo, err := NewBoltRepository(filepath.Join(dir, "test_db.db"))
 	assert.NoError(b, err, "Opening Repo Failed")
 
 	spectrum := loadTestSpectrum(b)
@@ -94,7 +94,7 @@ func Benchmark_Retrieve(b *testing.B) {
 	dir, err := ioutil.TempDir("", "")
 	assert.NoError(b, err, "Creating tempdir failed")
 
-	repo, err := NewRepository(filepath.Join(dir, "test_db.db"))
+	repo, err := NewBoltRepository(filepath.Join(dir, "test_db.db"))
 	assert.NoError(b, err, "Opening Repo Failed")
 
 	spectrum := loadTestSpectrum(b)

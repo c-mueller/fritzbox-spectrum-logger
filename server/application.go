@@ -65,7 +65,7 @@ func LaunchFromEnvironment() *Application {
 func (a *Application) Listen() error {
 	log.Debug("Launching server...")
 	log.Debug("Initializing repository (Datastore)")
-	repo, err := repository.NewRepository(a.config.DatabasePath)
+	repo, err := repository.NewBoltRepository(a.config.DatabasePath)
 
 	if err != nil {
 		return err

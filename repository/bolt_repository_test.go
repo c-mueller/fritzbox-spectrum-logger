@@ -31,7 +31,7 @@ func TestCollect_Stats(t *testing.T) {
 	tmpdir := filet.TmpDir(t, "")
 	defer filet.CleanUp(t)
 
-	repo, err := NewRepository(filepath.Join(tmpdir, "test_db.db"))
+	repo, err := NewBoltRepository(filepath.Join(tmpdir, "test_db.db"))
 	assert.NoErrorf(t, err, "Initialization Failed")
 
 	spectrum := loadTestSpectrum(t)
@@ -50,7 +50,7 @@ func TestInitRepo(t *testing.T) {
 	tmpdir := filet.TmpDir(t, "")
 	defer filet.CleanUp(t)
 
-	repo, err := NewRepository(filepath.Join(tmpdir, "test_db.db"))
+	repo, err := NewBoltRepository(filepath.Join(tmpdir, "test_db.db"))
 	assert.NoErrorf(t, err, "Initialization Failed")
 	repo.Close()
 }
@@ -59,7 +59,7 @@ func TestRepository_Insert(t *testing.T) {
 	tmpdir := filet.TmpDir(t, "")
 	defer filet.CleanUp(t)
 
-	repo, err := NewRepository(filepath.Join(tmpdir, "test_db.db"))
+	repo, err := NewBoltRepository(filepath.Join(tmpdir, "test_db.db"))
 	assert.NoErrorf(t, err, "Initialization Failed")
 
 	spectrum := loadTestSpectrum(t)
@@ -73,7 +73,7 @@ func TestRepository_GetAllSpectrumKeys(t *testing.T) {
 	tmpdir := filet.TmpDir(t, "")
 	defer filet.CleanUp(t)
 
-	repo, err := NewRepository(filepath.Join(tmpdir, "test_db.db"))
+	repo, err := NewBoltRepository(filepath.Join(tmpdir, "test_db.db"))
 	assert.NoErrorf(t, err, "Initialization Failed")
 
 	spectrum := loadTestSpectrum(t)
@@ -96,7 +96,7 @@ func TestRepository_GetSpectrumForTimestamp(t *testing.T) {
 	tmpdir := filet.TmpDir(t, "")
 	defer filet.CleanUp(t)
 
-	repo, err := NewRepository(filepath.Join(tmpdir, "test_db.db"))
+	repo, err := NewBoltRepository(filepath.Join(tmpdir, "test_db.db"))
 	assert.NoErrorf(t, err, "Initialization Failed")
 
 	spectrum := loadTestSpectrum(t)
@@ -116,7 +116,7 @@ func TestRepository_GetSpectraForDayByTimestamp(t *testing.T) {
 	tmpdir := filet.TmpDir(t, "")
 	defer filet.CleanUp(t)
 
-	repo, err := NewRepository(filepath.Join(tmpdir, "test_db.db"))
+	repo, err := NewBoltRepository(filepath.Join(tmpdir, "test_db.db"))
 	assert.NoErrorf(t, err, "Initialization Failed")
 
 	spectrum := loadTestSpectrum(t)
@@ -149,7 +149,7 @@ func TestRepository_GetSpectraForDayByTimestamp(t *testing.T) {
 	repo.Close()
 }
 
-func insertSpectra(spectrum *fritz.Spectrum, repo *Repository, t testing.TB, count, hourMultiplier int) {
+func insertSpectra(spectrum *fritz.Spectrum, repo *BoltRepository, t testing.TB, count, hourMultiplier int) {
 	for i := 0; i < count; i++ {
 		timestamp := time.Date(2018, 2, 14, 0, 0, 0, 0, time.UTC)
 		timestamp = timestamp.Add(time.Duration(i*hourMultiplier) * time.Hour)

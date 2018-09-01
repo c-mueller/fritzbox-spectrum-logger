@@ -28,7 +28,7 @@ import (
 
 var log = logging.MustGetLogger("repository")
 
-func NewRepository(path string) (*Repository, error) {
+func NewBoltRepository(path string) (*BoltRepository, error) {
 	log.Debugf("Opening database '%s'", path)
 	db, err := bolt.Open(path, 0777, bolt.DefaultOptions)
 
@@ -38,12 +38,12 @@ func NewRepository(path string) (*Repository, error) {
 
 	err = initDb(db)
 
-	return &Repository{
+	return &BoltRepository{
 		db: db,
 	}, nil
 }
 
-func (r *Repository) GetAllSpectrumKeys() (SpectraKeys, error) {
+func (r *BoltRepository) GetAllSpectrumKeys() (SpectraKeys, error) {
 	keys := make(SpectraKeys, 0)
 
 	err := r.forEachSpectrumKey(func(dayBucket *bolt.Bucket, key SpectrumKey) error {
@@ -60,13 +60,13 @@ func (r *Repository) GetAllSpectrumKeys() (SpectraKeys, error) {
 	return keys, nil
 }
 
-func (r *Repository) GetSpectrumForTimestamp(timestamp int64) (*fritz.Spectrum, error) {
+func (r *BoltRepository) GetSpectrumForTimestamp(timestamp int64) (*fritz.Spectrum, error) {
 	t := time.Unix(timestamp, 0)
 	d, m, y := t.Day(), int(t.Month()), t.Year()
 	return r.GetSpectrum(d, m, y, timestamp)
 }
 
-func (r *Repository) GetSpectrum(day, month, year int, timestamp int64) (*fritz.Spectrum, error) {
+func (r *BoltRepository) GetSpectrum(day, month, year int, timestamp int64) (*fritz.Spectrum, error) {
 	yearByte, monthByte, dayByte := convertToByte(year, month, day)
 	timestampByte := []byte(fmt.Sprintf("%d", timestamp))
 	var spectrum *fritz.Spectrum
@@ -90,7 +90,7 @@ func (r *Repository) GetSpectrum(day, month, year int, timestamp int64) (*fritz.
 	return spectrum, nil
 }
 
-func (r *Repository) GetTimestampsForDay(day, month, year int) (TimestampArray, error) {
+func (r *BoltRepository) GetTimestampsForDay(day, month, year int) (TimestampArray, error) {
 	data := make(TimestampArray, 0)
 
 	err := r.forEachSpectrumInDay(year, month, day, func(dayBucket *bolt.Bucket, k, v []byte) error {
@@ -111,7 +111,7 @@ func (r *Repository) GetTimestampsForDay(day, month, year int) (TimestampArray, 
 	return data, nil
 }
 
-func (r *Repository) Insert(spectrum *fritz.Spectrum) error {
+func (r *BoltRepository) Insert(spectrum *fritz.Spectrum) error {
 	err := r.db.Update(func(tx *bolt.Tx) error {
 		timestamp := time.Unix(spectrum.Timestamp, 0)
 		year, month, day := convertToByte(timestamp.Year(), int(timestamp.Month()), timestamp.Day())
@@ -134,7 +134,7 @@ func (r *Repository) Insert(spectrum *fritz.Spectrum) error {
 	return err
 }
 
-func (r *Repository) GetStatistics() (*SpectraStats, error) {
+func (r *BoltRepository) GetStatistics() (*SpectraStats, error) {
 	min := time.Now().Unix() * 2
 	max := int64(0)
 	count := int64(0)
@@ -167,7 +167,7 @@ func (r *Repository) GetStatistics() (*SpectraStats, error) {
 	}, nil
 }
 
-func (r *Repository) Close() error {
+func (r *BoltRepository) Close() error {
 	log.Debug("Closing Database")
 	return r.db.Close()
 }

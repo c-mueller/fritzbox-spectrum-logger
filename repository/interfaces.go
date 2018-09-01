@@ -15,31 +15,14 @@
 
 package repository
 
-import (
-	"github.com/boltdb/bolt"
-	"github.com/jinzhu/gorm"
-)
+import "github.com/c-mueller/fritzbox-spectrum-logger/fritz"
 
-type BoltRepository struct {
-	DatabasePath string
-	db           *bolt.DB
-}
-
-type RelationalRepository struct {
-	db *gorm.DB
-}
-
-type SpectrumKey struct {
-	Year  string `json:"year"`
-	Month string `json:"month"`
-	Day   string `json:"day"`
-}
-
-type SpectraKeys []SpectrumKey
-type TimestampArray []int64
-
-type SpectraStats struct {
-	TotalCount     int64 `json:"total_count"`
-	LatestSpectrum int64 `json:"latest_spectrum"`
-	FirstSpectrum  int64 `json:"first_spectrum"`
+type Repository interface {
+	GetAllSpectrumKeys() (SpectraKeys, error)
+	GetSpectrumForTimestamp(timestamp int64) (*fritz.Spectrum, error)
+	GetSpectrum(day, month, year int, timestamp int64) (*fritz.Spectrum, error)
+	GetTimestampsForDay(day, month, year int) (TimestampArray, error)
+	Insert(spectrum *fritz.Spectrum) error
+	GetStatistics() (*SpectraStats, error)
+	Close() error
 }

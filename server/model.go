@@ -25,7 +25,7 @@ import (
 type Application struct {
 	config            config.Configuration
 	bindAdr           string
-	repo              *repository.Repository
+	repo              *repository.BoltRepository
 	session           *fritz.Session
 	state             APIState
 	startTime         time.Time

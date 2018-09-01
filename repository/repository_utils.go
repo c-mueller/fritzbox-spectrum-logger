@@ -19,7 +19,7 @@ import (
 	"github.com/boltdb/bolt"
 )
 
-func (r *Repository) GetTimestampsForSpectrumKey(k SpectrumKey) (TimestampArray, error) {
+func (r *BoltRepository) GetTimestampsForSpectrumKey(k SpectrumKey) (TimestampArray, error) {
 	if !k.IsValid() {
 		return nil, InvalidDateKey
 	}
@@ -27,7 +27,7 @@ func (r *Repository) GetTimestampsForSpectrumKey(k SpectrumKey) (TimestampArray,
 	return r.GetTimestampsForDay(d, m, y)
 }
 
-func (r *Repository) forEachSpectrumInDay(y, m, d int, operator func(dayBucket *bolt.Bucket, k, v []byte) error) error {
+func (r *BoltRepository) forEachSpectrumInDay(y, m, d int, operator func(dayBucket *bolt.Bucket, k, v []byte) error) error {
 	yearByte, monthByte, dayByte := convertToByte(y, m, d)
 
 	err := r.db.View(func(tx *bolt.Tx) error {
@@ -46,7 +46,7 @@ func (r *Repository) forEachSpectrumInDay(y, m, d int, operator func(dayBucket *
 	return err
 }
 
-func (r *Repository) forEachSpectrumKey(operator func(dayBucket *bolt.Bucket, key SpectrumKey) error) error {
+func (r *BoltRepository) forEachSpectrumKey(operator func(dayBucket *bolt.Bucket, key SpectrumKey) error) error {
 	err := r.db.View(func(tx *bolt.Tx) error {
 		spectraBucket := tx.Bucket([]byte(SpectrumListBucketName))
 
@@ -84,7 +84,7 @@ func (r *Repository) forEachSpectrumKey(operator func(dayBucket *bolt.Bucket, ke
 	return err
 }
 
-func (r *Repository) getDayBucket(dayByte, monthByte, yearByte []byte, tx *bolt.Tx) (*bolt.Bucket, error) {
+func (r *BoltRepository) getDayBucket(dayByte, monthByte, yearByte []byte, tx *bolt.Tx) (*bolt.Bucket, error) {
 	spectraBucket := tx.Bucket([]byte(SpectrumListBucketName))
 	if spectraBucket == nil {
 		log.Error("Spectra Bucket not found!")

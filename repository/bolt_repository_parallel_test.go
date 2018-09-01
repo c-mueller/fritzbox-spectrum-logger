@@ -35,7 +35,7 @@ func Test_Parallel_Usage(t *testing.T) {
 	tmpdir := filet.TmpDir(t, "")
 	defer filet.CleanUp(t)
 
-	repo, err := NewRepository(filepath.Join(tmpdir, "test_db.db"))
+	repo, err := NewBoltRepository(filepath.Join(tmpdir, "test_db.db"))
 	assert.NoErrorf(t, err, "Initialization Failed")
 
 	var waitGroup sync.WaitGroup
@@ -61,7 +61,7 @@ func Test_Parallel_Usage(t *testing.T) {
 
 }
 
-func handleInsertions(t *testing.T, repo *Repository, wg *sync.WaitGroup) {
+func handleInsertions(t *testing.T, repo *BoltRepository, wg *sync.WaitGroup) {
 	spectrum := loadTestSpectrum(t)
 	defer wg.Done()
 	cnt := 0
@@ -89,7 +89,7 @@ func handleInsertions(t *testing.T, repo *Repository, wg *sync.WaitGroup) {
 	t.Log("Inserted", cnt, "Elements")
 }
 
-func handleRetrievals(t *testing.T, repo *Repository, wg *sync.WaitGroup) {
+func handleRetrievals(t *testing.T, repo *BoltRepository, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for i := 0; i < retrievalOuterCycleCount; i++ {
 		executions := int64(0)

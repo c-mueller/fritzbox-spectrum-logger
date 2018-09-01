@@ -26,7 +26,18 @@ type BoltRepository struct {
 }
 
 type RelationalRepository struct {
-	db *gorm.DB
+	db       *gorm.DB
+	compress bool
+}
+
+type spectrumDSO struct {
+	gorm.Model
+	Year         int
+	Month        int
+	Day          int
+	Timestamp    int64
+	SpectrumData []byte `gorm:"size:20480"`
+	Compressed   bool
 }
 
 type SpectrumKey struct {

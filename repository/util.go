@@ -16,11 +16,60 @@
 package repository
 
 import (
+	"bytes"
+	"compress/gzip"
+	"encoding/json"
 	"fmt"
+	"github.com/c-mueller/fritzbox-spectrum-logger/fritz"
+	"io/ioutil"
 	"sort"
 	"strconv"
 	"time"
 )
+
+func compress(data []byte) ([]byte, error) {
+	var outputBuffer bytes.Buffer
+	compressionWriter := gzip.NewWriter(&outputBuffer)
+	_, err := compressionWriter.Write(data)
+	if err != nil {
+		return nil, err
+	}
+	compressionWriter.Close()
+
+	return outputBuffer.Bytes(), nil
+}
+
+func decompress(data []byte) ([]byte, error) {
+	inputBuffer := bytes.NewReader(data)
+	compressionReader, err := gzip.NewReader(inputBuffer)
+	if err != nil {
+		return nil, err
+	}
+
+	defer compressionReader.Close()
+
+	return ioutil.ReadAll(compressionReader)
+}
+
+func (dso *spectrumDSO) toSpectrum() (*fritz.Spectrum, error) {
+	data := dso.SpectrumData
+	if dso.Compressed {
+		dataI, err := decompress(data)
+		if err != nil {
+			return nil, err
+		}
+		data = dataI
+	}
+
+	var spectrum fritz.Spectrum
+	err := json.Unmarshal(data, &spectrum)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &spectrum, nil
+}
 
 func GetFromTimestamp(timestamp int64) SpectrumKey {
 	t := time.Unix(timestamp, 0)

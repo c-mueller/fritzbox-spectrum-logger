@@ -120,7 +120,7 @@ func initializeSQLiteDatabase(t *testing.T, compress bool) *RelationalRepository
 	t.Log("Using tempdir", tmpdir)
 	databasePath := fmt.Sprintf("%s/test_database.db", tmpdir)
 
-	db, err := NewSQLiteRepository( databasePath, compress)
+	db, err := NewSQLiteRepository(databasePath, compress)
 	if err != nil {
 		assert.NoError(t, err)
 		t.FailNow()

@@ -113,12 +113,12 @@ func (c *Configuration) ValidateDatabaseMode() error {
 			return nil
 		}
 	}
-	
+
 	if c.DatabaseMode == "" {
 		c.DatabaseMode = DatabaseModeBolt
 		return nil
 	}
-	
+
 	return InvalidDbModeError
 }
 

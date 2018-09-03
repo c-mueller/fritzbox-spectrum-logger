@@ -51,9 +51,12 @@ func decompress(data []byte) ([]byte, error) {
 	return ioutil.ReadAll(compressionReader)
 }
 
-func (dso *spectrumDSO) toSpectrum() (*fritz.Spectrum, error) {
-	data := dso.SpectrumData
-	if dso.Compressed {
+func (dso *spectrumDSO) toSpectrum(repo *RelationalRepository) (*fritz.Spectrum, error) {
+	var specData spectrumData
+	repo.db.Find(&specData, dso.SpectrumDataID)
+
+	data := specData.SpectrumData
+	if specData.Compressed {
 		dataI, err := decompress(data)
 		if err != nil {
 			return nil, err

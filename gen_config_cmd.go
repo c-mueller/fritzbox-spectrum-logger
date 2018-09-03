@@ -42,7 +42,8 @@ var (
 		"The password used to authenticate with the Fritz!Box").Default("").Short('p').String()
 
 	// Repository Flags
-	genRepoPathFlag = genConfigCmd.Flag("db-path", "Path to the database").Default("spectra.db").File()
+	genRepoPathFlag   = genConfigCmd.Flag("db-path", "Path to the database").Default("spectra.db").File()
+	genRepoDbModeFlag = genConfigCmd.Flag("db-mode", "The Database engine to use").Default("bolt").String()
 
 	// Server Flags
 	genServerPortFlag = genConfigCmd.Flag("bind-url",
@@ -98,6 +99,7 @@ func getConfigFromFlags() *config.Configuration {
 			Username: *genUsernameFlag,
 			Password: *genPasswordFlag,
 		},
+		DatabaseMode:               *genRepoDbModeFlag,
 		DatabasePath:               (*genRepoPathFlag).Name(),
 		UpdateInterval:             *genUpdateInterval,
 		Autolaunch:                 *genAutolaunch,

@@ -22,6 +22,7 @@ type Repository interface {
 	GetSpectrumForTimestamp(timestamp int64) (*fritz.Spectrum, error)
 	GetSpectrum(day, month, year int, timestamp int64) (*fritz.Spectrum, error)
 	GetTimestampsForDay(day, month, year int) (TimestampArray, error)
+	GetTimestampsForSpectrumKey(key SpectrumKey) (TimestampArray, error)
 	Insert(spectrum *fritz.Spectrum) error
 	GetStatistics() (*SpectraStats, error)
 	Close() error

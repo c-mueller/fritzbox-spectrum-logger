@@ -107,8 +107,10 @@ func validateInsertions(t *testing.T, repo *RelationalRepository, count, dataSiz
 	assert.Equal(t, count, len(spectra))
 
 	for _, v := range spectra {
-		assert.True(t, len(v.SpectrumData) >= dataSizeMin && len(v.SpectrumData) <= dataSizeMax,
-			"Data Size out of bounds expected %d <= x <= %d. But x is %d", dataSizeMin, dataSizeMax, len(v.SpectrumData))
+		var d spectrumData
+		repo.db.Find(&d, v.SpectrumDataID)
+		assert.True(t, len(d.SpectrumData) >= dataSizeMin && len(d.SpectrumData) <= dataSizeMax,
+			"Data Size out of bounds expected %d <= x <= %d. But x is %d", dataSizeMin, dataSizeMax, len(d.SpectrumData))
 	}
 
 }
@@ -118,7 +120,7 @@ func initializeSQLiteDatabase(t *testing.T, compress bool) *RelationalRepository
 	t.Log("Using tempdir", tmpdir)
 	databasePath := fmt.Sprintf("%s/test_database.db", tmpdir)
 
-	db, err := NewRelationalRepository("sqlite3", databasePath, compress)
+	db, err := NewSQLiteRepository(databasePath, compress)
 	if err != nil {
 		assert.NoError(t, err)
 		t.FailNow()

@@ -28,6 +28,7 @@ var log = logging.MustGetLogger("config")
 var DefaultConfig = Configuration{
 	BindAddress:                defaultBindAddress,
 	DatabasePath:               defaultDbPath,
+	DatabaseMode:               defaultDbMode,
 	Autolaunch:                 defaultAutoLaunch,
 	SessionRenewalAttemptCount: defaultSessionRefreshAttempts,
 	MaxDownloadFails:           defaultMaxDownloadFails,
@@ -54,6 +55,11 @@ func FromEnvironment() (*Configuration, error) {
 
 	data.Credentials = creds
 
+	err = data.ValidateDatabaseMode()
+	if err != nil {
+		return nil, err
+	}
+
 	return data, nil
 }
 
@@ -73,6 +79,7 @@ func ReadOrCreate(path string) (*Configuration, error) {
 		}
 		return &cfg, nil
 	}
+
 	log.Debug("Loading Configuration")
 	cfgFile, err := os.Open(path)
 	defer cfgFile.Close()
@@ -92,11 +99,31 @@ func ReadOrCreate(path string) (*Configuration, error) {
 	}
 	conf.cfgPath = path
 
+	err = conf.ValidateDatabaseMode()
+	if err != nil {
+		return nil, err
+	}
+
 	return &conf, nil
 }
 
+func (c *Configuration) ValidateDatabaseMode() error {
+	for _, v := range supportedDatabaseModes {
+		if v == c.DatabaseMode {
+			return nil
+		}
+	}
+
+	if c.DatabaseMode == "" {
+		c.DatabaseMode = DatabaseModeBolt
+		return nil
+	}
+
+	return InvalidDbModeError
+}
+
 func (c *Configuration) Update(cfg *Configuration) {
-	//Only allow the updating of the Credentials, Intervall and autolaunch property using the webinterface
+	//Only allow the updating of the Credentials, Interval and autolaunch property using the webinterface
 	c.Credentials = cfg.Credentials
 	c.Autolaunch = cfg.Autolaunch
 	c.UpdateInterval = cfg.UpdateInterval

@@ -62,16 +62,37 @@ func LaunchFromEnvironment() *Application {
 	}
 }
 
-func (a *Application) Listen() error {
+func (a *Application) initRepository() error {
 	log.Debug("Launching server...")
 	log.Debug("Initializing repository (Datastore)")
-	repo, err := repository.NewBoltRepository(a.config.DatabasePath)
+
+	var repo repository.Repository
+	var err error
+
+	switch a.config.DatabaseMode {
+	case config.DatabaseModeBolt:
+		log.Debug("Using BoltDB based Datastore located at", a.config.DatabasePath)
+		repo, err = repository.NewBoltRepository(a.config.DatabasePath)
+		break
+	case config.DatabaseModeSQLite:
+		log.Debug("Using SQLite based Datastore located at", a.config.DatabasePath)
+		repo, err = repository.NewSQLiteRepository(a.config.DatabasePath, true)
+		break
+	}
 
 	if err != nil {
 		return err
 	}
-	defer repo.Close()
 	a.repo = repo
+	return nil
+}
+
+func (a *Application) Listen() error {
+	if err := a.initRepository(); err != nil {
+		return err
+	}
+
+	defer a.repo.Close()
 
 	log.Debug("Registering HTTP mappings")
 	gin.SetMode(gin.ReleaseMode)

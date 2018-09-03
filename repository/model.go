@@ -32,10 +32,15 @@ type RelationalRepository struct {
 
 type spectrumDSO struct {
 	gorm.Model
-	Year         int
-	Month        int
-	Day          int
-	Timestamp    int64
+	Year           int
+	Month          int
+	Day            int
+	Timestamp      int64
+	SpectrumDataID uint
+}
+
+type spectrumData struct {
+	gorm.Model
 	SpectrumData []byte `gorm:"size:20480"`
 	Compressed   bool
 }

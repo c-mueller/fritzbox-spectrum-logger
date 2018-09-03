@@ -15,6 +15,19 @@
 
 package config
 
+import (
+	"errors"
+	"fmt"
+)
+
+const DatabaseModeBolt = "bolt"
+const DatabaseModeSQLite = "sqlite"
+
+var supportedDatabaseModes = []string{DatabaseModeBolt, DatabaseModeSQLite}
+
+var InvalidDbModeError = errors.New(fmt.Sprintf("config: invalid database mode. Supported modes: %s",
+	fmt.Sprint(supportedDatabaseModes)))
+
 const defaultBindAddress = ":8080"
 const defaultInterval = 60
 const defaultSessionRefreshInterval = 3600
@@ -23,9 +36,11 @@ const defaultMaxDownloadFails = 5
 const defaultAutoLaunch = false
 const defaultDbPath = "spectra.db"
 const defaultEndpoint = "192.168.178.1"
+const defaultDbMode = "bolt"
 
 type Configuration struct {
 	Credentials                RouterCredentials `yaml:"credentials" json:"credentials"`
+	DatabaseMode               string            `yaml:"database_mode" json:"database_mode" env:"DB_MODE" envDefault:"bolt"`
 	DatabasePath               string            `yaml:"database_path" json:"database_path" env:"DB_PATH" envDefault:"spectra.db"`
 	UpdateInterval             int               `yaml:"update_interval" json:"update_interval" env:"UPDATE_INTERVAL" envDefault:"60"`
 	Autolaunch                 bool              `yaml:"autolaunch" json:"autolaunch" env:"AUTOLAUNCH" envDefault:"false"`

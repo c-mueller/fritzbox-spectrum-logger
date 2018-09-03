@@ -8,7 +8,7 @@ import (
 const (
 	dockerfileFormat = "ENV %s=\"%s\"\n"
 	bashFormat       = "export %s=\"%s\"\n"
-	fishFormat       = "set -x %s \"%s\"\ns"
+	fishFormat       = "set -x %s \"%s\"\n"
 )
 
 func MapStructToDockerfileCommands(data interface{}) (string, error) {

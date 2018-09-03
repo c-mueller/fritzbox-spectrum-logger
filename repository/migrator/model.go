@@ -13,39 +13,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package main
+package migrator
 
 import (
-	"gopkg.in/alecthomas/kingpin.v2"
+	"github.com/c-mueller/fritzbox-spectrum-logger/repository"
+	"github.com/op/go-logging"
 )
 
-var (
-	verbose = kingpin.Flag("verbose",
-		"Run command with verbose output").Short('v').Default("false").Bool()
-	debug = kingpin.Flag("debug",
-		"Run command in debug mode (includes verbose mode)").Short('d').Default("false").Bool()
-)
+var log = logging.MustGetLogger("migrator")
 
-func main() {
-	cliCommand := kingpin.Parse()
-	initializeLogger()
-
-	switch cliCommand {
-	case "server config":
-		launchServerWithConfig()
-	case "server env":
-		launchServerFromEnvironment()
-	case "version":
-		versionInfo()
-	case "generate-config yaml":
-		generateYaml()
-	case "generate-config docker":
-		generateDockerfileCommands()
-	case "generate-config bash":
-		generateBash()
-	case "generate-config fish":
-		generateFish()
-	case "merge":
-		handleDatabaseMerge()
-	}
+type DatabaseMigrator struct {
+	TargetRepository   repository.Repository
+	SourceRepositories []repository.Repository
+	Verbose            bool
 }

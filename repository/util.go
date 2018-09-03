@@ -106,7 +106,8 @@ func (sk *SpectrumKey) IsValid() bool {
 }
 
 func (sk *SpectrumKey) String() string {
-	return fmt.Sprintf("Year: %s Month: %s Day: %s", sk.Year, sk.Month, sk.Day)
+	y, m, d := sk.GetIntegerValues()
+	return fmt.Sprintf("%02d.%02d.%04d", d, m, y)
 }
 
 func (ta TimestampArray) Search(value int64) int {

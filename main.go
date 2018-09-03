@@ -45,5 +45,7 @@ func main() {
 		generateBash()
 	case "generate-config fish":
 		generateFish()
+	case "merge":
+		handleDatabaseMerge()
 	}
 }

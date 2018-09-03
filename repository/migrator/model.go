@@ -13,40 +13,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package repository
+package migrator
 
 import (
-	"github.com/stretchr/testify/assert"
-	"path/filepath"
-	"testing"
+	"github.com/c-mueller/fritzbox-spectrum-logger/repository"
+	"github.com/op/go-logging"
 )
 
-func Benchmark_Bolt_Insert(b *testing.B) {
-	dir := initializeTempDir(b)
+var log = logging.MustGetLogger("migrator")
 
-	repo := initBoltRepository(dir, b)
-
-	handleInsertionBenchmark(b, repo, dir)
-}
-
-func Benchmark_Bolt_Get_Timestamps(b *testing.B) {
-	dir := initializeTempDir(b)
-
-	repo := initBoltRepository(dir, b)
-
-	handleBenchmarkGetTimestamps(b, repo, dir)
-}
-
-func Benchmark_Bolt_Retrieve(b *testing.B) {
-	dir := initializeTempDir(b)
-
-	repo := initBoltRepository(dir, b)
-
-	handleRetrievalBenchmark(b, repo, dir)
-}
-
-func initBoltRepository(dir string, b *testing.B) *BoltRepository {
-	repo, err := NewBoltRepository(filepath.Join(dir, "test_db.db"))
-	assert.NoError(b, err, "Opening Repo Failed")
-	return repo
+type DatabaseMigrator struct {
+	TargetRepository   repository.Repository
+	SourceRepositories []repository.Repository
+	Verbose            bool
 }

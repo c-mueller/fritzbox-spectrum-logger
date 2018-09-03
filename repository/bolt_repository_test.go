@@ -149,7 +149,7 @@ func TestRepository_GetSpectraForDayByTimestamp(t *testing.T) {
 	repo.Close()
 }
 
-func insertSpectra(spectrum *fritz.Spectrum, repo *BoltRepository, t testing.TB, count, hourMultiplier int) {
+func insertSpectra(spectrum *fritz.Spectrum, repo Repository, t testing.TB, count, hourMultiplier int) {
 	for i := 0; i < count; i++ {
 		timestamp := time.Date(2018, 2, 14, 0, 0, 0, 0, time.UTC)
 		timestamp = timestamp.Add(time.Duration(i*hourMultiplier) * time.Hour)

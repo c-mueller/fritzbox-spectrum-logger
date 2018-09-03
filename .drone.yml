@@ -14,7 +14,7 @@ pipeline:
       # Copy built artifact for static linking
       - cd dist
       - cp -r * ../../server/ui-dist
-  load_deps:
+  build_backend:
     image: golang:${GO_VERSION}
     commands:
       # Install Fish shell
@@ -32,10 +32,14 @@ pipeline:
       - ./build.fish
       # Build ARM Version
       - ./build_arm.fish
-  test_and_benchmark:
+  test:
     image: golang:${GO_VERSION}
     commands:
-      - go test -v -cover -bench=. -benchtime=1s ./...
+      - go test -v -cover ./...
+  benchmark:
+    image: golang:${GO_VERSION}
+    commands:
+      - go test -v -benchtime=10s -bench ./.. -run NONE
   cloc_report:
     image: halive/git-cloc:latest
     commands:

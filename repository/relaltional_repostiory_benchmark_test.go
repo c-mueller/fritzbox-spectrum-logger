@@ -21,32 +21,56 @@ import (
 	"testing"
 )
 
-func Benchmark_Bolt_Insert(b *testing.B) {
+func Benchmark_SQLite_Insert_Compressed(b *testing.B) {
 	dir := initializeTempDir(b)
 
-	repo := initBoltRepository(dir, b)
+	repo := initSQLiteRepository(dir, b, true)
 
 	handleInsertionBenchmark(b, repo, dir)
 }
 
-func Benchmark_Bolt_Get_Timestamps(b *testing.B) {
+func Benchmark_SQLite_Get_Timestamps_Compressed(b *testing.B) {
 	dir := initializeTempDir(b)
 
-	repo := initBoltRepository(dir, b)
+	repo := initSQLiteRepository(dir, b, true)
 
 	handleBenchmarkGetTimestamps(b, repo, dir)
 }
 
-func Benchmark_Bolt_Retrieve(b *testing.B) {
+func Benchmark_SQLite_Retrieve_Compressed(b *testing.B) {
 	dir := initializeTempDir(b)
 
-	repo := initBoltRepository(dir, b)
+	repo := initSQLiteRepository(dir, b, true)
 
 	handleRetrievalBenchmark(b, repo, dir)
 }
 
-func initBoltRepository(dir string, b *testing.B) *BoltRepository {
-	repo, err := NewBoltRepository(filepath.Join(dir, "test_db.db"))
+func Benchmark_SQLite_Insert_Uncompressed(b *testing.B) {
+	dir := initializeTempDir(b)
+
+	repo := initSQLiteRepository(dir, b, false)
+
+	handleInsertionBenchmark(b, repo, dir)
+}
+
+func Benchmark_SQLite_Get_Timestamps_Uncompressed(b *testing.B) {
+	dir := initializeTempDir(b)
+
+	repo := initSQLiteRepository(dir, b, false)
+
+	handleBenchmarkGetTimestamps(b, repo, dir)
+}
+
+func Benchmark_SQLite_Retrieve_Uncompressed(b *testing.B) {
+	dir := initializeTempDir(b)
+
+	repo := initSQLiteRepository(dir, b, false)
+
+	handleRetrievalBenchmark(b, repo, dir)
+}
+
+func initSQLiteRepository(dir string, b *testing.B, compress bool) Repository {
+	repo, err := NewSQLiteRepository(filepath.Join(dir, "test_db.db"), compress)
 	assert.NoError(b, err, "Opening Repo Failed")
 	return repo
 }

@@ -20,7 +20,7 @@ import (
 	"gopkg.in/cheggaaa/pb.v1"
 )
 
-func NewMigrator(target repository.Repository, verbose bool, source ... repository.Repository) (*DatabaseMigrator, error) {
+func NewMigrator(target repository.Repository, verbose bool, source ...repository.Repository) (*DatabaseMigrator, error) {
 	return &DatabaseMigrator{
 		TargetRepository:   target,
 		SourceRepositories: source,

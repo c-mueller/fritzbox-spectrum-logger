@@ -35,7 +35,7 @@ func Test_Parallel_Usage(t *testing.T) {
 	tmpdir := filet.TmpDir(t, "")
 	defer filet.CleanUp(t)
 
-	repo, err := NewBoltRepository(filepath.Join(tmpdir, "test_db.db"))
+	repo, err := NewBoltRepository(filepath.Join(tmpdir, "test_db.db"), false)
 	assert.NoErrorf(t, err, "Initialization Failed")
 
 	var waitGroup sync.WaitGroup

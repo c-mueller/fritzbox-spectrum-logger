@@ -22,6 +22,7 @@ import (
 
 type BoltRepository struct {
 	DatabasePath string
+	compress     bool
 	db           *bolt.DB
 }
 

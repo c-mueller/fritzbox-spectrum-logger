@@ -71,12 +71,12 @@ func (a *Application) initRepository() error {
 
 	switch a.config.DatabaseMode {
 	case config.DatabaseModeBolt:
-		log.Debug("Using BoltDB based Datastore located at", a.config.DatabasePath)
-		repo, err = repository.NewBoltRepository(a.config.DatabasePath)
+		log.Debugf("Using BoltDB based datastore located at %q...", a.config.DatabasePath)
+		repo, err = repository.NewBoltRepository(a.config.DatabasePath, a.config.DatabaseCompression)
 		break
 	case config.DatabaseModeSQLite:
-		log.Debug("Using SQLite based Datastore located at", a.config.DatabasePath)
-		repo, err = repository.NewSQLiteRepository(a.config.DatabasePath, true)
+		log.Debugf("Using SQLite based datastore located at %q...", a.config.DatabasePath)
+		repo, err = repository.NewSQLiteRepository(a.config.DatabasePath, a.config.DatabaseCompression)
 		break
 	}
 

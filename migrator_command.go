@@ -53,7 +53,7 @@ func getRepository(path string) repository.Repository {
 	//Attempt creating a BoltDB Repo
 	var repo repository.Repository
 
-	repo, err := repository.NewBoltRepository(path)
+	repo, err := repository.NewBoltRepository(path, !*compressFlag)
 	if err == nil {
 		return repo
 	}

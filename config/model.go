@@ -37,11 +37,13 @@ const defaultAutoLaunch = false
 const defaultDbPath = "spectra.db"
 const defaultEndpoint = "192.168.178.1"
 const defaultDbMode = "bolt"
+const defaultDbCompression = true
 
 type Configuration struct {
 	Credentials                RouterCredentials `yaml:"credentials" json:"credentials"`
 	DatabaseMode               string            `yaml:"database_mode" json:"database_mode" env:"DB_MODE" envDefault:"bolt"`
 	DatabasePath               string            `yaml:"database_path" json:"database_path" env:"DB_PATH" envDefault:"spectra.db"`
+	DatabaseCompression        bool              `yaml:"database_compression" json:"database_compression" env:"DB_COMPRESSION" envDefault:"true"`
 	UpdateInterval             int               `yaml:"update_interval" json:"update_interval" env:"UPDATE_INTERVAL" envDefault:"60"`
 	Autolaunch                 bool              `yaml:"autolaunch" json:"autolaunch" env:"AUTOLAUNCH" envDefault:"false"`
 	BindAddress                string            `yaml:"bind_address" json:"bind_address" env:"ENDPOINT_URL" envDefault:":8080"`

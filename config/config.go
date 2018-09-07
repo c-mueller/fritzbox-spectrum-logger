@@ -29,6 +29,7 @@ var DefaultConfig = Configuration{
 	BindAddress:                defaultBindAddress,
 	DatabasePath:               defaultDbPath,
 	DatabaseMode:               defaultDbMode,
+	DatabaseCompression:        defaultDbCompression,
 	Autolaunch:                 defaultAutoLaunch,
 	SessionRenewalAttemptCount: defaultSessionRefreshAttempts,
 	MaxDownloadFails:           defaultMaxDownloadFails,

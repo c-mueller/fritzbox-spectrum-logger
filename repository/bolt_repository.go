@@ -28,7 +28,7 @@ import (
 
 var log = logging.MustGetLogger("repository")
 
-func NewBoltRepository(path string) (*BoltRepository, error) {
+func NewBoltRepository(path string, compress bool) (*BoltRepository, error) {
 	log.Debugf("Opening database '%s'", path)
 	db, err := bolt.Open(path, 0777, bolt.DefaultOptions)
 
@@ -39,7 +39,8 @@ func NewBoltRepository(path string) (*BoltRepository, error) {
 	err = initDb(db)
 
 	return &BoltRepository{
-		db: db,
+		db:       db,
+		compress: compress,
 	}, nil
 }
 
@@ -80,6 +81,14 @@ func (r *BoltRepository) GetSpectrum(day, month, year int, timestamp int64) (*fr
 		if byteData == nil {
 			return InvalidTimestampKey
 		}
+
+		if byteData[0] != []byte("{")[0] {
+			byteData, err = decompress(byteData)
+			if err != nil {
+				return err
+			}
+		}
+
 		err = json.Unmarshal(byteData, &spectrum)
 		return err
 	})
@@ -126,6 +135,14 @@ func (r *BoltRepository) Insert(spectrum *fritz.Spectrum) error {
 		if err != nil {
 			return err
 		}
+
+		if r.compress {
+			jsonData, err = compress(jsonData)
+			if err != nil {
+				return err
+			}
+		}
+
 		err = dayBucket.Put([]byte(string(fmt.Sprintf("%d", timestamp.Unix()))), jsonData)
 		return err
 	})

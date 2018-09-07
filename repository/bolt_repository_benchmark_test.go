@@ -21,32 +21,56 @@ import (
 	"testing"
 )
 
-func Benchmark_Bolt_Insert(b *testing.B) {
+func Benchmark_Bolt_Insert_Uncompressed(b *testing.B) {
 	dir := initializeTempDir(b)
 
-	repo := initBoltRepository(dir, b)
+	repo := initBoltRepository(dir, b, false)
 
 	handleInsertionBenchmark(b, repo, dir)
 }
 
-func Benchmark_Bolt_Get_Timestamps(b *testing.B) {
+func Benchmark_Bolt_Get_Timestamps_Uncompressed(b *testing.B) {
 	dir := initializeTempDir(b)
 
-	repo := initBoltRepository(dir, b)
+	repo := initBoltRepository(dir, b, false)
 
 	handleBenchmarkGetTimestamps(b, repo, dir)
 }
 
-func Benchmark_Bolt_Retrieve(b *testing.B) {
+func Benchmark_Bolt_Retrieve_Uncompressed(b *testing.B) {
 	dir := initializeTempDir(b)
 
-	repo := initBoltRepository(dir, b)
+	repo := initBoltRepository(dir, b, false)
 
 	handleRetrievalBenchmark(b, repo, dir)
 }
 
-func initBoltRepository(dir string, b *testing.B) *BoltRepository {
-	repo, err := NewBoltRepository(filepath.Join(dir, "test_db.db"))
+func Benchmark_Bolt_Insert_Compressed(b *testing.B) {
+	dir := initializeTempDir(b)
+
+	repo := initBoltRepository(dir, b, true)
+
+	handleInsertionBenchmark(b, repo, dir)
+}
+
+func Benchmark_Bolt_Get_Timestamps_Compressed(b *testing.B) {
+	dir := initializeTempDir(b)
+
+	repo := initBoltRepository(dir, b, true)
+
+	handleBenchmarkGetTimestamps(b, repo, dir)
+}
+
+func Benchmark_Bolt_Retrieve_Compressed(b *testing.B) {
+	dir := initializeTempDir(b)
+
+	repo := initBoltRepository(dir, b, true)
+
+	handleRetrievalBenchmark(b, repo, dir)
+}
+
+func initBoltRepository(dir string, b *testing.B, compress bool) *BoltRepository {
+	repo, err := NewBoltRepository(filepath.Join(dir, "test_db.db"), compress)
 	assert.NoError(b, err, "Opening Repo Failed")
 	return repo
 }

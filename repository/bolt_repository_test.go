@@ -31,7 +31,7 @@ func TestCollect_Stats(t *testing.T) {
 	tmpdir := filet.TmpDir(t, "")
 	defer filet.CleanUp(t)
 
-	repo, err := NewBoltRepository(filepath.Join(tmpdir, "test_db.db"))
+	repo, err := NewBoltRepository(filepath.Join(tmpdir, "test_db.db"), false)
 	assert.NoErrorf(t, err, "Initialization Failed")
 
 	spectrum := loadTestSpectrum(t)
@@ -50,7 +50,7 @@ func TestInitRepo(t *testing.T) {
 	tmpdir := filet.TmpDir(t, "")
 	defer filet.CleanUp(t)
 
-	repo, err := NewBoltRepository(filepath.Join(tmpdir, "test_db.db"))
+	repo, err := NewBoltRepository(filepath.Join(tmpdir, "test_db.db"), false)
 	assert.NoErrorf(t, err, "Initialization Failed")
 	repo.Close()
 }
@@ -59,7 +59,7 @@ func TestRepository_Insert(t *testing.T) {
 	tmpdir := filet.TmpDir(t, "")
 	defer filet.CleanUp(t)
 
-	repo, err := NewBoltRepository(filepath.Join(tmpdir, "test_db.db"))
+	repo, err := NewBoltRepository(filepath.Join(tmpdir, "test_db.db"), false)
 	assert.NoErrorf(t, err, "Initialization Failed")
 
 	spectrum := loadTestSpectrum(t)
@@ -73,7 +73,7 @@ func TestRepository_GetAllSpectrumKeys(t *testing.T) {
 	tmpdir := filet.TmpDir(t, "")
 	defer filet.CleanUp(t)
 
-	repo, err := NewBoltRepository(filepath.Join(tmpdir, "test_db.db"))
+	repo, err := NewBoltRepository(filepath.Join(tmpdir, "test_db.db"), false)
 	assert.NoErrorf(t, err, "Initialization Failed")
 
 	spectrum := loadTestSpectrum(t)
@@ -96,7 +96,7 @@ func TestRepository_GetSpectrumForTimestamp(t *testing.T) {
 	tmpdir := filet.TmpDir(t, "")
 	defer filet.CleanUp(t)
 
-	repo, err := NewBoltRepository(filepath.Join(tmpdir, "test_db.db"))
+	repo, err := NewBoltRepository(filepath.Join(tmpdir, "test_db.db"), false)
 	assert.NoErrorf(t, err, "Initialization Failed")
 
 	spectrum := loadTestSpectrum(t)
@@ -116,7 +116,7 @@ func TestRepository_GetSpectraForDayByTimestamp(t *testing.T) {
 	tmpdir := filet.TmpDir(t, "")
 	defer filet.CleanUp(t)
 
-	repo, err := NewBoltRepository(filepath.Join(tmpdir, "test_db.db"))
+	repo, err := NewBoltRepository(filepath.Join(tmpdir, "test_db.db"), false)
 	assert.NoErrorf(t, err, "Initialization Failed")
 
 	spectrum := loadTestSpectrum(t)

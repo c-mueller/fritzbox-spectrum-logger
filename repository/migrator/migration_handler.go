@@ -46,10 +46,12 @@ func (m *DatabaseMigrator) Migrate() error {
 
 			log.Infof("Inserting %d Spectra for %s...", len(timestamps), spectrumKey.String())
 
-			bar := pb.New(len(timestamps))
-			bar.Start()
+			var bar *pb.ProgressBar
 
-			bar.NotPrint = !m.Verbose
+			if m.Verbose {
+				bar = pb.New(len(timestamps))
+				bar.Start()
+			}
 
 			for _, timestamp := range timestamps {
 				year, month, day := spectrumKey.GetIntegerValues()
@@ -62,10 +64,14 @@ func (m *DatabaseMigrator) Migrate() error {
 				if err != nil {
 					return err
 				}
-				bar.Increment()
+				if m.Verbose {
+					bar.Increment()
+				}
 			}
-			bar.Finish()
-			log.Infof("Completed Day %d/%d...", dayIdx, len(sKeys))
+			if m.Verbose {
+				bar.Finish()
+			}
+			log.Infof("Completed Day %d/%d...", dayIdx+1, len(sKeys))
 		}
 	}
 	return nil

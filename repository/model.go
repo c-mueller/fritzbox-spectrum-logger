@@ -53,6 +53,7 @@ type SpectrumKey struct {
 }
 
 type SpectraKeys []SpectrumKey
+type Timestamp int64
 type TimestampArray []int64
 
 type SpectraStats struct {

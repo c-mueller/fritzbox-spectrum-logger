@@ -62,28 +62,12 @@ func (a *Application) getNeighbours(ctx *gin.Context) {
 		return
 	}
 
-	keys, err := a.repo.GetTimestampsForSpectrumKey(key)
+	previous, next, err := repository.GetNeighbours(a.repo, timestamp)
 	if err != nil {
-		sendError(ctx, 404, "Retrieving the Neighbours for the Timestamp %d has failed", timestamp)
+		ctx.String(500, "")
 		return
 	}
 
-	index := keys.Search(timestamp)
-	if keys[index] != timestamp {
-		sendError(ctx, 404, "No spectrum found with timestamp %d", timestamp)
-		return
-	}
-	previous, next := int64(index-1), int64(index+1)
-	if previous < 0 {
-		previous = -1
-	} else {
-		previous = keys[previous]
-	}
-	if next >= int64(keys.Len()) {
-		next = -1
-	} else {
-		next = keys[next]
-	}
 	ctx.JSON(200, NeighboursResponse{
 		PreviousTimestamp: previous,
 		NextTimestamp:     next,

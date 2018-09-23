@@ -16,6 +16,7 @@
 package server
 
 import (
+	"github.com/zsais/go-gin-prometheus"
 	"time"
 
 	"github.com/GeertJohan/go.rice"
@@ -121,6 +122,16 @@ func (a *Application) registerHTTPMappings(engine *gin.Engine) {
 	} else {
 		log.Warning("This is a Development Binary. This Means the WebApplication is not available on <URL>/ui")
 	}
+
+	////Prometheus Metrics
+	//prometheusHandler := promhttp.Handler()
+	//engine.GET("/metrics", func(c *gin.Context) {
+	//	prometheusHandler.ServeHTTP(c.Writer, c.Request)
+	//})
+
+	p := ginprometheus.NewPrometheus("gin")
+
+	p.Use(engine)
 
 	//Status Informations
 	engine.GET("/api/status", a.getStatus)

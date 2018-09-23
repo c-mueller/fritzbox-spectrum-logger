@@ -78,3 +78,9 @@ func (s *Session) getConnectionInfoUrl() (*url.URL, error) {
 func (s *Spectrum) JSON() ([]byte, error) {
 	return json.Marshal(s)
 }
+
+// Attempts to parse the Connection informations from the gathered connection
+// information string. Returns a ParsingError if it fails
+func (s *Spectrum) GetConnectionInformation() (*ConnectionInformation, error) {
+	return ParseConnectionInformation(s.ConnectionInformation)
+}

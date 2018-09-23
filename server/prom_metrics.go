@@ -13,32 +13,4 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package fritz
-
-import (
-	"github.com/stretchr/testify/assert"
-	"io/ioutil"
-	"os"
-	"testing"
-)
-
-func TestParser(t *testing.T) {
-	input, err := os.Open("testdata/sample_connection_info.html")
-	assert.NoError(t, err)
-	defer input.Close()
-	data, err := ioutil.ReadAll(input)
-	assert.NoError(t, err)
-
-	conInfo, err := ParseConnectionInformation(string(data))
-	assert.NoError(t, err)
-
-	assert.Equal(t, 24984, conInfo.Downstream.CurrentDataRate)
-	assert.Equal(t, 15846, conInfo.Upstream.Capacity)
-
-}
-
-func TestParser_EmptyInput(t *testing.T) {
-	ci, err := ParseConnectionInformation("")
-	assert.Error(t, err)
-	assert.Nil(t, ci)
-}
+package server

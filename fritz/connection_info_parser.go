@@ -17,7 +17,6 @@ package fritz
 
 import (
 	"errors"
-	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -51,11 +50,17 @@ func init() {
 }
 
 func ParseConnectionInformation(html string) (*ConnectionInformation, error) {
+	if len(html) == 0 {
+		return nil, ParsingError
+	}
+
 	cleanLines := cleanupAndSplit(html)
 
 	connectionMatrix := toTableMatrix(cleanLines)
 
-	fmt.Println(connectionMatrix)
+	if len(connectionMatrix) < 16 {
+		return nil, ParsingError
+	}
 
 	conInfo := ConnectionInformation{
 		Upstream:   ConnectionTransmissionDirection{},
@@ -201,10 +206,59 @@ func ParseConnectionInformation(html string) (*ConnectionInformation, error) {
 			conInfo.Upstream.Carrier = row[2]
 
 			break
+		case 14: // Downstream Errors
+			errs, err := parseErrorFromTableLine(row)
+			if err != nil {
+				return nil, err
+			}
+
+			conInfo.Downstream.Errors = *errs
+			break
+		case 15: // Upstream Errors
+			errs, err := parseErrorFromTableLine(row)
+			if err != nil {
+				return nil, err
+			}
+
+			conInfo.Downstream.Errors = *errs
+			break
 		}
 	}
 
 	return &conInfo, nil
+}
+
+func parseErrorFromTableLine(row []string) (*Errors, error) {
+	if len(row) != 5 {
+		return nil, ParsingError
+	}
+
+	es, err := strconv.ParseFloat(row[1], 64)
+	if err != nil {
+		return nil, ParsingError
+	}
+
+	ses, err := strconv.ParseFloat(row[2], 64)
+	if err != nil {
+		return nil, ParsingError
+	}
+
+	perMin, err := strconv.ParseFloat(row[3], 64)
+	if err != nil {
+		return nil, ParsingError
+	}
+
+	last15minES, err := strconv.ParseFloat(row[4], 64)
+	if err != nil {
+		return nil, ParsingError
+	}
+
+	return &Errors{
+		SecondsWithErrors:     es,
+		SecondsWithManyErrors: ses,
+		ErrorsPerMinute:       perMin,
+		ErrorsLast15Min:       last15minES,
+	}, nil
 }
 
 func getUpDownValuesInt(row []string) (int, int, error) {

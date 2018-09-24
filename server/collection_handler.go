@@ -98,6 +98,9 @@ func (a *Application) collectionHandler() {
 		err := a.collect()
 		if err != nil {
 			spectrumLoadErrors++
+
+			failCountVec.WithLabelValues().Inc()
+
 			log.Errorf("Could not download Spectrum. Aborting. Error: %v", err)
 			if spectrumLoadErrors >= a.config.MaxDownloadFails {
 				log.Errorf("Logging Stopped because %d Download attempts in a row have failed!", spectrumLoadErrors)
@@ -135,6 +138,8 @@ func (a *Application) collect() error {
 		return err
 	}
 
+	go a.updatePrometheus(spec)
+
 	sk := repository.GetFromTimestamp(spec.Timestamp)
 	a.latest = &LatestSpectrumResponse{
 		Key:       sk,
@@ -149,4 +154,33 @@ func (a *Application) collect() error {
 	a.sessionLogCounter++
 
 	return nil
+}
+
+func (a *Application) updatePrometheus(spectrum *fritz.Spectrum) {
+	conInfo, err := spectrum.GetConnectionInformation()
+	if err != nil {
+		return
+	}
+
+	streams := []fritz.ConnectionTransmissionDirection{conInfo.Downstream, conInfo.Upstream}
+	name := []string{"DOWNSTREAM", "UPSTREAM"}
+
+	for index, streamInfo := range streams {
+		streamName := name[index]
+
+		maxDataRateVec.WithLabelValues(streamName).Set(float64(streamInfo.MaximumDataRate))
+		minDataRateVec.WithLabelValues(streamName).Set(float64(streamInfo.MinimumDataRate))
+		capacityVec.WithLabelValues(streamName).Set(float64(streamInfo.Capacity))
+		currentDataRateVec.WithLabelValues(streamName).Set(float64(streamInfo.CurrentDataRate))
+
+		lineLatencyVec.WithLabelValues(streamName).Set(float64(streamInfo.Latency))
+		inpValueVec.WithLabelValues(streamName).Set(float64(streamInfo.INPValue))
+		snrVec.WithLabelValues(streamName).Set(streamInfo.SNMargin)
+		attenuationVec.WithLabelValues(streamName).Set(streamInfo.LineAttenuation)
+
+		errorVec.WithLabelValues(streamName).Set(streamInfo.Errors.SecondsWithErrors)
+		manyErrorVec.WithLabelValues(streamName).Set(streamInfo.Errors.SecondsWithManyErrors)
+		errorsPerMinVec.WithLabelValues(streamName).Set(streamInfo.Errors.ErrorsPerMinute)
+		errorsLast15MinVec.WithLabelValues(streamName).Set(streamInfo.Errors.ErrorsLast15Min)
+	}
 }

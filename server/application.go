@@ -16,7 +16,7 @@
 package server
 
 import (
-	"github.com/zsais/go-gin-prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"time"
 
 	"github.com/GeertJohan/go.rice"
@@ -123,15 +123,11 @@ func (a *Application) registerHTTPMappings(engine *gin.Engine) {
 		log.Warning("This is a Development Binary. This Means the WebApplication is not available on <URL>/ui")
 	}
 
-	////Prometheus Metrics
-	//prometheusHandler := promhttp.Handler()
-	//engine.GET("/metrics", func(c *gin.Context) {
-	//	prometheusHandler.ServeHTTP(c.Writer, c.Request)
-	//})
-
-	p := ginprometheus.NewPrometheus("gin")
-
-	p.Use(engine)
+	//Prometheus Metrics
+	prometheusHandler := promhttp.Handler()
+	engine.GET("/metrics", func(c *gin.Context) {
+		prometheusHandler.ServeHTTP(c.Writer, c.Request)
+	})
 
 	//Status Informations
 	engine.GET("/api/status", a.getStatus)

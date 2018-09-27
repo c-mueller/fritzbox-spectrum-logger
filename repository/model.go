@@ -15,37 +15,6 @@
 
 package repository
 
-import (
-	"github.com/boltdb/bolt"
-	"github.com/jinzhu/gorm"
-)
-
-type BoltRepository struct {
-	DatabasePath string
-	compress     bool
-	db           *bolt.DB
-}
-
-type RelationalRepository struct {
-	db       *gorm.DB
-	compress bool
-}
-
-type spectrumDSO struct {
-	gorm.Model
-	Year           int
-	Month          int
-	Day            int
-	Timestamp      int64
-	SpectrumDataID uint
-}
-
-type spectrumData struct {
-	gorm.Model
-	SpectrumData []byte `gorm:"size:20480"`
-	Compressed   bool
-}
-
 type SpectrumKey struct {
 	Year  string `json:"year"`
 	Month string `json:"month"`

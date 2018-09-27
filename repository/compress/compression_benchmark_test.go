@@ -13,11 +13,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package repository
+package compress
 
 import (
 	"encoding/json"
 	"github.com/c-mueller/fritzbox-spectrum-logger/fritz"
+	"github.com/stretchr/testify/assert"
+	"io/ioutil"
+	"os"
 	"testing"
 	"time"
 )
@@ -31,7 +34,7 @@ func Benchmark_CompressionSpeed(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		data, _ := json.Marshal(spectrum)
-		compress(data)
+		Compress(data)
 
 		opcnt++
 	}
@@ -44,14 +47,14 @@ func Benchmark_CompressionSpeed(b *testing.B) {
 func Benchmark_DecompressionSpeed(b *testing.B) {
 	spectrum := loadTestSpectrum(b)
 	data, _ := json.Marshal(spectrum)
-	compressedData, _ := compress(data)
+	compressedData, _ := Compress(data)
 
 	start := time.Now()
 	opcnt := 0
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		uncompressed, _ := decompress(compressedData)
+		uncompressed, _ := Decompress(compressedData)
 		var spectrum fritz.Spectrum
 		json.Unmarshal(uncompressed, &spectrum)
 
@@ -61,4 +64,14 @@ func Benchmark_DecompressionSpeed(b *testing.B) {
 	execTime := time.Now().Sub(start)
 
 	b.Logf("Ran %d decompression Iterations in %s", opcnt, execTime.String())
+}
+
+func loadTestSpectrum(t testing.TB) *fritz.Spectrum {
+	file, err := os.Open("../testdata/example_spectrum.json")
+	assert.NoError(t, err, "Loading Dummy Spectrum failed")
+	var result *fritz.Spectrum
+	data, err := ioutil.ReadAll(file)
+	file.Close()
+	err = json.Unmarshal(data, &result)
+	return result
 }

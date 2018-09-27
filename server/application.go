@@ -16,6 +16,7 @@
 package server
 
 import (
+	"github.com/c-mueller/fritzbox-spectrum-logger/repository/reporegistry"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"time"
 
@@ -25,6 +26,9 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/op/go-logging"
+
+	_ "github.com/c-mueller/fritzbox-spectrum-logger/repository/bolt"
+	_ "github.com/c-mueller/fritzbox-spectrum-logger/repository/relational"
 )
 
 var log = logging.MustGetLogger("server")
@@ -73,11 +77,11 @@ func (a *Application) initRepository() error {
 	switch a.config.DatabaseMode {
 	case config.DatabaseModeBolt:
 		log.Debugf("Using BoltDB based datastore located at %q...", a.config.DatabasePath)
-		repo, err = repository.NewBoltRepository(a.config.DatabasePath, a.config.DatabaseCompression)
+		repo, err = reporegistry.GetForName("bolt").BuildRepository(a.config.DatabaseCompression, a.config.DatabasePath)
 		break
 	case config.DatabaseModeSQLite:
 		log.Debugf("Using SQLite based datastore located at %q...", a.config.DatabasePath)
-		repo, err = repository.NewSQLiteRepository(a.config.DatabasePath, a.config.DatabaseCompression)
+		repo, err = reporegistry.GetForName("sqlite").BuildRepository(a.config.DatabaseCompression, a.config.DatabasePath)
 		break
 	}
 

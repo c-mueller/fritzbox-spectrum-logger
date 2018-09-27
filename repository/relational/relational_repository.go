@@ -13,17 +13,45 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package repository
+package relational
 
 import (
 	"encoding/json"
 	"fmt"
 	"github.com/c-mueller/fritzbox-spectrum-logger/fritz"
+	"github.com/c-mueller/fritzbox-spectrum-logger/repository"
+	"github.com/c-mueller/fritzbox-spectrum-logger/repository/compress"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"github.com/op/go-logging"
 )
+
+var log = logging.MustGetLogger("sql_repository")
+
+type spectrumData struct {
+	gorm.Model
+	SpectrumData []byte `gorm:"size:20480"`
+	Compressed   bool
+}
+
+type spectrumDSO struct {
+	gorm.Model
+	Year           int
+	Month          int
+	Day            int
+	Timestamp      int64
+	SpectrumDataID uint
+}
+
+type RelationalRepository struct {
+	db       *gorm.DB
+	compress bool
+}
+
+
+
 
 func NewSQLiteRepository(path string, compress bool) (*RelationalRepository, error) {
 	return NewRelationalRepository("sqlite3", path, compress)
@@ -49,14 +77,14 @@ func NewRelationalRepository(mode, connectionString string, compress bool) (*Rel
 	}, nil
 }
 
-func (r *RelationalRepository) GetAllSpectrumKeys() (SpectraKeys, error) {
+func (r *RelationalRepository) GetAllSpectrumKeys() (repository.SpectraKeys, error) {
 	keys := make([]spectrumDSO, 0)
 	r.db.Find(&keys, &spectrumDSO{})
 
-	sKeys := make(SpectraKeys, 0)
+	sKeys := make(repository.SpectraKeys, 0)
 
 	for _, v := range keys {
-		sKeys = append(sKeys, SpectrumKey{
+		sKeys = append(sKeys, repository.SpectrumKey{
 			Year:  fmt.Sprintf("%d", v.Year),
 			Month: fmt.Sprintf("%d", int(v.Month)),
 			Day:   fmt.Sprintf("%d", v.Day),
@@ -66,12 +94,12 @@ func (r *RelationalRepository) GetAllSpectrumKeys() (SpectraKeys, error) {
 	return sKeys, nil
 }
 
-func (r *RelationalRepository) GetTimestampsForSpectrumKey(key SpectrumKey) (TimestampArray, error) {
+func (r *RelationalRepository) GetTimestampsForSpectrumKey(key repository.SpectrumKey) (repository.TimestampArray, error) {
 	y, m, d := key.GetIntegerValues()
 	return r.GetTimestampsForDay(d, m, y)
 }
 
-func (r *RelationalRepository) GetSpectrumForTimestamp(timestamp int64) (*fritz.Spectrum, error) {
+func (r *RelationalRepository) GetSpectrum(timestamp int64) (*fritz.Spectrum, error) {
 	var dso spectrumDSO
 
 	r.db.First(&dso, &spectrumDSO{Timestamp: timestamp})
@@ -79,11 +107,7 @@ func (r *RelationalRepository) GetSpectrumForTimestamp(timestamp int64) (*fritz.
 	return dso.toSpectrum(r)
 }
 
-func (r *RelationalRepository) GetSpectrum(day, month, year int, timestamp int64) (*fritz.Spectrum, error) {
-	return r.GetSpectrumForTimestamp(timestamp)
-}
-
-func (r *RelationalRepository) GetTimestampsForDay(day, month, year int) (TimestampArray, error) {
+func (r *RelationalRepository) GetTimestampsForDay(day, month, year int) (repository.TimestampArray, error) {
 	data := make([]spectrumDSO, 0)
 	r.db.Find(&data, &spectrumDSO{Day: day, Month: month, Year: year})
 
@@ -92,7 +116,7 @@ func (r *RelationalRepository) GetTimestampsForDay(day, month, year int) (Timest
 	for k, v := range data {
 		timestamps[k] = v.Timestamp
 	}
-	return TimestampArray(timestamps), nil
+	return repository.TimestampArray(timestamps), nil
 }
 
 func (r *RelationalRepository) Insert(spectrum *fritz.Spectrum) error {
@@ -103,7 +127,7 @@ func (r *RelationalRepository) Insert(spectrum *fritz.Spectrum) error {
 
 	data := marshaledSpectrum
 	if r.compress {
-		data, err = compress(data)
+		data, err = compress.Compress(data)
 		if err != nil {
 			return err
 		}
@@ -116,7 +140,7 @@ func (r *RelationalRepository) Insert(spectrum *fritz.Spectrum) error {
 
 	r.db.Create(&spectrumData)
 
-	skey := GetFromTimestamp(spectrum.Timestamp)
+	skey := repository.GetFromTimestamp(spectrum.Timestamp)
 	y, m, d := skey.GetIntegerValues()
 
 	spectrumDSO := spectrumDSO{
@@ -132,13 +156,36 @@ func (r *RelationalRepository) Insert(spectrum *fritz.Spectrum) error {
 	return nil
 }
 
-func (r *RelationalRepository) GetStatistics() (*SpectraStats, error) {
+func (r *RelationalRepository) GetStatistics() (*repository.SpectraStats, error) {
 	keys := make([]spectrumDSO, 0)
 	r.db.Find(&keys, &spectrumDSO{})
 
-	return &SpectraStats{TotalCount: int64(len(keys)), FirstSpectrum: keys[0].Timestamp, LatestSpectrum: keys[len(keys)-1].Timestamp}, nil
+	return &repository.SpectraStats{TotalCount: int64(len(keys)), FirstSpectrum: keys[0].Timestamp, LatestSpectrum: keys[len(keys)-1].Timestamp}, nil
 }
 
 func (r *RelationalRepository) Close() error {
 	return r.db.Close()
+}
+
+func (dso *spectrumDSO) toSpectrum(repo *RelationalRepository) (*fritz.Spectrum, error) {
+	var specData spectrumData
+	repo.db.Find(&specData, dso.SpectrumDataID)
+
+	data := specData.SpectrumData
+	if specData.Compressed {
+		dataI, err := compress.Decompress(data)
+		if err != nil {
+			return nil, err
+		}
+		data = dataI
+	}
+
+	var spectrum fritz.Spectrum
+	err := json.Unmarshal(data, &spectrum)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &spectrum, nil
 }

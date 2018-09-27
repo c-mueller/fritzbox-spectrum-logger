@@ -54,8 +54,7 @@ func (m *DatabaseMigrator) Migrate() error {
 			}
 
 			for _, timestamp := range timestamps {
-				year, month, day := spectrumKey.GetIntegerValues()
-				spectrum, err := source.GetSpectrum(day, month, year, timestamp)
+				spectrum, err := source.GetSpectrum(timestamp)
 				if err != nil {
 					return err
 				}

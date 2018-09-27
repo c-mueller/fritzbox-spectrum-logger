@@ -13,20 +13,32 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package repository
+package bolt
 
 import (
 	"encoding/json"
 	"fmt"
 	"github.com/boltdb/bolt"
 	"github.com/c-mueller/fritzbox-spectrum-logger/fritz"
+	"github.com/c-mueller/fritzbox-spectrum-logger/repository"
+	"github.com/c-mueller/fritzbox-spectrum-logger/repository/compress"
 	"github.com/op/go-logging"
 	"sort"
 	"strconv"
 	"time"
 )
 
-var log = logging.MustGetLogger("repository")
+var log = logging.MustGetLogger("bolt_repository")
+
+const (
+	SpectrumListBucketName = "Spectra"
+)
+
+type BoltRepository struct {
+	DatabasePath string
+	compress     bool
+	db           *bolt.DB
+}
 
 func NewBoltRepository(path string, compress bool) (*BoltRepository, error) {
 	log.Debugf("Opening database '%s'", path)
@@ -44,10 +56,10 @@ func NewBoltRepository(path string, compress bool) (*BoltRepository, error) {
 	}, nil
 }
 
-func (r *BoltRepository) GetAllSpectrumKeys() (SpectraKeys, error) {
-	keys := make(SpectraKeys, 0)
+func (r *BoltRepository) GetAllSpectrumKeys() (repository.SpectraKeys, error) {
+	keys := make(repository.SpectraKeys, 0)
 
-	err := r.forEachSpectrumKey(func(dayBucket *bolt.Bucket, key SpectrumKey) error {
+	err := r.forEachSpectrumKey(func(dayBucket *bolt.Bucket, key repository.SpectrumKey) error {
 		keys = append(keys, key)
 		return nil
 	})
@@ -61,13 +73,13 @@ func (r *BoltRepository) GetAllSpectrumKeys() (SpectraKeys, error) {
 	return keys, nil
 }
 
-func (r *BoltRepository) GetSpectrumForTimestamp(timestamp int64) (*fritz.Spectrum, error) {
+func (r *BoltRepository) GetSpectrum(timestamp int64) (*fritz.Spectrum, error) {
 	t := time.Unix(timestamp, 0)
 	d, m, y := t.Day(), int(t.Month()), t.Year()
-	return r.GetSpectrum(d, m, y, timestamp)
+	return r.GetSpectrumWithDate(d, m, y, timestamp)
 }
 
-func (r *BoltRepository) GetSpectrum(day, month, year int, timestamp int64) (*fritz.Spectrum, error) {
+func (r *BoltRepository) GetSpectrumWithDate(day, month, year int, timestamp int64) (*fritz.Spectrum, error) {
 	yearByte, monthByte, dayByte := convertToByte(year, month, day)
 	timestampByte := []byte(fmt.Sprintf("%d", timestamp))
 	var spectrum *fritz.Spectrum
@@ -79,11 +91,11 @@ func (r *BoltRepository) GetSpectrum(day, month, year int, timestamp int64) (*fr
 		}
 		byteData := dayBucket.Get(timestampByte)
 		if byteData == nil {
-			return InvalidTimestampKey
+			return repository.InvalidTimestampKey
 		}
 
 		if byteData[0] != []byte("{")[0] {
-			byteData, err = decompress(byteData)
+			byteData, err = compress.Decompress(byteData)
 			if err != nil {
 				return err
 			}
@@ -99,8 +111,8 @@ func (r *BoltRepository) GetSpectrum(day, month, year int, timestamp int64) (*fr
 	return spectrum, nil
 }
 
-func (r *BoltRepository) GetTimestampsForDay(day, month, year int) (TimestampArray, error) {
-	data := make(TimestampArray, 0)
+func (r *BoltRepository) GetTimestampsForDay(day, month, year int) (repository.TimestampArray, error) {
+	data := make(repository.TimestampArray, 0)
 
 	err := r.forEachSpectrumInDay(year, month, day, func(dayBucket *bolt.Bucket, k, v []byte) error {
 		timestampString := string(k)
@@ -137,7 +149,7 @@ func (r *BoltRepository) Insert(spectrum *fritz.Spectrum) error {
 		}
 
 		if r.compress {
-			jsonData, err = compress(jsonData)
+			jsonData, err = compress.Compress(jsonData)
 			if err != nil {
 				return err
 			}
@@ -151,12 +163,12 @@ func (r *BoltRepository) Insert(spectrum *fritz.Spectrum) error {
 	return err
 }
 
-func (r *BoltRepository) GetStatistics() (*SpectraStats, error) {
+func (r *BoltRepository) GetStatistics() (*repository.SpectraStats, error) {
 	min := time.Now().Unix() * 2
 	max := int64(0)
 	count := int64(0)
 
-	err := r.forEachSpectrumKey(func(dayBucket *bolt.Bucket, key SpectrumKey) error {
+	err := r.forEachSpectrumKey(func(dayBucket *bolt.Bucket, key repository.SpectrumKey) error {
 		err := dayBucket.ForEach(func(k, v []byte) error {
 			count++
 			parsedTimestamp, err := strconv.ParseInt(string(k), 10, 64)
@@ -177,7 +189,7 @@ func (r *BoltRepository) GetStatistics() (*SpectraStats, error) {
 		return nil, err
 	}
 
-	return &SpectraStats{
+	return &repository.SpectraStats{
 		FirstSpectrum:  min,
 		LatestSpectrum: max,
 		TotalCount:     count,
@@ -202,4 +214,11 @@ func initDb(db *bolt.DB) error {
 		return err
 	}
 	return nil
+}
+
+func convertToByte(year, month, day int) ([]byte, []byte, []byte) {
+	yearByte := []byte(fmt.Sprintf("%d", year))
+	monthByte := []byte(fmt.Sprintf("%d", month))
+	dayByte := []byte(fmt.Sprintf("%d", day))
+	return yearByte, monthByte, dayByte
 }

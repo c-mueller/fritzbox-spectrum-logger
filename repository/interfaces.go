@@ -17,10 +17,14 @@ package repository
 
 import "github.com/c-mueller/fritzbox-spectrum-logger/fritz"
 
+type RepoBuilder interface {
+	BuildRepository(compress bool, path string) (Repository, error)
+	GetName() string
+}
+
 type Repository interface {
 	GetAllSpectrumKeys() (SpectraKeys, error)
-	GetSpectrumForTimestamp(timestamp int64) (*fritz.Spectrum, error)
-	GetSpectrum(day, month, year int, timestamp int64) (*fritz.Spectrum, error)
+	GetSpectrum(timestamp int64) (*fritz.Spectrum, error)
 	GetTimestampsForDay(day, month, year int) (TimestampArray, error)
 	GetTimestampsForSpectrumKey(key SpectrumKey) (TimestampArray, error)
 	Insert(spectrum *fritz.Spectrum) error

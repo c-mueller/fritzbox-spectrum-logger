@@ -38,7 +38,7 @@ func (a *Application) getSpectraComparison(ctx *gin.Context) {
 
 	spectraCollection := make(fritz.ComparisonSet, 0)
 	for _, timestamp := range spectraList.Timestamps {
-		spectrum, err := a.repo.GetSpectrumForTimestamp(timestamp)
+		spectrum, err := a.repo.GetSpectrum(timestamp)
 		if err != nil {
 			ctx.String(404, "")
 			return

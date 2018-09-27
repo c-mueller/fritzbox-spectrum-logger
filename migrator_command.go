@@ -17,7 +17,9 @@ package main
 
 import (
 	"github.com/c-mueller/fritzbox-spectrum-logger/repository"
+	"github.com/c-mueller/fritzbox-spectrum-logger/repository/bolt"
 	"github.com/c-mueller/fritzbox-spectrum-logger/repository/migrator"
+	"github.com/c-mueller/fritzbox-spectrum-logger/repository/relational"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"os"
 )
@@ -53,12 +55,12 @@ func getRepository(path string) repository.Repository {
 	//Attempt creating a BoltDB Repo
 	var repo repository.Repository
 
-	repo, err := repository.NewBoltRepository(path, !*compressFlag)
+	repo, err := bolt.NewBoltRepository(path, !*compressFlag)
 	if err == nil {
 		return repo
 	}
 	//Attempt creating a SQLite Repo
-	repo, err = repository.NewSQLiteRepository(path, !*compressFlag)
+	repo, err = relational.NewSQLiteRepository(path, !*compressFlag)
 	if err == nil {
 		return repo
 	}

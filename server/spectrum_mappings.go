@@ -65,7 +65,7 @@ func (a *Application) getSpectrumFromParameters(ctx *gin.Context) *fritz.Spectru
 		sendError(ctx, 404, "A Invalid Key was requested: %s - Timestamp: %s", key.String(), timestampString)
 		return nil
 	}
-	spectrum, err := a.repo.GetSpectrumForTimestamp(timestamp)
+	spectrum, err := a.repo.GetSpectrum(timestamp)
 	if err != nil {
 		sendError(ctx, 404, "Spectra Retrieval Failed: %s", err.Error())
 		return nil

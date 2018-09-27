@@ -13,15 +13,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package repository
+package bolt
 
 import (
 	"github.com/boltdb/bolt"
+	"github.com/c-mueller/fritzbox-spectrum-logger/repository"
 )
 
-func (r *BoltRepository) GetTimestampsForSpectrumKey(k SpectrumKey) (TimestampArray, error) {
+func (r *BoltRepository) GetTimestampsForSpectrumKey(k repository.SpectrumKey) (repository.TimestampArray, error) {
 	if !k.IsValid() {
-		return nil, InvalidDateKey
+		return nil, repository.InvalidDateKey
 	}
 	y, m, d := k.GetIntegerValues()
 	return r.GetTimestampsForDay(d, m, y)
@@ -46,7 +47,7 @@ func (r *BoltRepository) forEachSpectrumInDay(y, m, d int, operator func(dayBuck
 	return err
 }
 
-func (r *BoltRepository) forEachSpectrumKey(operator func(dayBucket *bolt.Bucket, key SpectrumKey) error) error {
+func (r *BoltRepository) forEachSpectrumKey(operator func(dayBucket *bolt.Bucket, key repository.SpectrumKey) error) error {
 	err := r.db.View(func(tx *bolt.Tx) error {
 		spectraBucket := tx.Bucket([]byte(SpectrumListBucketName))
 
@@ -68,7 +69,7 @@ func (r *BoltRepository) forEachSpectrumKey(operator func(dayBucket *bolt.Bucket
 						//Ignore element if it is not a bucket
 						return nil
 					}
-					key := SpectrumKey{
+					key := repository.SpectrumKey{
 						Year:  string(yearKey),
 						Month: string(monthKey),
 						Day:   string(dayKey),
@@ -88,25 +89,25 @@ func (r *BoltRepository) getDayBucket(dayByte, monthByte, yearByte []byte, tx *b
 	spectraBucket := tx.Bucket([]byte(SpectrumListBucketName))
 	if spectraBucket == nil {
 		log.Error("Spectra Bucket not found!")
-		return nil, BucketNotFoundError
+		return nil, repository.BucketNotFoundError
 	}
 	yearBucket := spectraBucket.Bucket(yearByte)
 	if yearBucket == nil {
 		log.Errorf("Year Bucket (Year: '%s') not found!",
 			string(yearByte))
-		return nil, BucketNotFoundError
+		return nil, repository.BucketNotFoundError
 	}
 	monthBucket := yearBucket.Bucket(monthByte)
 	if monthBucket == nil {
 		log.Errorf("Month Bucket (Year: '%s' Month: '%s') not found!",
 			string(yearByte), string(monthByte))
-		return nil, BucketNotFoundError
+		return nil, repository.BucketNotFoundError
 	}
 	dayBucket := monthBucket.Bucket(dayByte)
 	if dayBucket == nil {
 		log.Errorf("Month Bucket (Year: '%s' Month: '%s' Day: '%s') not found!",
 			string(yearByte), string(monthByte), string(dayByte))
-		return nil, BucketNotFoundError
+		return nil, repository.BucketNotFoundError
 	}
 	return dayBucket, nil
 }

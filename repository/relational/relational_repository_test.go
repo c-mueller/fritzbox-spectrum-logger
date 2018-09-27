@@ -14,13 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package repository
+package relational
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/Flaque/filet"
 	"github.com/c-mueller/fritzbox-spectrum-logger/fritz"
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
+	"os"
 	"testing"
 )
 
@@ -61,7 +64,7 @@ func TestSQLiteQueryByTimestamp_Compressed(t *testing.T) {
 	err := db.Insert(testSpectrum)
 	assert.NoError(t, err)
 
-	spc, err := db.GetSpectrumForTimestamp(testSpectrum.Timestamp)
+	spc, err := db.GetSpectrum(testSpectrum.Timestamp)
 	assert.NoError(t, err)
 
 	assert.Equal(t, testSpectrum.Timestamp, spc.Timestamp)
@@ -79,7 +82,7 @@ func TestSQLiteQueryByTimestamp_Uncompressed(t *testing.T) {
 	err := db.Insert(testSpectrum)
 	assert.NoError(t, err)
 
-	spc, err := db.GetSpectrumForTimestamp(testSpectrum.Timestamp)
+	spc, err := db.GetSpectrum(testSpectrum.Timestamp)
 	assert.NoError(t, err)
 
 	assert.Equal(t, testSpectrum.Timestamp, spc.Timestamp)
@@ -126,4 +129,14 @@ func initializeSQLiteDatabase(t *testing.T, compress bool) *RelationalRepository
 		t.FailNow()
 	}
 	return db
+}
+
+func loadTestSpectrum(t testing.TB) *fritz.Spectrum {
+	file, err := os.Open("../testdata/example_spectrum.json")
+	assert.NoError(t, err, "Loading Dummy Spectrum failed")
+	var result *fritz.Spectrum
+	data, err := ioutil.ReadAll(file)
+	file.Close()
+	err = json.Unmarshal(data, &result)
+	return result
 }

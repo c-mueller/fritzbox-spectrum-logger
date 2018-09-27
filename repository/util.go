@@ -101,4 +101,3 @@ func (k SpectraKeys) Less(i, j int) bool {
 		return aY < bY
 	}
 }
-

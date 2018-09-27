@@ -50,9 +50,6 @@ type RelationalRepository struct {
 	compress bool
 }
 
-
-
-
 func NewSQLiteRepository(path string, compress bool) (*RelationalRepository, error) {
 	return NewRelationalRepository("sqlite3", path, compress)
 }

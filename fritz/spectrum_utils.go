@@ -138,7 +138,7 @@ func (s *Spectrum) computeSize() (int, int) {
 	return width, height
 }
 
-func (c ComparisonSet) computeComparisonDimensions(scaled bool) (int, int) {
+func (c SpectraList) computeComparisonDimensions(scaled bool) (int, int) {
 
 	graphWidth := barWidth * c.getMaxEntryCount()
 
@@ -151,7 +151,7 @@ func (c ComparisonSet) computeComparisonDimensions(scaled bool) (int, int) {
 	return width, height
 }
 
-func (c ComparisonSet) getMaxEntryCount() int {
+func (c SpectraList) getMaxEntryCount() int {
 	max := 0
 
 	for _, v := range c {
@@ -164,7 +164,7 @@ func (c ComparisonSet) getMaxEntryCount() int {
 	return max
 }
 
-func (c ComparisonSet) getBitMaxHeight() float64 {
+func (c SpectraList) getBitMaxHeight() float64 {
 	maxHeight := float64(0)
 
 	for _, v := range c {
@@ -177,7 +177,7 @@ func (c ComparisonSet) getBitMaxHeight() float64 {
 	return maxHeight
 }
 
-func (c ComparisonSet) getSNRMaxHeight() float64 {
+func (c SpectraList) getSNRMaxHeight() float64 {
 	maxHeight := float64(0)
 
 	for _, v := range c {

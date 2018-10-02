@@ -137,7 +137,7 @@ func testComparison(t *testing.T, scaled bool, validate func(t *testing.T, data 
 	t.Log("Loading test Data")
 	spectrumB := loadTestData(t, singlePortComparisonAPath)
 	spectrumC := loadTestData(t, singlePortComparisonBPath)
-	comparison := ComparisonSet{*spectrumB, *spectrumC}
+	comparison := SpectraList{*spectrumB, *spectrumC}
 	imgdata, err := comparison.RenderComparison(scaled)
 	assert.NoError(t, err)
 	validate(t, imgdata)

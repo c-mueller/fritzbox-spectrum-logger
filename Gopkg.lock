@@ -263,6 +263,19 @@
   version = "v1.1.1"
 
 [[projects]]
+  name = "github.com/wcharczuk/go-chart"
+  packages = [
+    ".",
+    "drawing",
+    "matrix",
+    "roboto",
+    "seq",
+    "util"
+  ]
+  revision = "7c3982fe3d8ab0c9eea9ab5d2aced51e45d447bc"
+  version = "v2.0.1"
+
+[[projects]]
   branch = "master"
   name = "golang.org/x/image"
   packages = [
@@ -327,6 +340,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e47ccf7be9fdff540f345887253dca263ae6b2f5d06c84446f7d12ca553272fe"
+  inputs-digest = "c4b6f28e4810ef4af588cf65bde80c40dcf56eb8b3980b7390f4af1d36936a80"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -26,7 +26,7 @@ import (
 
 const comparisonPortIndex = 0
 
-func (c ComparisonSet) RenderComparison(scaled bool) ([]byte, error) {
+func (c SpectraList) RenderComparison(scaled bool) ([]byte, error) {
 	sort.Sort(c)
 
 	w, h := c.computeComparisonDimensions(scaled)
@@ -65,13 +65,13 @@ func (c ComparisonSet) RenderComparison(scaled bool) ([]byte, error) {
 	return outputBuffer.Bytes(), nil
 }
 
-func (c ComparisonSet) Len() int {
+func (c SpectraList) Len() int {
 	return len(c)
 }
-func (c ComparisonSet) Swap(a, b int) {
+func (c SpectraList) Swap(a, b int) {
 	c[a], c[b] = c[b], c[a]
 }
 
-func (c ComparisonSet) Less(a, b int) bool {
+func (c SpectraList) Less(a, b int) bool {
 	return c[a].Timestamp < c[b].Timestamp
 }

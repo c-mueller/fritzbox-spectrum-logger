@@ -147,6 +147,7 @@ func (a *Application) registerHTTPMappings(engine *gin.Engine) {
 	engine.GET("/api/spectrum/:timestamp/img", a.getRenderedSpectrum)
 	engine.GET("/api/spectrum/:timestamp/neighbours", a.getNeighbours)
 	engine.GET("/api/spectrum/:timestamp/info", a.getConnectionInformation)
+	engine.GET("/api/spectrum/:timestamp/info.json", a.getParsedConnectionInformation)
 
 	//Spectrum Comparsion
 	engine.POST("/api/comparison", a.getSpectraComparison)

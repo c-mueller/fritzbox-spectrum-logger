@@ -47,6 +47,22 @@ func (a *Application) getRenderedSpectrum(ctx *gin.Context) {
 	ctx.Data(200, "image/png", image)
 }
 
+func (a *Application) getParsedConnectionInformation(ctx *gin.Context) {
+	spectrum := a.getSpectrumFromParameters(ctx)
+
+	if spectrum == nil {
+		ctx.Data(404, "application/json", []byte("{}"))
+		return
+	}
+
+	conInfo, err := spectrum.GetConnectionInformation()
+	if err != nil {
+		ctx.Data(400, "application/json", []byte("{}"))
+	} else {
+		ctx.JSON(200, conInfo)
+	}
+}
+
 func (a *Application) getConnectionInformation(ctx *gin.Context) {
 	spectrum := a.getSpectrumFromParameters(ctx)
 

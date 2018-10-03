@@ -220,7 +220,7 @@ func ParseConnectionInformation(html string) (*ConnectionInformation, error) {
 				return nil, err
 			}
 
-			conInfo.Downstream.Errors = *errs
+			conInfo.Upstream.Errors = *errs
 			break
 		}
 	}

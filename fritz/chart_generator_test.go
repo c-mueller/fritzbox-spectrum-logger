@@ -3,6 +3,7 @@ package fritz
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/Flaque/filet"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"os"
@@ -12,50 +13,13 @@ import (
 )
 
 func TestChartGenerator(t *testing.T) {
+	tmpdir := filet.TmpDir(t, "")
+	defer filet.CleanUp(t)
+
 	files, err := ioutil.ReadDir("testdata/graphdata")
 	assert.NoError(t, err)
 
-	chartGen := ChartGenerator{
-		Title: "DSL Geschwindigkeitsverlauf - August bis September 2018",
-		ValueSets: []*ValueSet{
-			{
-				Name: "Aktuelle Datenrate - Downstream",
-				Extractor: func(s *Spectrum, conInfo *ConnectionInformation) (float64, error) {
-					return float64(conInfo.Downstream.CurrentDataRate), nil
-				},
-			},
-			{
-				Name: "Aktuelle Datenrate - Upstream",
-				Extractor: func(s *Spectrum, conInfo *ConnectionInformation) (float64, error) {
-					return float64(conInfo.Upstream.CurrentDataRate), nil
-				},
-			},
-			{
-				Name: "Leitungskapazität - Downstream",
-				Extractor: func(s *Spectrum, conInfo *ConnectionInformation) (float64, error) {
-					return float64(conInfo.Downstream.Capacity), nil
-				},
-			},
-			{
-				Name: "Leitungskapazität - Upstream",
-				Extractor: func(s *Spectrum, conInfo *ConnectionInformation) (float64, error) {
-					return float64(conInfo.Upstream.Capacity), nil
-				},
-			},
-			//{
-			//	Name: "Maximale Datenrate - Downstream",
-			//	Extractor: func(s *Spectrum, conInfo *ConnectionInformation) (float64, error) {
-			//		return float64(conInfo.Downstream.MaximumDataRate), nil
-			//	},
-			//},
-			//{
-			//	Name: "Maximale Datenrate - Upstream",
-			//	Extractor: func(s *Spectrum, conInfo *ConnectionInformation) (float64, error) {
-			//		return float64(conInfo.Upstream.MaximumDataRate), nil
-			//	},
-			//},
-		},
-	}
+	chartGen := NewConnectionSpeedChartGenerator("DSL Geschwindigkeitsverlauf", NewDefaultConnectionSpeedValueSet())
 
 	for idx, f := range files {
 		p := filepath.Join("testdata/graphdata", f.Name())
@@ -78,7 +42,9 @@ func TestChartGenerator(t *testing.T) {
 		fmt.Printf("%s: %f\n", v.Name, v.Values.AverageX())
 	}
 
-	w, err := os.Create(fmt.Sprintf("test-%d.png", time.Now().Unix()))
+	path := filepath.Join(tmpdir, fmt.Sprintf("test-%d.png", time.Now().Unix()))
+
+	w, err := os.Create(path)
 	assert.NoError(t, err)
 
 	data, err := chartGen.ToChart()

@@ -7,6 +7,10 @@ import (
 )
 
 type ChartGenerator struct {
+	Width     int
+	Height    int
+	XAxisName string
+	YAxisName string
 	ValueSets []*ValueSet
 	Title     string
 }
@@ -22,6 +26,57 @@ type ValuePairs []ValuePair
 type ValuePair struct {
 	Timestamp int64
 	Value     float64
+}
+
+func NewDefaultConnectionSpeedValueSet() []*ValueSet {
+	return []*ValueSet{
+		{
+			Name: "Aktuelle Datenrate - Downstream",
+			Extractor: func(s *Spectrum, conInfo *ConnectionInformation) (float64, error) {
+				return float64(conInfo.Downstream.CurrentDataRate), nil
+			},
+		},
+		{
+			Name: "Aktuelle Datenrate - Upstream",
+			Extractor: func(s *Spectrum, conInfo *ConnectionInformation) (float64, error) {
+				return float64(conInfo.Upstream.CurrentDataRate), nil
+			},
+		},
+		{
+			Name: "Leitungskapazität - Downstream",
+			Extractor: func(s *Spectrum, conInfo *ConnectionInformation) (float64, error) {
+				return float64(conInfo.Downstream.Capacity), nil
+			},
+		},
+		{
+			Name: "Leitungskapazität - Upstream",
+			Extractor: func(s *Spectrum, conInfo *ConnectionInformation) (float64, error) {
+				return float64(conInfo.Upstream.Capacity), nil
+			},
+		},
+		//{
+		//	Name: "Maximale Datenrate - Downstream",
+		//	Extractor: func(s *Spectrum, conInfo *ConnectionInformation) (float64, error) {
+		//		return float64(conInfo.Downstream.MaximumDataRate), nil
+		//	},
+		//},
+		//{
+		//	Name: "Maximale Datenrate - Upstream",
+		//	Extractor: func(s *Spectrum, conInfo *ConnectionInformation) (float64, error) {
+		//		return float64(conInfo.Upstream.MaximumDataRate), nil
+		//	},
+		//},
+	}
+}
+
+func NewConnectionSpeedChartGenerator(title string, valueSets []*ValueSet) *ChartGenerator {
+	return &ChartGenerator{
+		XAxisName: "Zeit",
+		YAxisName: "KBit/s",
+		Width:     5000,
+		Height:    2000,
+		ValueSets: valueSets,
+	}
 }
 
 func (v ValuePairs) AverageX() float64 {
@@ -83,17 +138,17 @@ func (c *ChartGenerator) ToChart() ([]byte, error) {
 	}
 
 	graph := chart.Chart{
-		Width:  len(c.ValueSets[0].Values),
-		Height: 2000,
+		Width:  c.Width,
+		Height: c.Height,
 		DPI:    200,
 		Title:  c.Title,
 		XAxis: chart.XAxis{
-			Name:      "Zeit",
+			Name:      c.XAxisName,
 			NameStyle: chart.StyleShow(),
 			Style:     chart.StyleShow(),
 		},
 		YAxis: chart.YAxis{
-			Name:      "KBit/s",
+			Name:      c.YAxisName,
 			NameStyle: chart.StyleShow(),
 			Style:     chart.StyleShow(),
 		},

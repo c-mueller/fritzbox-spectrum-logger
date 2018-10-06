@@ -17,84 +17,84 @@ package server
 
 import "github.com/prometheus/client_golang/prometheus"
 
-var maxDataRateVec = prometheus.NewCounterVec(prometheus.CounterOpts{
+var maxDataRateVec = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 	Namespace: "",
 	Subsystem: "fsl",
 	Name:      "fritzbox_line_dslam_max_data_rate",
 	Help:      "Maximum datarate of the DSLAM",
 }, []string{"direction"})
 
-var minDataRateVec = prometheus.NewCounterVec(prometheus.CounterOpts{
+var minDataRateVec = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 	Namespace: "",
 	Subsystem: "fsl",
 	Name:      "fritzbox_line_dslam_min_data_rate",
 	Help:      "Minimum datarate of the DSLAM",
 }, []string{"direction"})
 
-var capacityVec = prometheus.NewCounterVec(prometheus.CounterOpts{
+var capacityVec = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 	Namespace: "",
 	Subsystem: "fsl",
 	Name:      "fritzbox_line_capacity",
 	Help:      "Capacity of the DSL Connection",
 }, []string{"direction"})
 
-var currentDataRateVec = prometheus.NewCounterVec(prometheus.CounterOpts{
+var currentDataRateVec = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 	Namespace: "",
 	Subsystem: "fsl",
 	Name:      "fritzbox_line_current_data_rate",
 	Help:      "Data rate of the connection",
 }, []string{"direction"})
 
-var lineLatencyVec = prometheus.NewCounterVec(prometheus.CounterOpts{
+var lineLatencyVec = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 	Namespace: "",
 	Subsystem: "fsl",
 	Name:      "fritzbox_line_latency",
 	Help:      "Latency in MS of the connection",
 }, []string{"direction"})
 
-var inpValueVec = prometheus.NewCounterVec(prometheus.CounterOpts{
+var inpValueVec = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 	Namespace: "",
 	Subsystem: "fsl",
 	Name:      "fritzbox_line_inp",
 	Help:      "INP value of the connection",
 }, []string{"direction"})
 
-var snrVec = prometheus.NewCounterVec(prometheus.CounterOpts{
+var snrVec = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 	Namespace: "",
 	Subsystem: "fsl",
 	Name:      "fritzbox_line_snr",
 	Help:      "SNR Value in dB of the connection",
 }, []string{"direction"})
 
-var attenuationVec = prometheus.NewCounterVec(prometheus.CounterOpts{
+var attenuationVec = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 	Namespace: "",
 	Subsystem: "fsl",
 	Name:      "fritzbox_line_attenuation",
 	Help:      "Attenuation in dB of the connection",
 }, []string{"direction"})
 
-var errorVec = prometheus.NewCounterVec(prometheus.CounterOpts{
+var errorVec = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 	Namespace: "",
 	Subsystem: "fsl",
 	Name:      "fritzbox_line_error_seconds",
 	Help:      "Errors ES",
 }, []string{"direction"})
 
-var manyErrorVec = prometheus.NewCounterVec(prometheus.CounterOpts{
+var manyErrorVec = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 	Namespace: "",
 	Subsystem: "fsl",
 	Name:      "fritzbox_line_many_error_seconds",
 	Help:      "Errors SES",
 }, []string{"direction"})
 
-var errorsPerMinVec = prometheus.NewCounterVec(prometheus.CounterOpts{
+var errorsPerMinVec = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 	Namespace: "",
 	Subsystem: "fsl",
 	Name:      "fritzbox_line_errors_per_minute",
 	Help:      "Errors per minute",
 }, []string{"direction"})
 
-var errorsLast15MinVec = prometheus.NewCounterVec(prometheus.CounterOpts{
+var errorsLast15MinVec = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 	Namespace: "",
 	Subsystem: "fsl",
 	Name:      "fritzbox_line_errors_last_15_min",

@@ -18,6 +18,7 @@ package server
 import (
 	"github.com/c-mueller/fritzbox-spectrum-logger/repository/reporegistry"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"regexp"
 	"time"
 
 	"github.com/GeertJohan/go.rice"
@@ -32,6 +33,24 @@ import (
 )
 
 var log = logging.MustGetLogger("server")
+
+func counterMiddleware() gin.HandlerFunc {
+
+	timestampRegex, _ := regexp.Compile("/[0-9]{9,}")
+	dateRegex, _ := regexp.Compile("/[0-9]{4}/1?[0-9]/[1-3]?[0-9]")
+
+	return func(context *gin.Context) {
+		requestPath := string(timestampRegex.ReplaceAll([]byte(context.Request.URL.Path), []byte("/TIMESTAMP")))
+		requestPath = string(dateRegex.ReplaceAll([]byte(requestPath), []byte("/YYYY/MM/DD")))
+
+		start := time.Now()
+
+		context.Next()
+
+		requestCounter.WithLabelValues(requestPath).Inc()
+		processingTimeHistogram.WithLabelValues(requestPath).Observe(float64(time.Now().Sub(start).Nanoseconds()) / 1000000)
+	}
+}
 
 func LaunchApplication(configPath string) *Application {
 	log.Debugf("Loading configuration from '%s'", configPath)
@@ -101,8 +120,11 @@ func (a *Application) Listen() error {
 
 	log.Debug("Registering HTTP mappings")
 	gin.SetMode(gin.ReleaseMode)
-	engine := gin.Default()
+	engine := gin.New()
 
+	engine.Use(counterMiddleware())
+	engine.Use(gin.Logger())
+	engine.Use(gin.Recovery())
 	engine.Use(cors.Default())
 
 	a.registerHTTPMappings(engine)

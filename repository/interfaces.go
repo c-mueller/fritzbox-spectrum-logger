@@ -15,7 +15,9 @@
 
 package repository
 
-import "github.com/c-mueller/fritzbox-spectrum-logger/fritz"
+import (
+	"github.com/c-mueller/fritzbox-spectrum-logger/fritz"
+)
 
 type RepoBuilder interface {
 	BuildRepository(compress bool, path string) (Repository, error)
@@ -29,5 +31,10 @@ type Repository interface {
 	GetTimestampsForSpectrumKey(key SpectrumKey) (TimestampArray, error)
 	Insert(spectrum *fritz.Spectrum) error
 	GetStatistics() (*SpectraStats, error)
+
+	StoreSupportData(data []byte, timestamp int) error
+	ListSupportDataEntries() []int
+	GetSupportData(timestamp int) ([]byte, error)
+
 	Close() error
 }

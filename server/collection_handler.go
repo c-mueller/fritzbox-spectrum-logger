@@ -76,6 +76,7 @@ func (a *Application) collectionHandler() {
 
 	renewalAttempts := 0
 	spectrumLoadErrors := 0
+	cyclesSinceLastSupportFetch := a.config.SupportDataFetchInterval
 
 	for range a.updateTicker.C {
 
@@ -94,6 +95,11 @@ func (a *Application) collectionHandler() {
 		}
 		renewalAttempts = 0
 
+		if a.config.GetSupportData && cyclesSinceLastSupportFetch == a.config.SupportDataFetchInterval {
+			go a.loadSupportData()
+			cyclesSinceLastSupportFetch = 0
+		}
+
 		log.Debug("Downloading Spectrum...")
 		err := a.collect()
 		if err != nil {
@@ -111,6 +117,7 @@ func (a *Application) collectionHandler() {
 		} else {
 			spectrumLoadErrors = 0
 		}
+		cyclesSinceLastSupportFetch++
 	}
 }
 
@@ -130,6 +137,26 @@ func (a *Application) renewSession(failOnError bool) bool {
 	a.session = session
 	log.Info("Logged In!")
 	return true
+}
+
+func (a *Application) loadSupportData() {
+	log.Info("Downloading Support Data")
+	data, err := a.session.DownloadSupportData()
+	if err != nil {
+		log.Error("Fetching support data failed")
+		log.Error(err.Error())
+		return
+	}
+
+	ts := time.Now().Unix()
+
+	err = a.repo.StoreSupportData(data, int(ts))
+	if err != nil {
+		log.Error("Storing support data failed")
+		log.Error(err.Error())
+		return
+	}
+	log.Info("Downloaded Support Data")
 }
 
 func (a *Application) collect() error {

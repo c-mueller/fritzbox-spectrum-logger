@@ -171,6 +171,9 @@ func (a *Application) registerHTTPMappings(engine *gin.Engine) {
 	engine.GET("/api/spectrum/:timestamp/info", a.getConnectionInformation)
 	engine.GET("/api/spectrum/:timestamp/info.json", a.getParsedConnectionInformation)
 
+	engine.GET("/api/sd", a.getSupportTimestamps)
+	engine.GET("/api/sd/:timestamp", a.getSupportData)
+
 	//Spectrum Comparsion
 	engine.POST("/api/comparison", a.getSpectraComparison)
 

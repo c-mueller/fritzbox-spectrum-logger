@@ -32,6 +32,7 @@ var log = logging.MustGetLogger("bolt_repository")
 
 const (
 	SpectrumListBucketName = "Spectra"
+	SupportDataBucketName  = "SupportData"
 )
 
 type BoltRepository struct {
@@ -214,6 +215,66 @@ func initDb(db *bolt.DB) error {
 		return err
 	}
 	return nil
+}
+
+func (r *BoltRepository) StoreSupportData(data []byte, timestamp int) error {
+	return r.db.Update(func(tx *bolt.Tx) error {
+		b, err := tx.CreateBucketIfNotExists([]byte(SupportDataBucketName))
+		if err != nil {
+			return err
+		}
+
+		cd, err := compress.Compress(data)
+
+		if err != nil {
+			return err
+		}
+
+		return b.Put([]byte(fmt.Sprintf("%d", timestamp)), cd)
+	})
+}
+
+func (r *BoltRepository) ListSupportDataEntries() []int {
+	data := make([]int, 0)
+
+	r.db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(SupportDataBucketName))
+		if b == nil {
+			return nil
+		}
+		return b.ForEach(func(k, v []byte) error {
+
+			d, _ := strconv.ParseInt(string(k), 10, 64)
+
+			data = append(data, int(d))
+
+			return nil
+		})
+
+	})
+
+	return data
+}
+
+func (r *BoltRepository) GetSupportData(timestamp int) ([]byte, error) {
+	var data []byte
+
+	err := r.db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(SupportDataBucketName))
+		if b == nil {
+			return bolt.ErrBucketNotFound
+		}
+
+		data = b.Get([]byte(fmt.Sprintf("%d", timestamp)))
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return compress.Decompress(data)
 }
 
 func convertToByte(year, month, day int) ([]byte, []byte, []byte) {

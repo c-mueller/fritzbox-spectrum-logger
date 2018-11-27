@@ -45,9 +45,22 @@ type spectrumDSO struct {
 	SpectrumDataID uint
 }
 
+
 type RelationalRepository struct {
 	db       *gorm.DB
 	compress bool
+}
+
+func (r *RelationalRepository) StoreSupportData(data []byte, timestamp int) error {
+	panic("implement me")
+}
+
+func (r *RelationalRepository) ListSupportDataEntries() []int {
+	panic("implement me")
+}
+
+func (r *RelationalRepository) GetSupportData(timestamp int) ([]byte, error) {
+	panic("implement me")
 }
 
 func NewSQLiteRepository(path string, compress bool) (*RelationalRepository, error) {

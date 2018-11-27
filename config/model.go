@@ -50,6 +50,8 @@ type Configuration struct {
 	SessionRefreshInterval     int               `yaml:"session_refresh_interval" json:"session_refresh_interval" env:"SESSION_REFRESH_INTERVAL" envDefault:"3600"`
 	SessionRenewalAttemptCount int               `yaml:"session_refresh_attempts" json:"session_refresh_attempts" env:"SESSION_REFRESH_ATTEMPTS" envDefault:"5"`
 	MaxDownloadFails           int               `yaml:"max_download_fails" json:"max_download_fails" env:"MAX_DOWNLOAD_FAILS" envDefault:"5"`
+	GetSupportData             bool              `yaml:"get_support_data" json:"get_support_data" env:"GET_SUPPORT_DATA" envDefault:"true"`
+	SupportDataFetchInterval   int               `yaml:"support_data_fetch_interval" json:"support_data_fetch_interval" env:"SUPPORT_DATA_INTERVAL" envDefault:"60"`
 	cfgPath                    string
 }
 

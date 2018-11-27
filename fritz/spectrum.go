@@ -66,7 +66,7 @@ func (s *Session) GetSpectrum() (*Spectrum, error) {
 }
 
 func (s *Session) getSpectrumUrl() (*url.URL, error) {
-	return s.getUrl(fmt.Sprintf("/internet/dsl_spectrum.lua?sid=%s&useajax=1", s.sessionInfo.SID))
+	return s.getUrl(fmt.Sprintf("/internet/dsl_spectrum.lua?sid=%s&useajax=1&xhr=1&myXhr=1", s.sessionInfo.SID))
 }
 
 func (s *Session) getConnectionInfoUrl() (*url.URL, error) {

@@ -17,6 +17,7 @@ package fritz
 
 import (
 	"errors"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -58,155 +59,55 @@ func ParseConnectionInformation(html string) (*ConnectionInformation, error) {
 
 	connectionMatrix := toTableMatrix(cleanLines)
 
-	if len(connectionMatrix) < 16 {
-		return nil, ParsingError
-	}
-
 	conInfo := ConnectionInformation{
 		Upstream:   ConnectionTransmissionDirection{},
 		Downstream: ConnectionTransmissionDirection{},
+		LineLength: -1,
 	}
 
 	for index, row := range connectionMatrix {
-		switch index {
 
-		case 0: // DSLAM Max Datarate
-			up, down, err := getUpDownValuesInt(row)
-			if err != nil {
-				return nil, err
+		key := row[0]
+
+		t := reflect.TypeOf(conInfo.Downstream)
+
+		for i := 0; i < t.NumField(); i++ {
+			f := t.Field(i)
+
+			value, present := f.Tag.Lookup("fbname")
+			if present && value == key {
+				downVal := reflect.ValueOf(&conInfo.Downstream).Elem().FieldByName(f.Name)
+				upVal := reflect.ValueOf(&conInfo.Upstream).Elem().FieldByName(f.Name)
+
+				downStr := row[1]
+				upStr := row[2]
+
+				switch f.Type.Kind() {
+				case reflect.Int:
+					downVal.SetInt(int64(parseInteger(downStr)))
+					upVal.SetInt(int64(parseInteger(upStr)))
+				case reflect.String:
+					downVal.SetString(downStr)
+					upVal.SetString(upStr)
+				case reflect.Bool:
+					downVal.SetBool(parseBoolean(downStr))
+					upVal.SetBool(parseBoolean(upStr))
+				case reflect.Float64:
+					downVal.SetFloat(parseFloat(downStr))
+					upVal.SetFloat(parseFloat(upStr))
+				}
 			}
 
-			conInfo.Downstream.MaximumDataRate = int(down)
-			conInfo.Upstream.MaximumDataRate = int(up)
+		}
 
-			break
-
-		case 1: //DSLAM Min Datarate
-			up, down, err := getUpDownValuesInt(row)
-			if err != nil {
-				return nil, err
-			}
-
-			conInfo.Downstream.MinimumDataRate = down
-			conInfo.Upstream.MinimumDataRate = up
-
-			break
-		case 2: // Line Capacity
-			up, down, err := getUpDownValuesInt(row)
-			if err != nil {
-				return nil, err
-			}
-
-			conInfo.Downstream.Capacity = down
-			conInfo.Upstream.Capacity = up
-
-			break
-		case 3: // Current Data Rate
-			up, down, err := getUpDownValuesInt(row)
-			if err != nil {
-				return nil, err
-			}
-
-			conInfo.Downstream.CurrentDataRate = down
-			conInfo.Upstream.CurrentDataRate = up
-
-			break
-		case 4: // "Nahtlose Ratenadaption"
-			up, down, err := getUpDownValuesBool(row)
-			if err != nil {
-				return nil, err
-			}
-
-			conInfo.Downstream.SeamlessRateAdjustment = down
-			conInfo.Upstream.SeamlessRateAdjustment = up
-
-			break
-		case 5: // Latency
-			up, down, err := getUpDownValuesInt(row)
-			if err != nil {
-				return nil, err
-			}
-
-			conInfo.Downstream.Latency = down
-			conInfo.Upstream.Latency = up
-
-			break
-		case 6: // INP Value
-			up, down, err := getUpDownValuesFloat(row)
-			if err != nil {
-				return nil, err
-			}
-
-			conInfo.Downstream.INPValue = down
-			conInfo.Upstream.INPValue = up
-
-			break
-		case 7: // G.INP Value
-			up, down, err := getUpDownValuesBool(row)
-			if err != nil {
-				return nil, err
-			}
-
-			conInfo.Downstream.GINP = down
-			conInfo.Upstream.GINP = up
-
-			break
-		case 8: // SNR Value
-			up, down, err := getUpDownValuesFloat(row)
-			if err != nil {
-				return nil, err
-			}
-
-			conInfo.Downstream.SNMargin = down
-			conInfo.Upstream.SNMargin = up
-
-			break
-		case 9: // Bitswap Value
-			up, down, err := getUpDownValuesBool(row)
-			if err != nil {
-				return nil, err
-			}
-
-			conInfo.Downstream.Bitswap = down
-			conInfo.Upstream.Bitswap = up
-
-			break
-		case 10: // Line Attenuation Value
-			up, down, err := getUpDownValuesFloat(row)
-			if err != nil {
-				return nil, err
-			}
-
-			conInfo.Downstream.LineAttenuation = down
-			conInfo.Upstream.LineAttenuation = up
-
-			break
-		case 11: // Profile
-			if len(row) != 2 {
-				return nil, ParsingError
-			}
+		if key == "Profil" {
 			conInfo.Profile = row[1]
+		} else if key == "ungefähre Leitungslänge" {
+			conInfo.LineLength = parseInteger(row[2])
+		}
 
-			break
-		case 12: // G.Vector mode
-			if len(row) != 3 {
-				return nil, ParsingError
-			}
-
-			conInfo.Downstream.VectorMode = row[1]
-			conInfo.Upstream.VectorMode = row[2]
-
-			break
-		case 13: // Carrier
-			if len(row) != 3 {
-				return nil, ParsingError
-			}
-
-			conInfo.Downstream.Carrier = row[1]
-			conInfo.Upstream.Carrier = row[2]
-
-			break
-		case 14: // Downstream Errors
+		switch index {
+		case len(connectionMatrix) - 2: // Downstream Errors
 			errs, err := parseErrorFromTableLine(row)
 			if err != nil {
 				return nil, err
@@ -214,7 +115,7 @@ func ParseConnectionInformation(html string) (*ConnectionInformation, error) {
 
 			conInfo.Downstream.Errors = *errs
 			break
-		case 15: // Upstream Errors
+		case len(connectionMatrix) - 2: // Upstream Errors
 			errs, err := parseErrorFromTableLine(row)
 			if err != nil {
 				return nil, err
@@ -226,6 +127,36 @@ func ParseConnectionInformation(html string) (*ConnectionInformation, error) {
 	}
 
 	return &conInfo, nil
+}
+
+func parseFloat(val string) float64 {
+	v, err := strconv.ParseFloat(val, 64)
+
+	if err != nil {
+		return -1
+	}
+	return v
+}
+
+func parseBoolean(val string) bool {
+	trueregex, _ := regexp.Compile("(an|wahr|on|active|true)")
+
+	return trueregex.Match([]byte(val))
+}
+
+func parseInteger(val string) int {
+	if val == "fast" {
+		return 0
+	} else if val == "-" {
+		return 0
+	}
+
+	value, err := strconv.ParseInt(val, 10, 64)
+	if err != nil {
+		return -1
+	}
+
+	return int(value)
 }
 
 func parseErrorFromTableLine(row []string) (*Errors, error) {
@@ -259,63 +190,6 @@ func parseErrorFromTableLine(row []string) (*Errors, error) {
 		ErrorsPerMinute:       perMin,
 		ErrorsLast15Min:       last15minES,
 	}, nil
-}
-
-func getUpDownValuesInt(row []string) (int, int, error) {
-	if len(row) != 3 {
-		return -1, -1, ParsingError
-	}
-
-	down, err := strconv.ParseInt(row[1], 10, 64)
-	if row[1] == "fast" {
-		down = 0
-		err = nil
-	}
-	if err != nil {
-		return -1, -1, ParsingError
-	}
-
-	up, err := strconv.ParseInt(row[2], 10, 64)
-	if row[2] == "fast" {
-		up = 0
-		err = nil
-	}
-	if err != nil {
-		return -1, -1, ParsingError
-	}
-
-	return int(up), int(down), nil
-}
-
-func getUpDownValuesFloat(row []string) (float64, float64, error) {
-	if len(row) != 3 {
-		return -1, -1, ParsingError
-	}
-
-	down, err := strconv.ParseFloat(row[1], 64)
-	if err != nil {
-		return -1, -1, ParsingError
-	}
-
-	up, err := strconv.ParseFloat(row[2], 64)
-	if err != nil {
-		return -1, -1, ParsingError
-	}
-
-	return up, down, nil
-}
-
-func getUpDownValuesBool(row []string) (bool, bool, error) {
-	if len(row) != 3 {
-		return false, false, ParsingError
-	}
-
-	trueregex, _ := regexp.Compile("(an|wahr|on|active|true)")
-
-	down := trueregex.Match([]byte(strings.ToLower(row[1])))
-	up := trueregex.Match([]byte(strings.ToLower(row[2])))
-
-	return up, down, nil
 }
 
 func toTableMatrix(cleanLines []string) [][]string {

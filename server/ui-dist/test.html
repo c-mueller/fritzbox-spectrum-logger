@@ -1,0 +1,325 @@
+<script>if (typeof jxl === 'undefined') {\nlocation.href = \"/\";\n}\n</script>\n\n
+<link rel=\"stylesheet\" type=\"text/css\" href=\"/css/default/chartist.css\">\n
+<link rel=\"stylesheet\" type=\"text/css\" href=\"/css/default/chartistplugins.css\">\n
+<style type=\"text/css\">\n.blue {
+    \nbackground-color: #0000ff;
+    \n
+}
+
+\n.lightblue {
+    \nbackground-color: #e1f4ff;
+    \n
+}
+
+\n.orange {
+    \nbackground-color: #ff9b00;
+    \n
+}
+
+\n.darkorange {
+    \nbackground-color: #c8781d;
+    \n
+}
+
+\n.red {
+    \nbackground-color: #ff0000;
+    \n
+}
+
+\n.white {
+    \nbackground-color: #ffffff;
+    \n
+}
+
+\n.yellow {
+    \nbackground-color: #ffff00;
+    \n
+}
+
+\n.green {
+    \nbackground-color: #00ff00;
+    \n
+}
+
+\n.pilot {
+    \nheight: 5.6875rem;
+    \nbackground-color: #ff0000;
+    \n
+}
+
+\n /* JZ-24020 */ \n.legend {
+    \ndisplay: flex;
+    \nflex-wrap: wrap;
+    \ncolumn-gap: 0.5rem;
+    \n-moz-column-gap: 0.5rem;
+    \n-webkit-column-gap: 4.5rem;
+    \ncolumns: 2 16rem;
+    \n-moz-columns: 2 16rem;
+    \n-webkit-columns: 2 16rem;
+    \nmax-width: 70%;
+    \n
+}
+
+\n.legend .item {
+    \nflex: 1 1 17rem;
+    \nborder: 1px solid transparent;
+    \nmargin: auto;
+    \n
+}
+
+\n.legend .item div {
+    \ndisplay: inline-block;
+    \nborder: 1px solid #000000;
+    \nwidth: 1.5rem;
+    \nheight: 0.8rem;
+    \noverflow: hidden;
+    \n
+}
+
+\n.ct-chart .ct-label.ct-horizontal, \n.ct-chart .ct-label.ct-horizontal.ct-end {
+    \ntext-align: center;
+    \n-webkit-justify-content: center;
+    \n-ms-justify-content: center;
+    \njustify-content: center;
+    \n
+}
+
+\n.ct-chart.ct-golden-section:before {
+    \npadding-bottom: 0;
+    \nheight: 12rem;
+    \n
+}
+
+\n.ct-bits.ct-chart.ct-golden-section:before {
+    \npadding-bottom: 0;
+    \nheight: 13rem;
+    \n
+}
+
+\n
+
+@media (max-width: 25em) {
+    \n.ct-chart.ct-golden-section:before {
+        \nheight: 9rem;
+        \n
+    }
+
+    \n.ct-bits.ct-chart.ct-golden-section:before {
+        \nheight: 10rem;
+        \n
+    }
+
+    \n
+}
+
+\n.ct-chart .ct-line {
+    \nstroke-width: 1px;
+    \n
+}
+
+\n.ct-snr.ct-chart .ct-series.ct-series-a .ct-area {
+    \nfill: rgb(255, 235, 24);
+    \nfill-opacity: 1;
+    \n
+}
+
+\n.ct-snr.ct-chart .ct-series.ct-series-a .ct-line {
+    \nstroke: rgb(255, 235, 24);
+    \n
+}
+
+\n.ct-snr.ct-chart .ct-series.ct-series-b .ct-area {
+    \nfill: none;
+    \n
+}
+
+\n.ct-snr.ct-chart .ct-series.ct-series-b .ct-line {
+    \nstroke: rgb(255, 155, 0);
+    \n
+}
+
+\n.ct-snr.ct-chart .ct-series.ct-series-c .ct-area {
+    \nfill: none;
+    \n
+}
+
+\n.ct-snr.ct-chart .ct-series.ct-series-c .ct-line {
+    \nstroke: rgb(200, 120, 29);
+    \n
+}
+
+\n.ct-bits.us.ct-chart .ct-series.ct-series-d .ct-line {
+    \nstroke: rgb(39, 201, 35);
+    \n
+}
+
+\n.ct-bits.us.ct-chart .ct-series.ct-series-d .ct-area {
+    \nfill: rgb(39, 201, 35);
+    \nfill-opacity: 1;
+    \n
+}
+
+\n.ct-bits.ct-chart .ct-series.ct-series-c .ct-line {
+    \nstroke: #1144b4;
+    \n
+}
+
+\n.ct-bits.ct-chart .ct-series.ct-series-c .ct-area {
+    \nfill: #1144b4;
+    \nfill-opacity: 1;
+    \n
+}
+
+\n.ct-bits.ct-chart .ct-series.ct-series-e .ct-line {
+    \nstroke: none;
+    \n
+}
+
+\n.ct-bits.ct-chart .ct-series.ct-series-e .ct-area {
+    \nfill: none;
+    \nfill-opacity: 0;
+    \n
+}
+
+\n.ct-bits.ct-chart .ct-series.ct-series-a .ct-area {
+    \nfill: none;
+    \n
+}
+
+\n.ct-bits.ct-chart .ct-series.ct-series-a .ct-line {
+    \nstroke: rgb(255, 155, 0);
+    \n
+}
+
+\n.ct-bits.ct-chart .ct-series.ct-series-b .ct-area {
+    \nfill: none;
+    \n
+}
+
+\n.ct-bits.ct-chart .ct-series.ct-series-b .ct-line {
+    \nstroke: rgb(200, 120, 29);
+    \n
+}
+
+\n.ct-chart .ct-rules .ct-bar {
+    \nstroke: #ffffff;
+    \nstroke-width: 0.5%;
+    \n
+}
+
+\n.ct-chart line.ct-bar:first-child {
+    \nstroke: #ff0000;
+    \n
+}
+
+\n.ct-chart .ct-grid.ct-vertical {
+    \nstroke: rgb(116, 135, 153);
+    \nstroke-dasharray: none;
+    \n
+}
+
+\n.ct-chart .ct-grids {
+    \nbackground-color: rgb(100, 122, 143);
+    \n
+}
+
+\n.ct-chart .ct-label.ct-horizontal, \n.ct-chart .ct-label.ct-vertical, \n.ct-chart .ct-label.ct-horizontal.ct-end, \n.ct-chart .ct-label.ct-vertical.ct-start {
+    \ncolor: #000000;
+    \nfill: #000000;
+    \nline-height: 1;
+    \nword-break: normal;
+    \n
+}
+
+\n.ct-chart .ct-end.ct-horizontal.ct-label {
+    \ntext-anchor: middle;
+    \n
+}
+
+\n#uiToggleMinMax {
+    \nmargin-top: 1rem;
+    \n
+}
+
+\n</style>\n
+<script type=\"text/javascript\" src=\"/js/chartist.js\"></script>\n
+<script type=\"text/javascript\" src=\"/js/chartistplugins.js\"></script>\n
+<script type=\"text/javascript\">
+    \nvar g_spectrum = {\"ports\":1,\"port\":[{\"us\":{\"TONES_PER_SNR_VALUE\":8,\"MAX_SNR_FREQ\":17664000,\"MAX_BAT_FREQ\":17664000,\"BIT_BANDCONFIG\":[{\"FIRST\":3,\"LAST\":7},{\"FIRST\":108,\"LAST\":150},{\"FIRST\":246,\"LAST\":347}],\"DETECTED_RFI_VALUES\":[],\"MIN_BIT_VALUES\":[0,0,0,0,4,5,5,0,0,4,5,5,5,4,5,4,4,4,4,4,4,3,3,3,3,3,3,2,2,2,2,2,1,2,2,2,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,7,7,5,6,7,7,5,6,6,7,6,6,7,7,6,6,7,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,0,0,6,6,6,6,6,6,7,6,7,7,6,6,6,6,6,6,6,6,6,5,6,6,6,5,5,6,6,5,6,6,5,5,5,6,5,5,5,5,5,5,5,0,0,5,6,6,5,5,6,6,5,5,6,5,5,5,5,5,5,5,6,5,4,5,5,5,5,5,5,5,5,5,6,5,6,5,5,5,5,6,6,5,5,5,6,5,5,5,6,5,4,5,6,5,5,5,5,5,5,5,5,5,4,4,4,5,4,5,4,5,5,4,5,5,4,5,4,4,5,4,5,5,5,5,4,5,5,5,5,5,4,5,4,5,4,5,0,0,1,2,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,4,4,3,4,4,3,3,4,4,4,3,3,3,4,3,3,4,3,3,3,3,3,2,3,3,3,2,2,3,3,2,3,2,3,2,2,2,3,2,2,3,2,2,2,2,2,2,2,2,2,2,2,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0,0],\"MAX_SNR_TONE\":4096,\"ACT_BIT_VALUES\":[0,0,0,0,4,6,5,0,0,4,5,5,5,4,5,4,4,4,4,4,4,3,3,3,3,3,3,2,2,2,2,2,1,2,2,2,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,7,7,5,6,7,7,5,6,6,7,6,6,7,7,6,6,7,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,0,0,6,6,6,6,7,7,7,7,7,7,7,6,6,6,6,6,6,6,6,6,6,6,6,5,6,6,6,5,6,6,6,5,6,6,6,5,5,5,5,5,5,0,0,5,6,6,5,5,6,6,5,5,6,5,5,5,5,5,5,5,6,5,5,5,5,5,5,5,5,5,5,5,6,5,6,5,5,5,5,6,6,5,5,5,6,5,5,5,6,5,4,5,6,5,5,5,5,5,5,5,5,5,4,4,4,5,4,5,4,5,5,4,5,5,4,5,4,4,5,4,5,5,5,5,4,5,5,5,5,5,4,5,4,5,4,5,0,0,2,2,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,4,4,3,4,4,3,3,4,4,4,3,3,3,4,3,3,4,3,3,3,3,3,2,3,3,3,2,2,3,3,2,3,2,3,2,2,2,3,2,2,3,2,2,2,2,2,2,2,2,2,2,2,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0,0],\"MAX_SNR_VALUES\":[0,0,0,0,0,0,0,0,0,92,102,100,102,98,98,98,96,98,94,96,92,94,90,92,92,86,90,84,88,82,86,84,80,82,82,84,80,80,78,80,76,78,78,78,76,74,76,74,74,74,70,72,68,70,70,66,70,68,68,68,64,66,64,64,102,118,118,110,112,118,116,108,112,118,116,110,114,118,118,114,116,118,118,114,116,118,118,114,114,116,116,110,112,116,114,110,112,116,114,110,114,116,114,112,110,110,108,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,106,108,108,106,106,108,108,104,104,108,108,104,102,108,106,102,104,108,108,104,106,110,108,106,108,110,108,108,108,108,108,106,106,108,108,106,106,108,106,104,104,106,106,102,104,106,106,100,104,106,106,104,104,106,106,104,104,106,106,104,104,106,106,104,104,106,104,102,104,106,104,102,104,106,104,102,104,106,104,102,102,104,104,102,102,104,104,100,100,104,102,98,104,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,94,94,94,94,94,94,94,94,94,94,94,92,94,94,94,92,94,94,94,92,92,94,94,92,92,94,94,92,92,94,92,90,92,94,92,90,90,92,92,90,90,92,92,90,90,92,92,90,90,92,92,90,90,92,90,90,90,90,90,90,90,90,90,88,90,90,90,88,90,90,90,90,90,92,90,90,90,90,90,88,90,90,90,88,90,90,90,88,88,90,88,86,88,90,88,86,88,90,88,86,88,90,88,88,88,88,88,86,86,88,88,86,86,88,88,84,86,88,86,84,86,86,86,84,86,86,86,84,86,86,86,86,86,86,86,86,86,86,86,84,86,86,86,84,84,86,86,84,84,86,86,84,84,86,86,84,86,86,86,86,70,70],\"MAX_BAT_TONE\":4096,\"MAX_BIT_VALUES\":[0,0,0,0,4,6,6,0,0,4,5,5,5,4,5,4,4,4,4,4,4,3,3,3,3,3,3,2,2,2,2,2,1,2,2,2,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,7,7,5,6,7,7,5,6,6,7,6,6,7,7,6,6,7,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,0,0,6,6,6,6,7,7,7,7,7,7,7,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,5,6,6,6,5,6,6,5,5,5,0,0,5,6,6,5,5,6,6,5,5,6,5,5,5,5,5,5,5,6,5,5,5,5,5,5,5,5,5,5,5,6,5,6,5,5,5,5,6,6,5,5,5,6,5,5,5,6,5,4,5,6,5,5,5,5,5,5,5,5,5,4,4,4,5,4,5,4,5,5,4,5,5,4,5,4,4,5,4,5,5,5,5,4,5,5,5,5,5,4,5,4,5,4,5,0,0,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,4,4,3,4,4,3,3,4,4,4,3,3,3,4,3,3,4,3,3,3,3,3,2,3,3,3,2,2,3,3,2,3,2,3,2,2,2,3,2,2,3,2,2,2,2,2,2,2,2,2,2,2,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0,0],\"PILOT\":73,\"MODE\":\"VDSL2\",\"MIN_SNR_VALUES\":[0,0,0,0,0,0,0,0,0,92,100,100,100,98,98,96,96,94,94,92,92,90,90,88,88,86,86,84,84,82,82,80,80,82,82,82,80,80,78,78,76,76,76,74,74,74,72,72,72,70,70,70,68,68,66,66,66,64,64,64,64,62,62,62,100,116,114,108,110,116,114,106,110,116,114,106,112,116,116,112,114,116,116,112,114,116,114,112,110,114,112,106,110,114,112,106,110,114,112,108,110,112,110,108,108,108,104,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,98,98,98,92,94,94,88,90,94,92,94,96,100,100,100,98,100,102,82,82,90,78,90,76,96,88,80,88,104,106,104,104,100,102,104,102,100,104,104,100,102,102,102,100,100,102,100,96,100,100,100,90,98,102,102,98,92,70,90,72,80,74,90,98,102,104,102,100,100,102,102,98,100,102,102,100,100,102,100,100,100,102,100,96,100,102,102,98,98,100,100,96,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,90,92,92,90,90,92,92,90,90,92,92,90,92,92,90,88,92,92,92,90,90,92,92,90,90,92,90,88,90,90,90,88,90,90,90,88,88,90,88,86,88,90,90,80,88,78,64,86,88,90,90,86,88,88,88,86,86,86,88,86,86,88,88,86,86,88,88,84,86,88,88,86,88,88,88,86,88,88,88,86,88,88,86,86,86,88,88,74,70,86,84,78,62,82,64,64,80,80,82,78,78,86,86,84,86,86,86,84,84,86,86,84,84,82,72,82,82,84,74,80,76,74,84,82,68,76,84,82,84,84,84,72,80,76,84,82,82,80,82,80,82,84,74,82,78,84,84,78,80,84,84,80,82,74,84,78,78,76,80,76,64,68],\"TONES_PER_BAT_VALUE\":8,\"BRIDGE_TAPS\":{\"STATS\":{\"TOTAL_BTS\":0,\"AGGR_LOSS_DS\":0,\"AGGR_LOSS_US\":0},\"DETAIL\":[]},\"ACT_SNR_VALUES\":[0,0,0,0,0,0,0,0,0,92,100,100,100,98,98,96,96,94,94,92,92,90,90,88,88,86,86,84,84,82,82,80,80,82,82,82,80,80,78,78,76,76,76,74,74,74,72,72,72,70,70,70,68,68,66,66,66,64,64,64,64,62,62,62,102,118,116,108,110,118,116,106,112,118,116,108,114,118,116,112,114,118,116,114,114,116,116,112,112,116,114,108,110,116,114,108,112,114,114,110,112,114,114,110,110,108,106,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,104,106,108,104,104,108,106,102,104,108,108,102,102,108,106,100,104,108,108,102,106,106,106,104,108,108,106,102,106,108,108,106,106,106,106,104,104,106,106,104,104,106,106,100,102,106,104,98,102,106,104,102,104,104,104,102,102,90,102,102,104,104,104,102,102,104,104,102,102,104,104,100,102,104,104,102,102,104,102,100,102,104,104,100,102,104,102,100,100,102,102,96,102,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,94,94,94,92,92,94,94,92,92,94,94,92,92,94,94,92,92,92,94,92,92,94,92,92,92,94,92,90,92,92,92,90,90,92,92,90,90,92,92,88,90,90,90,88,90,90,90,90,90,90,90,88,90,90,90,88,88,90,90,88,88,90,90,88,88,90,90,88,88,90,90,88,90,90,90,88,88,90,90,88,88,90,88,88,88,90,88,86,86,88,88,86,88,88,88,86,86,88,88,86,86,88,88,86,86,88,88,86,86,88,88,86,84,86,86,84,84,86,86,82,84,86,86,84,84,86,84,84,84,86,84,84,84,84,84,84,84,84,84,84,84,84,84,84,82,84,84,84,82,84,84,82,84,84,84,82,84,86,86,84,70,68]}}]};\nvar g_show_MinMax= false ;\nfunction yAxisFormatterSnr(val, axis) {\nif (val % 10 == 0) {\nreturn val;\n}\nelse {\nreturn \"\";\n}\n}\nvar g_Snr = {};\nfunction renderSNR(container, spectrum)\n{\nif (!spectrum) {\nreturn;\n}\nvar snrValues = [];\nvar snrMinValues = [];\nvar snrMaxValues = [];\nfor (var j = 0; j < spectrum.ACT_SNR_VALUES.length; j++) {\nsnrValues.push(spectrum.ACT_SNR_VALUES[j] / 2);\nsnrMinValues.push(spectrum.MIN_SNR_VALUES[j] / 2);\nsnrMaxValues.push(spectrum.MAX_SNR_VALUES[j] / 2);\n}\nvar data = {\nlabels: [],\nseries: [snrValues]\n};\nif (g_show_MinMax)\n{\ndata.series.push(snrMinValues);\ndata.series.push(snrMaxValues);\n}\nvar scaleCount = 16;\nvar steps = spectrum.ACT_SNR_VALUES.length / scaleCount;\nfor (var i = 0; i <= spectrum.ACT_SNR_VALUES.length; i++) {\nif (i % steps === 0) {\ndata.labels.push(i * spectrum.TONES_PER_SNR_VALUE);\n} else {\ndata.labels.push(null);\n}\n}\nvar dataExists = snrValues.length > 1;\nif (g_Snr[container]) {\ng_Snr[container].update(data, {\naxisY: {\nonlyInteger: dataExists,\nshowLabel: dataExists\n},\naxisX: {\nshowLabel: dataExists }\n}, true);\n} else {\nvar options = {\nlow: 0,\nshowPoint: false,\nshowLine: true,\nshowArea: true,\nlineSmooth: false,\nfullWidth: true,\naxisY: {\nlabelOffset: {\ny: 6\n},\noffset: 25,\nscaleMinSpace: 30,\nonlyInteger: dataExists,\nshowLabel: dataExists\n},\naxisX: {\noffset: 25,\nshowGrid: false,\nshowLabel: dataExists\n},\nplugins: [ctplugins.ctRect({showBg: true}),\nctplugins.ctScaleExtended({\naxisX: {\ntext: \"Träger\",\nscaleCount: scaleCount,\nlabelPercentOffset: -50\n},\naxisY: {\ntext: \"Signal / Rausch-Verhältnis in dB\"\n}\n})\n],\nchartPadding: {\ntop: 20,\nright: 20,\nbottom: 10,\nleft: 5\n},\n};\nvar responsiveOptions = [\n['(max-width: 600px)', {\naxisX: {\nlabelInterpolationFnc: function(value, index) {\nreturn index % (steps * 3) === 0 ? value : null;\n}\n}\n}],\n['(max-width: 400px)', {\naxisY: {\noffset: 20,\nlabelOffset: {\nx: -2\n},\nscaleMinSpace: 10,\nlabelInterpolationFnc: function(value, index) {\nreturn index % 2 === 0 ? value : null;\n}\n},\naxisX: {\nlabelInterpolationFnc: function(value, index) {\nreturn index % (steps * 4) === 0 ? value : null;\n}\n}\n}]\n];\ng_Snr[container] = new Chartist.Line(jxl.get(container), data, options, responsiveOptions);\n}\n}\nfunction yAxisFormatterBits(val, axis) {\nif (axis % 2 == 0) {\nreturn val;\n}\nelse {\nreturn \"\";\n}\n}\nvar g_Bits = {};\nfunction renderBits(container, spectrum)\n{\njsl.display(container, spectrum);\nif (!spectrum) {\nreturn;\n}\nvar rev = spectrum.BIT_BANDCONFIG || spectrum.BIT_US_BANDCONFIG;\nvar n = rev.length;\nvar data = {\nlabels: [],\nseries: [ [], [], [], []]\n};\nif (g_show_MinMax) {\ndata.series[0] = spectrum.MIN_BIT_VALUES;\ndata.series[1] = spectrum.MAX_BIT_VALUES;\n}\nvar dataLength = spectrum.ACT_BIT_VALUES.length;\nvar emptyData = [];\nfor (var k = 0; k < dataLength; k++ ) {\nemptyData.push(0);\n}\nvar revLast = (rev[0] || {}).LAST || 0;\ndata.series[3] = data.series[3].concat(emptyData.slice(0, rev[0].FIRST));\ndata.series[2] = data.series[2].concat(spectrum.ACT_BIT_VALUES.slice(0, revLast));\ndata.series[3] = data.series[3].concat(spectrum.ACT_BIT_VALUES.slice(rev[0].FIRST, revLast));\nfor (var j = 1; j < n; j++ )\n{\ndata.series[2] = data.series[2].concat(spectrum.ACT_BIT_VALUES.slice(revLast, rev[j].FIRST));\ndata.series[2] = data.series[2].concat(emptyData.slice(rev[j].FIRST, rev[j].LAST));\ndata.series[3] = data.series[3].concat(emptyData.slice(revLast, rev[j].FIRST));\ndata.series[3] = data.series[3].concat(spectrum.ACT_BIT_VALUES.slice(rev[j].FIRST, rev[j].LAST));\nrevLast = rev[j].LAST;\n}\ndata.series[3] = data.series[3].concat(emptyData.slice(revLast, dataLength));\ndata.series[2] = data.series[2].concat(spectrum.ACT_BIT_VALUES.slice(revLast, dataLength));\nvar scaleCount = 16;\nvar steps = dataLength / scaleCount;\nvar stepsScnd = spectrum.MAX_BAT_FREQ / scaleCount / 1000;\nvar dataMax = 0;\nfor (var i = 0; i <= dataLength; i++) {\nfor (var j = 0; j < data.series.length; j++) {\nif (data.series[j][i] >= dataMax) {\ndataMax = data.series[j][i];\n}\n}\nif (i % steps === 0) {\n//--var label = i * g_spectrum.port[0].TONES_PER_SNR_VALUE;\nvar label = i * spectrum.TONES_PER_SNR_VALUE;\nif (i % (2 * steps) === 0) {\nlabel = label + \"<br>\" + (i * stepsScnd / steps).toFixed(1);\n}\ndata.labels.push(label);\n} else {\ndata.labels.push(null);\n}\n}\ndata.series[4] = [dataMax + 1];\nvar dataExists = dataLength > 1;\nif (g_Bits[container]) {\ng_Bits[container].update(data, {axisY: {onlyInteger: dataExists, showLabel: dataExists },axisX: { showLabel: dataExists }}, true);\n} else {\nvar options = {\nlow: 0,\naxisY: {\nlabelOffset: {\ny: 7\n},\noffset: 15,\nscaleMinSpace: 10,\nonlyInteger: dataExists,\nshowLabel: dataExists,\nlabelInterpolationFnc: yAxisFormatterBits\n},\naxisX: {\noffset: 35,\nshowGrid: false,\nshowLabel: dataExists\n},\nchartPadding: {\ntop: 20,\nright: 20,\nbottom: 10,\nleft: 5\n},\nshowPoint: false,\nshowLine: true,\nshowArea: true,\nlineSmooth: false,\nfullWidth: true,\nplugins: [\nctplugins.ctSorter({order:[\"ct-series-c\", \"ct-series-d\", \"ct-series-e\", \"ct-series-f\", \"ct-series-g\", \"ct-series-h\", \"ct-series-i\", \"ct-series-a\", \"ct-series-b\"]}),\nctplugins.ctVerticalRule({series: [spectrum.PILOT].concat(spectrum.DETECTED_RFI_VALUES), index:2}),\nctplugins.ctRect({showBg: true}),\nctplugins.ctScaleExtended({\naxisX: {\ntext: \"Träger / Frequenz in kHz\",\nscaleCount: scaleCount,\nlabelPercentOffset: -50\n},\naxisY: {\ntext: \"Bits\"\n}\n})\n]\n};\nvar responsiveOptions = [\n['(max-width: 700px)', {\naxisX: {\nlabelInterpolationFnc: function(value, index) {\nreturn index % (steps * 2) === 0 ? value : null;\n}\n}\n}],\n['(max-width: 400px)', {\naxisY: {\noffset: 20,\nscaleMinSpace: 5,\nlabelOffset: {\nx: -2\n}\n},\naxisX: {\nlabelInterpolationFnc: function(value, index) {\nreturn index % (steps * 4) === 0 ? value : null;\n}\n}\n}]\n];\ng_Bits[container] = new Chartist.Line(jxl.get(container), data, options, responsiveOptions);\n}\n}\nfunction updateGraph()\n{\nfor (var k=0; k < g_spectrum.ports; k++) {\nvar port = String(k + 1);\nvar spectrum = g_spectrum.port[k];\nrenderSNR(\"uiSnrBox\"+port, spectrum.us);\nrenderBits(\"uiBitsBoxUs\"+port, spectrum.us);\nrenderBits(\"uiBitsBoxDs\"+port, spectrum.ds);\n}\n}\nfunction OnMinMax() {\ng_show_MinMax = !g_show_MinMax;\nif (g_show_MinMax) {\njxl.setHtml(\"uiToggleMinMax\", \"Minimum und Maximum ausblenden\");\njxl.overwriteClass(\"uiMinMaxReset\", \"textlink\")\n} else {\njxl.setHtml(\"uiToggleMinMax\", \"Minimum und Maximum anzeigen\");\njxl.overwriteClass(\"uiMinMaxReset\", \"hide\")\n}\nstartAjax(true);\n}\nvar gResetMinMax = false;\nfunction ResetMinMax() {\nif(!gResetMinMax){\ngResetMinMax = true;\n}\nstartAjax();\n}\nvar gTimer = {};\nvar gXhr = {};\nfunction startAjax()\n{\nvar url = encodeURI( \"/internet/dsl_spectrum.lua\" );\nurl = addUrlParam( url, \"sid\", \"dd4f76f33ee50415\" );\nurl = addUrlParam( url, \"no_sidrenew\", 1 );\nurl = addUrlParam( url, \"myXhr\", 1 );\nif(gResetMinMax){\nurl = addUrlParam( url, \"m_m_Reset\", 1);\n}\nsendUpdateRequest();\nfunction sendUpdateRequest() {\nclearTimeout(gTimer);\nstopXhr(gXhr);\ngXhr = ajaxGet( url, cbUpdateValues );\n}\nvar jsonParse = makeJSONParser();\nfunction cbUpdateValues(xhr) {\nvar txt = xhr.responseText || \"null\";\nif (xhr.status != 200) {\ntxt = \"null\";\n}\nvar newData = jsonParse(txt);\nif (newData) {\ng_spectrum = newData;\nupdateGraph();\n}\nif(newData.isResetd){\ngResetMinMax = false;\nstartAjax();\n}else{\ngTimer = jxl.setTimeout(sendUpdateRequest, 3000);\n}\n}\n}\nfunction transitionListener(event) {\nif (event.target.id == \"contentBox\") {\nupdateGraph();\n}\n}\nfunction init() {\nvar k;\nfor (k = g_spectrum.ports; k > 0; k = k - 1) {\nvar snr = jsl.get(\"uiSnr\");\nvar bits = jsl.get(\"uiBits\");\nvar port = String(k);\nvar spectrum = g_spectrum.port[k - 1];\nbits.insertBefore(html2.div({id: \"uiBitsBoxDs\" + port, class: \"ct-bits ct-chart ct-golden-section\", style:\"display:none\"}), bits.firstChild);\nbits.insertBefore(html2.div({id: \"uiBitsBoxUs\" + port, class: \"ct-bits us ct-chart ct-golden-section\"}), bits.firstChild);\nsnr.insertBefore(html2.div({id: \"uiSnrBox\" + port, class: \"ct-snr ct-chart ct-golden-section\"}), snr.firstChild);\n}\nupdateGraph();\nstartAjax();\nvar contentBox = jxl.get(\"contentBox\");\nif (typeof contentBox == \"object\") {\njxl.addEventHandler(contentBox, \"transitionend\", transitionListener);\n}\n}\nready.onReady(init);\n
+</script>\n\n\n
+<form id=\"main_form\" method=\"POST\" action=\"/internet/dsl_spectrum.lua?sid=dd4f76f33ee50415\">\n
+    <div>\n
+        <div id=\"uiSnr\">\n
+            <div class=\"legend formular\
+            ">\n
+            <div class=\"item\">\n
+                <div class=\"yellow\"></div>
+                \nEmpfangsrichtung\n(Downstream)\n
+            </div>
+            \n
+            <div class=\"item\">\n
+                <div class=\"orange\"></div>
+                \nMinimum\n
+            </div>
+            \n
+            <div class=\"item\">\n
+                <div class=\"darkorange\"></div>
+                \nMaximum\n
+            </div>
+            \n
+        </div>
+        \n
+    </div>
+    \n<br>\n
+    <div id=\"uiBits\">\n
+        <div class=\"legend formular\
+        ">\n
+        <div class=\"item\">\n
+            <div class=\"green\"></div>
+            \nSenderichtung\n(Upstream)\n
+        </div>
+        \n
+        <div class=\"item\">\n
+            <div class=\"blue\"></div>
+            \nEmpfangsrichtung\n(Downstream)\n
+        </div>
+        \n
+        <div class=\"item\">\n
+            <div class=\"white\"></div>
+            \nKompensierter Leitungsstörer\n
+        </div>
+        \n
+        <div class=\"item\">\n
+            <div class=\"red\"></div>
+            \nPilottöne\n
+        </div>
+        \n
+        <div class=\"item\">\n
+            <div class=\"orange\"></div>
+            \nMinimum\n
+        </div>
+        \n
+        <div class=\"item\">\n
+            <div class=\"darkorange\"></div>
+            \nMaximum\n
+        </div>
+        \n
+    </div>
+    \n</div>\n<!-- Legende xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx--> \n
+    <div class=\"formular\">\n<a href=\"javascript:OnMinMax()\" class=\"textlink nocancel\"
+        id=\"uiToggleMinMax\">Minimum und Maximum anzeigen</a><br>\n<a href=\"javascript:ResetMinMax()\" class=\"hide\"
+                                                                       id=\"uiMinMaxReset\">Minimum und Maximum
+            zurücksetzen</a>\n
+    </div>
+    \n</div>\n
+    <div id=\"btn_form_foot\">\n
+        <button type=\"submit\" name=\"cancel\">Aktualisieren</button>
+        \n
+    </div>
+    \n
+</form>\n<input id=\"oldPageXhrSid\" type=\"hidden\" value=\"dd4f76f33ee50415\"><input id=\"fdhidedata\" type=\"hidden\"
+                                                                                       value=\"{&quot;ssoEmail&quot;:true,&quot;mobile&quot;:true,&quot;liveTv&quot;:true,&quot;provServ&quot;:true,&quot;ssoSet&quot;:true,&quot;shareUsb&quot;:true}\">
+<input id=\"oldpageactive\" type=\"hidden\" value=\"/internet/dsl_spectrum.lua\"><input id=\"oldPageTitle\"
+                                                                                        type=\"hidden\" value=\"\">
+<input id=\"gHelpPage\" type=\"hidden\" value=\"hilfe_dslinfo_Spektrum.html\">
+<div id=\"domReady\" style=\"display:none\"></div>\n\n\n" source="spectrum.go:47

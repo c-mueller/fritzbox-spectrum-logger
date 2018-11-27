@@ -9,12 +9,11 @@ var requestCounter = prometheus.NewCounterVec(prometheus.CounterOpts{
 	Help:      "Number of requests processed in since application launch",
 }, []string{"path"})
 
-var processingTimeHistogram = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+var processingTimeHistogram = prometheus.NewSummaryVec(prometheus.SummaryOpts{
 	Namespace: "",
 	Subsystem: "fsl",
-	Name:      "request_processing_time",
-	Help:      "Processing time Histogram",
-	Buckets:   []float64{1, 2, 5, 10, 20, 50, 100, 250, 500, 1000, 2500,},
+	Name:      "request_processing_time_summary",
+	Help:      "Processing time summary",
 }, []string{"path"})
 
 func init() {

@@ -19,17 +19,21 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
+func init()  {
+	cliCommand = kingpin.Parse()
+	initializeLogger()
+}
+
 var (
 	verbose = kingpin.Flag("verbose",
 		"Run command with verbose output").Short('v').Default("false").Bool()
 	debug = kingpin.Flag("debug",
 		"Run command in debug mode (includes verbose mode)").Short('d').Default("false").Bool()
+
+	cliCommand string
 )
 
 func main() {
-	cliCommand := kingpin.Parse()
-	initializeLogger()
-
 	switch cliCommand {
 	case "server config":
 		launchServerWithConfig()

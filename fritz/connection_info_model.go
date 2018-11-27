@@ -19,25 +19,26 @@ type ConnectionInformation struct {
 	Downstream ConnectionTransmissionDirection `json:"downstream"`
 	Upstream   ConnectionTransmissionDirection `json:"upstream"`
 	Profile    string                          `json:"profile"`
+	LineLength int                             `json:"line_length"`
 }
 
 type ConnectionTransmissionDirection struct {
-	MinimumDataRate        int  `json:"minimum_data_rate"`
-	MaximumDataRate        int  `json:"maximum_data_rate"`
-	Capacity               int  `json:"capacity"`
-	CurrentDataRate        int  `json:"current_data_rate"`
-	SeamlessRateAdjustment bool `json:"seamless_rate_adjustment"`
+	MinimumDataRate        int  `json:"minimum_data_rate" fbname:"DSLAM-Datenrate Min."`
+	MaximumDataRate        int  `json:"maximum_data_rate" fbname:"DSLAM-Datenrate Max."`
+	Capacity               int  `json:"capacity" fbname:"Leitungskapazität"`
+	CurrentDataRate        int  `json:"current_data_rate" fbname:"Aktuelle Datenrate"`
+	SeamlessRateAdjustment bool `json:"seamless_rate_adjustment" fbname:"Nahtlose Ratenadaption"`
 
-	Latency  int     `json:"latency"`
-	INPValue float64 `json:"inp_value"`
-	GINP     bool    `json:"ginp"`
+	Latency  int     `json:"latency" fbname:"Latenz"`
+	INPValue float64 `json:"inp_value" fbname:"Impulsstörungsschutz (INP)"`
+	GINP     bool    `json:"ginp" fbname:"G.INP"`
 
-	SNMargin        float64 `json:"sn_margin"`
-	Bitswap         bool    `json:"bitswap"`
-	LineAttenuation float64 `json:"line_attenuation"`
+	SNMargin        float64 `json:"sn_margin" fbname:"Störabstandsmarge"`
+	Bitswap         bool    `json:"bitswap" fbname:"Trägertausch (Bitswap)"`
+	LineAttenuation float64 `json:"line_attenuation" fbname:"Leitungsdämpfung"`
 
-	VectorMode string `json:"vector_mode"`
-	Carrier    string `json:"carrier"`
+	VectorMode string `json:"vector_mode" fbname:"G.Vector"`
+	Carrier    string `json:"carrier" fbname:"Trägersatz"`
 
 	Errors Errors `json:"errors"`
 }

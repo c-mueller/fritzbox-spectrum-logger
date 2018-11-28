@@ -35,6 +35,7 @@ max_download_fails: 480                 # The count of failed downloads needed t
 ## Tested Devices
 
 - Fritz!Box 7390 (Firmware Version 6.83)
+- Fritz!Box 7590 (Firmware Version 7.01)
 
 Other devices like the Fritz!Box 7490 should also work, but they have not been tested!
 If you can confirm the functionality of this application on another Fritz!Box, please modify this document and submit a Pull Request.

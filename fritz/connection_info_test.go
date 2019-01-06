@@ -47,8 +47,8 @@ func TestParser_WithErrs(t *testing.T) {
 	conInfo, err := ParseConnectionInformation(string(data))
 	assert.NoError(t, err)
 
-	assert.Equal(t, 24984, conInfo.Downstream.CurrentDataRate)
-	assert.Equal(t, 15846, conInfo.Upstream.Capacity)
+	assert.Equal(t, 21112, conInfo.Downstream.CurrentDataRate)
+	assert.Equal(t, 15954, conInfo.Upstream.Capacity)
 
 }
 

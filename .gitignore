@@ -58,3 +58,4 @@ vendor/
 config.yml
 fritzbox-spectrum-logger
 *.db
+.idea/

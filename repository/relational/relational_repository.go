@@ -21,7 +21,9 @@ import (
 	"github.com/c-mueller/fritzbox-spectrum-logger/fritz"
 	"github.com/c-mueller/fritzbox-spectrum-logger/repository"
 	"github.com/c-mueller/fritzbox-spectrum-logger/repository/compress"
+	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mssql"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
@@ -45,22 +47,55 @@ type spectrumDSO struct {
 	SpectrumDataID uint
 }
 
+type supportData struct {
+	gorm.Model
+	SupportData []byte `gorm:"size:8192000"`
+	Timestamp   int    `gorm:"unique_index"`
+}
 
 type RelationalRepository struct {
 	db       *gorm.DB
 	compress bool
 }
 
+func (r *RelationalRepository) Backup() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		context.String(400, "Not Supported")
+	}
+}
+
 func (r *RelationalRepository) StoreSupportData(data []byte, timestamp int) error {
-	panic("implement me")
+	compressed, _ := compress.Compress(data)
+
+	v := supportData{
+		SupportData: compressed,
+		Timestamp:   timestamp,
+	}
+
+	r.db.Save(&v)
+
+	return nil
 }
 
 func (r *RelationalRepository) ListSupportDataEntries() []int {
-	panic("implement me")
+	e := make([]supportData, 0)
+	r.db.Find(&e)
+
+	vals := make([]int, 0)
+	for _, v := range e {
+		vals = append(vals, v.Timestamp)
+	}
+
+	return vals
 }
 
 func (r *RelationalRepository) GetSupportData(timestamp int) ([]byte, error) {
-	panic("implement me")
+	d := supportData{}
+	r.db.Find(&d, supportData{Timestamp: timestamp})
+
+	ucd, _ := compress.Decompress(d.SupportData)
+
+	return ucd, nil
 }
 
 func NewSQLiteRepository(path string, compress bool) (*RelationalRepository, error) {
@@ -78,6 +113,7 @@ func NewRelationalRepository(mode, connectionString string, compress bool) (*Rel
 	log.Debug("Running Migrations (Creating Tables)...")
 	db.AutoMigrate(&spectrumDSO{})
 	db.AutoMigrate(&spectrumData{})
+	db.AutoMigrate(&supportData{})
 	db.Model(&spectrumDSO{}).AddUniqueIndex("idx_timestamp", "timestamp")
 
 	log.Info("Initialized Database")

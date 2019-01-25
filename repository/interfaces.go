@@ -17,6 +17,7 @@ package repository
 
 import (
 	"github.com/c-mueller/fritzbox-spectrum-logger/fritz"
+	"github.com/gin-gonic/gin"
 )
 
 type RepoBuilder interface {
@@ -35,6 +36,8 @@ type Repository interface {
 	StoreSupportData(data []byte, timestamp int) error
 	ListSupportDataEntries() []int
 	GetSupportData(timestamp int) ([]byte, error)
+
+	Backup() gin.HandlerFunc
 
 	Close() error
 }

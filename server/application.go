@@ -181,6 +181,8 @@ func (a *Application) registerHTTPMappings(engine *gin.Engine) {
 	engine.POST("/api/config", a.updateConfig)
 	engine.POST("/api/control/start", a.startCollecting)
 	engine.POST("/api/control/stop", a.stopCollecting)
+
+	engine.GET("/api/db/backup", a.repo.Backup())
 }
 
 func (a *Application) redirectToUi(ctx *gin.Context) {
